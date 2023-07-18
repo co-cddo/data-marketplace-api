@@ -1,0 +1,63 @@
+{
+    "openapi": "3.0.2",
+    "info": {
+        "title": "CDDO DM Catalogue API",
+        "version": "0.1"
+    },
+    "servers": [
+        {
+            "url": "https://marketplace.cddo.gov.uk/v1"
+        }
+    ],
+    "paths": {
+        "/datasets": {
+            "get": {
+                "description": "List all datasets",
+                "parameters": [],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "$ref": "schemas/cddo-dataset-schema.json"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/datasets/{id}": {
+            "get": {
+                "description": "Return a dataset based on its id",
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "id",
+                        "required": true,
+                        "description": "Identifier of the dataset to return",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "schemas/cddo-dataset-schema.json"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
