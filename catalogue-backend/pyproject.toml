@@ -2,7 +2,7 @@
 name = "catalogue-backend"
 version = "0.1.0"
 description = ""
-authors = ["Kiran Joshi <kiran@swirrl.local>"]
+authors = ["Kiran Joshi <kiran.joshi@tpximpact.com>", "Madeline Kosse <madeline.kosse@tpximpact.com>"]
 readme = "README.md"
 packages = [{include = "catalogue_backend"}]
 
