@@ -1,0 +1,7 @@
+catalogue-backend/__pycache__/
+catalogue-backend/localdb/DB2/
+catalogue-backend/localdb/apache-jena-fuseki-*/*
+catalogue-backend/localdb/fuseki
+catalogue-backend/localdb/run/
+catalogue-backend/src/__pycache__/
+

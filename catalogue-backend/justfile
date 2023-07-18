@@ -1,0 +1,8 @@
+run:
+	uvicorn src.main:app --reload
+
+dev-deps:
+  ./localdb/install.sh
+
+start-db:
+  (cd localdb && ./fuseki/fuseki-server --config=fuseki-config.ttl)
