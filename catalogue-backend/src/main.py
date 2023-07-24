@@ -1,5 +1,4 @@
 from fastapi import FastAPI, Body
-import src.db as db
 
 app = FastAPI()
 
