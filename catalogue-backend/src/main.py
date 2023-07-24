@@ -1,4 +1,5 @@
 from fastapi import FastAPI, Body
+from src.model import DataResource, CreateResourceBody, create
 
 app = FastAPI()
 
@@ -8,11 +9,30 @@ async def root():
     return {"greeting": "Hello world"}
 
 
-@app.get("/dataset/list")
-async def datasets_ep():
-    return db.list_datasets()
+@app.get("/catalogue")
+async def list_catalogue_entries() -> list[DataResource]:
+    return []
+
+
+@app.get("/catalogue/{resource_id}")
+async def catalogue_entry_detail() -> DataResource:
+    return None
 
 
 @app.post("/dataset/new")
-async def new_ds(ds_id: str = Body(...), name: str = Body(...)):
-    return db.add_entry(ds_id, name, "description")
+async def new_ds(resource: CreateResourceBody) -> DataResource:
+    return create(resource)
+
+
+# Find API Methods
+# Search and Filter
+# Facet search parameters
+# Organisation
+# Topic
+# …
+# Default find all
+#
+# GET /catalogue?query=?param1=1,2,3?etc
+# _limit, _offset
+# Get Asset Info
+# GET /catalogue/[UUID]
