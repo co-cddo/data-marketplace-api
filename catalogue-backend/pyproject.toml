@@ -1,0 +1,23 @@
+[tool.poetry]
+name = "catalogue-backend"
+version = "0.1.0"
+description = ""
+authors = ["Kiran Joshi <kiran.joshi@tpximpact.com>", "Madeline Kosse <madeline.kosse@tpximpact.com>"]
+readme = "README.md"
+packages = [{include = "catalogue_backend"}]
+
+[tool.poetry.dependencies]
+python = "^3.11"
+fastapi = "^0.100.0"
+uvicorn = {extras = ["standard"], version = "^0.23.1"}
+rdflib = "^6.3.2"
+SPARQLWrapper = "^2.0.0"
+python-dotenv = "^1.0.0"
+
+[tool.poetry.group.dev.dependencies]
+black = "^23.7.0"
+pre-commit = "^3.3.3"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
