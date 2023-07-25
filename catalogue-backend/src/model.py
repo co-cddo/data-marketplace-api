@@ -51,21 +51,20 @@ class Organisation(BaseModel):
     acronym: str
     homepage: AnyUrl
 
-    def from_id(org_id):
-        org = orgs[org_id]
-        return Organisation(
-            title=org["title"],
-            slug=org_id,
-            acronym=org["acronym"],
-            homepage=org["homepage"],
-        )
 
-    @model_validator(mode="after")
-    def check_valid_org(self) -> "Organisation":
-        if dict(self) == organisations.get(self.id):
-            return self
-        else:
-            raise ValueError(f"Invalid organisation {dict(self)}")
+class organisationID(str, Enum):
+    dwp = "department-for-work-pensions"
+    fsa = "food-standards-agency"
+    nhsd = "nhs-digital"
+    os = "ordnance-survey"
+
+
+def lookup_organisation(org_id: organisationID) -> Organisation:
+    try:
+        org_data = organisations[org_id]
+    except:
+        raise ValueError("Organisation does not exist")
+    return Organisation.parse_obj(org_data)
 
 
 class securityClass(str, Enum):
@@ -75,22 +74,33 @@ class securityClass(str, Enum):
     na = "NOT_APPLICABLE"
 
 
-class BaseResource(BaseModel):
+class ContactPoint(BaseModel):
+    contactName: str | None = None
+    email: str = Field(
+        # TODO use some kinda library for this so it generates something sensible
+        pattern=r"([A-Za-z0-9]+[.-_])*[A-Za-z0-9]+@[A-Za-z0-9-]+(\.[A-Z|a-z]{2,})+",
+        json_schema_extra={"description": "Valid email address"},
+        examples=["user@domain.com"],
+    )
+
+
+class BaseResourceSummary(BaseModel):
     title: str
     description: str
     created: datetime
     type: resourceType  # TODO I reckon this should be a uri - dcat:DataService, dcat:DataSet
+    modified: datetime | None = None
+
+
+class BaseResource(BaseResourceSummary):
     alternativeTitle: List[str] | None = []
     issued: datetime | None = None
-    modified: datetime | None = None
     accessRights: rightsStatement | None = None
-    contactPoint: str = Field(
-        pattern=r"([A-Za-z0-9]+[.-_])*[A-Za-z0-9]+@[A-Za-z0-9-]+(\.[A-Z|a-z]{2,})+",
-        json_schema_extra={"description": "Valid email address"},
-    )
+    contactPoint: ContactPoint
     keyword: List[str] | None = []
     relatedResource: List[AnyUrl] | None = []
     summary: str | None = None
+    # TODO - URL, label, and ID for these?
     theme: List[AnyUrl] | None = []
 
     # TODO - dunno if these are right
@@ -104,39 +114,32 @@ class BaseResource(BaseModel):
         use_enum_values = True
 
 
-class DataResource(BaseResource):
+# Common class for resources returned from the server
+class OutputResourceInfo(BaseModel):
     id: uuid.UUID
     publisher: Organisation
+
+
+# A single resource returned from resource detail endpoint
+class DataResource(BaseResource, OutputResourceInfo):
     creator: List[Organisation] | None = []
 
 
+# For the list endpoint, which returns only a summary of each resource
+class DataResourceSummary(BaseResourceSummary, OutputResourceInfo):
+    pass
+
+
 class CreateResourceBody(BaseResource):
-    publisherID: str
-    creatorID: List[str] | None = []
-
-    class Config:
-        use_enum_values = True
-
-    def _validate_id(self, org_id) -> str:
-        if organisations.get(org_id) is not None:
-            return org_id
-        else:
-            raise ValueError(f"No organisation with ID {org_id}")
-
-    @field_validator("publisherID")
-    def publisher_exists(cls, pid) -> str:
-        return self._validate_id(pid)
-
-    @field_validator("creatorID")
-    def all_creators_exist(cls, creator_ids) -> List[str]:
-        return [self._validate_id(c) for c in creator_ids]
+    publisherID: organisationID
+    creatorID: List[organisationID] | None = []
 
 
 def create(resource: CreateResourceBody):
-    publisher = Organisation.from_id(resource.publisherID)
-    creator = [Organisation.from_id(o) for o in resource.creatorID]
     data = dict(resource)
+    data["publisher"] = lookup_organisation(data["publisherID"])
     data.pop("publisherID")
+    creator = [lookup_organisation(o) for o in data["creatorID"]]
     data.pop("creatorID")
     data["id"] = uuid.uuid4()
     return DataResource.parse_obj(data)
