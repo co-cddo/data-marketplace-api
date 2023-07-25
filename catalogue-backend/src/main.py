@@ -51,7 +51,8 @@ async def list_catalogue_entries(
 
 @app.get("/catalogue/{resource_id}")
 async def catalogue_entry_detail(resource_id: UUID) -> DataResource:
-    return None
+    # Obviously, this would return the resource if it existed!
+    raise HTTPException(status_code=404, detail="Item not found")
 
 
 @app.post("/dataset/new")
