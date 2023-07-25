@@ -51,21 +51,20 @@ class Organisation(BaseModel):
     acronym: str
     homepage: AnyUrl
 
-    def from_id(org_id):
-        org = orgs[org_id]
-        return Organisation(
-            title=org["title"],
-            slug=org_id,
-            acronym=org["acronym"],
-            homepage=org["homepage"],
-        )
 
-    @model_validator(mode="after")
-    def check_valid_org(self) -> "Organisation":
-        if dict(self) == organisations.get(self.id):
-            return self
-        else:
-            raise ValueError(f"Invalid organisation {dict(self)}")
+class organisationID(str, Enum):
+    dwp = "department-for-work-pensions"
+    fsa = "food-standards-agency"
+    nhsd = "nhs-digital"
+    os = "ordnance-survey"
+
+
+def lookup_organisation(org_id: organisationID) -> Organisation:
+    try:
+        org_data = organisations[org_id]
+    except:
+        raise ValueError("Organisation does not exist")
+    return Organisation.parse_obj(org_data)
 
 
 class securityClass(str, Enum):
@@ -126,34 +125,16 @@ class DataResourceSummary(BaseResourceSummary, OutputResourceInfo):
     pass
 
 
-def validate_org_id(org_id: str):
-    if organisations.get(org_id) is not None:
-        return org_id
-    else:
-        raise ValueError(f"No organisation with ID {org_id}")
-
-
 class CreateResourceBody(BaseResource):
-    publisherID: str
-    creatorID: List[str] | None = []
-
-    class Config:
-        use_enum_values = True
-
-    @field_validator("publisherID")
-    def publisher_exists(cls, pid) -> str:
-        return validate_org_id(pid)
-
-    @field_validator("creatorID")
-    def all_creators_exist(cls, creator_ids) -> List[str]:
-        return [validate_org_id(c) for c in creator_ids]
+    publisherID: organisationID
+    creatorID: List[organisationID] | None = []
 
 
 def create(resource: CreateResourceBody):
-    publisher = Organisation.from_id(resource.publisherID)
-    creator = [Organisation.from_id(o) for o in resource.creatorID]
     data = dict(resource)
+    data["publisher"] = lookup_organisation(data["publisherID"])
     data.pop("publisherID")
+    creator = [lookup_organisation(o) for o in data["creatorID"]]
     data.pop("creatorID")
     data["id"] = uuid.uuid4()
     return DataResource.parse_obj(data)

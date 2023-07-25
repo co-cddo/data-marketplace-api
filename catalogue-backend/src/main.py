@@ -8,7 +8,7 @@ from src.model import (
     DataResourceSummary,
     create,
     resourceType,
-    validate_org_id,
+    organisationID,
 )
 from pydantic import BaseModel, field_validator
 
@@ -24,30 +24,11 @@ async def root():
 @app.get("/catalogue")
 async def list_catalogue_entries(
     query: str = None,
-    publisherID: Annotated[List[str], Query()] = [],
+    publisherID: Annotated[List[organisationID], Query()] = [],
     resourceType: Annotated[List[resourceType], Query()] = [],
     _limit: int = 100,
     _offset: int = 0,
 ) -> list[DataResourceSummary]:
-    bad_org_ids = []
-    for i in publisherID:
-        try:
-            validate_org_id(i)
-        except ValueError:
-            bad_org_ids.append(i)
-    if bad_org_ids != []:
-        return JSONResponse(
-            status_code=422,
-            content={
-                "detail": [
-                    {
-                        "loc": ["publisherID"],
-                        "msg": f"Organisation ID(s) not found: {bad_org_ids}",
-                        "type": "value_error",
-                    }
-                ]
-            },
-        )
     return []
 
 
