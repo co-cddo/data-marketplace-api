@@ -1,5 +1,15 @@
-from fastapi import FastAPI, Body
-from src.model import DataResource, CreateResourceBody, create
+from uuid import UUID
+from typing import Annotated, List
+from fastapi import FastAPI, Body, Query, HTTPException
+from fastapi.responses import JSONResponse
+from src.model import (
+    DataResource,
+    CreateResourceBody,
+    create,
+    resourceType,
+    validate_org_id,
+)
+from pydantic import BaseModel, field_validator
 
 app = FastAPI()
 
@@ -10,29 +20,40 @@ async def root():
 
 
 @app.get("/catalogue")
-async def list_catalogue_entries() -> list[DataResource]:
+async def list_catalogue_entries(
+    query: str = None,
+    publisherID: Annotated[List[str], Query()] = [],
+    resourceType: Annotated[List[resourceType], Query()] = [],
+    _limit: int = 100,
+    _offset: int = 0,
+) -> list[DataResource]:
+    bad_org_ids = []
+    for i in publisherID:
+        try:
+            validate_org_id(i)
+        except ValueError:
+            bad_org_ids.append(i)
+    if bad_org_ids != []:
+        return JSONResponse(
+            status_code=422,
+            content={
+                "detail": [
+                    {
+                        "loc": ["publisherID"],
+                        "msg": f"Organisation ID(s) not found: {bad_org_ids}",
+                        "type": "value_error",
+                    }
+                ]
+            },
+        )
     return []
 
 
 @app.get("/catalogue/{resource_id}")
-async def catalogue_entry_detail() -> DataResource:
+async def catalogue_entry_detail(resource_id: UUID) -> DataResource:
     return None
 
 
 @app.post("/dataset/new")
 async def new_ds(resource: CreateResourceBody) -> DataResource:
     return create(resource)
-
-
-# Find API Methods
-# Search and Filter
-# Facet search parameters
-# Organisation
-# Topic
-# …
-# Default find all
-#
-# GET /catalogue?query=?param1=1,2,3?etc
-# _limit, _offset
-# Get Asset Info
-# GET /catalogue/[UUID]

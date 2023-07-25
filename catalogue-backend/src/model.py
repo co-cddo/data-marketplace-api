@@ -84,13 +84,16 @@ class BaseResource(BaseModel):
     issued: datetime | None = None
     modified: datetime | None = None
     accessRights: rightsStatement | None = None
+    # TODO: features contactName, email
     contactPoint: str = Field(
+        # TODO use some kinda library for this so it generates something sensible
         pattern=r"([A-Za-z0-9]+[.-_])*[A-Za-z0-9]+@[A-Za-z0-9-]+(\.[A-Z|a-z]{2,})+",
         json_schema_extra={"description": "Valid email address"},
     )
     keyword: List[str] | None = []
     relatedResource: List[AnyUrl] | None = []
     summary: str | None = None
+    # TODO - URL, label, and ID
     theme: List[AnyUrl] | None = []
 
     # TODO - dunno if these are right
@@ -110,6 +113,13 @@ class DataResource(BaseResource):
     creator: List[Organisation] | None = []
 
 
+def validate_org_id(org_id: str):
+    if organisations.get(org_id) is not None:
+        return org_id
+    else:
+        raise ValueError(f"No organisation with ID {org_id}")
+
+
 class CreateResourceBody(BaseResource):
     publisherID: str
     creatorID: List[str] | None = []
@@ -117,19 +127,13 @@ class CreateResourceBody(BaseResource):
     class Config:
         use_enum_values = True
 
-    def _validate_id(self, org_id) -> str:
-        if organisations.get(org_id) is not None:
-            return org_id
-        else:
-            raise ValueError(f"No organisation with ID {org_id}")
-
     @field_validator("publisherID")
     def publisher_exists(cls, pid) -> str:
-        return self._validate_id(pid)
+        return validate_org_id(pid)
 
     @field_validator("creatorID")
     def all_creators_exist(cls, creator_ids) -> List[str]:
-        return [self._validate_id(c) for c in creator_ids]
+        return [validate_org_id(c) for c in creator_ids]
 
 
 def create(resource: CreateResourceBody):
