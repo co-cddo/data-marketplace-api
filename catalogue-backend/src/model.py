@@ -75,14 +75,17 @@ class securityClass(str, Enum):
     na = "NOT_APPLICABLE"
 
 
-class BaseResource(BaseModel):
+class BaseResourceSummary(BaseModel):
     title: str
     description: str
     created: datetime
     type: resourceType  # TODO I reckon this should be a uri - dcat:DataService, dcat:DataSet
+    modified: datetime | None = None
+
+
+class BaseResource(BaseResourceSummary):
     alternativeTitle: List[str] | None = []
     issued: datetime | None = None
-    modified: datetime | None = None
     accessRights: rightsStatement | None = None
     # TODO: features contactName, email
     contactPoint: str = Field(
@@ -107,10 +110,20 @@ class BaseResource(BaseModel):
         use_enum_values = True
 
 
-class DataResource(BaseResource):
+# Common class for resources returned from the server
+class OutputResourceInfo(BaseModel):
     id: uuid.UUID
     publisher: Organisation
+
+
+# A single resource returned from resource detail endpoint
+class DataResource(BaseResource, OutputResourceInfo):
     creator: List[Organisation] | None = []
+
+
+# For the list endpoint, which returns only a summary of each resource
+class DataResourceSummary(BaseResourceSummary, OutputResourceInfo):
+    pass
 
 
 def validate_org_id(org_id: str):

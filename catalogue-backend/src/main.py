@@ -5,6 +5,7 @@ from fastapi.responses import JSONResponse
 from src.model import (
     DataResource,
     CreateResourceBody,
+    DataResourceSummary,
     create,
     resourceType,
     validate_org_id,
@@ -19,6 +20,7 @@ async def root():
     return {"greeting": "Hello world"}
 
 
+# TODO: add theme query param
 @app.get("/catalogue")
 async def list_catalogue_entries(
     query: str = None,
@@ -26,7 +28,7 @@ async def list_catalogue_entries(
     resourceType: Annotated[List[resourceType], Query()] = [],
     _limit: int = 100,
     _offset: int = 0,
-) -> list[DataResource]:
+) -> list[DataResourceSummary]:
     bad_org_ids = []
     for i in publisherID:
         try:
