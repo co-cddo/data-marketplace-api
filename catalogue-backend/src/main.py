@@ -20,6 +20,10 @@ async def root():
     return {"greeting": "Hello world"}
 
 
+# TODO: in order to find out what filters are available, we need
+# and endpoint to return all of the available organisations, themes, and types
+
+
 # TODO: add theme query param
 @app.get("/catalogue")
 async def list_catalogue_entries(

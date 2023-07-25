@@ -74,6 +74,16 @@ class securityClass(str, Enum):
     na = "NOT_APPLICABLE"
 
 
+class ContactPoint(BaseModel):
+    contactName: str | None = None
+    email: str = Field(
+        # TODO use some kinda library for this so it generates something sensible
+        pattern=r"([A-Za-z0-9]+[.-_])*[A-Za-z0-9]+@[A-Za-z0-9-]+(\.[A-Z|a-z]{2,})+",
+        json_schema_extra={"description": "Valid email address"},
+        examples=["user@domain.com"],
+    )
+
+
 class BaseResourceSummary(BaseModel):
     title: str
     description: str
@@ -86,16 +96,11 @@ class BaseResource(BaseResourceSummary):
     alternativeTitle: List[str] | None = []
     issued: datetime | None = None
     accessRights: rightsStatement | None = None
-    # TODO: features contactName, email
-    contactPoint: str = Field(
-        # TODO use some kinda library for this so it generates something sensible
-        pattern=r"([A-Za-z0-9]+[.-_])*[A-Za-z0-9]+@[A-Za-z0-9-]+(\.[A-Z|a-z]{2,})+",
-        json_schema_extra={"description": "Valid email address"},
-    )
+    contactPoint: ContactPoint
     keyword: List[str] | None = []
     relatedResource: List[AnyUrl] | None = []
     summary: str | None = None
-    # TODO - URL, label, and ID
+    # TODO - URL, label, and ID for these?
     theme: List[AnyUrl] | None = []
 
     # TODO - dunno if these are right
