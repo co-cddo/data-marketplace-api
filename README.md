@@ -37,8 +37,8 @@ Start the API with `just run`.
 The OpenAPI/Swagger documentation will be served at: http://localhost:8000/docs
 
 ### SPARQL server (Fuseki)
-> :warning: Currently the API does not serve any data, so there's not really any need to start up fuseki.
+:warning: Currently the API does not serve any data, so there's not really any need to start up fuseki. :warning:
 
-Running `just fuseki-docker` will start up Fuseki with the data in `fuseki/data` pre-loaded in the database.
+Running `just start-fuseki` will start up Fuseki with the data in `fuseki/data` pre-loaded in the database.
 
 Use `just stop-fuseki` to stop it again.
