@@ -1,7 +1,7 @@
 import uuid
 from datetime import datetime
 from enum import Enum
-from pydantic import BaseModel, Field, model_validator, field_validator
+from pydantic import BaseModel, Field
 from typing import List
 from pydantic.networks import AnyUrl
 
@@ -12,7 +12,7 @@ class rightsStatement(str, Enum):
     commercial = "COMMERCIAL"
 
 
-class resourceType(str, Enum):
+class assetType(str, Enum):
     service = "dataService"
     dataset = "dataset"
 
@@ -74,6 +74,17 @@ class securityClass(str, Enum):
     na = "NOT_APPLICABLE"
 
 
+class SearchFacet(BaseModel):
+    title: str
+    id: str
+
+
+class SearchFacets(BaseModel):
+    topics: list[SearchFacet]
+    organisations: list[SearchFacet]
+    assetTypes: list[SearchFacet]
+
+
 class ContactPoint(BaseModel):
     contactName: str | None = None
     email: str = Field(
@@ -84,21 +95,21 @@ class ContactPoint(BaseModel):
     )
 
 
-class BaseResourceSummary(BaseModel):
+class BaseAssetSummary(BaseModel):
     title: str
     description: str
     created: datetime
-    type: resourceType  # TODO I reckon this should be a uri - dcat:DataService, dcat:DataSet
+    type: assetType  # TODO I reckon this should be a uri - dcat:DataService, dcat:DataSet
     modified: datetime | None = None
 
 
-class BaseResource(BaseResourceSummary):
+class BaseAsset(BaseAssetSummary):
     alternativeTitle: List[str] | None = []
     issued: datetime | None = None
     accessRights: rightsStatement | None = None
     contactPoint: ContactPoint
     keyword: List[str] | None = []
-    relatedResource: List[AnyUrl] | None = []
+    relatedAssets: List[AnyUrl] | None = []
     summary: str | None = None
     # TODO - URL, label, and ID for these?
     theme: List[AnyUrl] | None = []
@@ -114,32 +125,37 @@ class BaseResource(BaseResourceSummary):
         use_enum_values = True
 
 
-# Common class for resources returned from the server
-class OutputResourceInfo(BaseModel):
+# Common class for assetss returned from the server
+class OutputAssetInfo(BaseModel):
     id: uuid.UUID
     publisher: Organisation
 
 
-# A single resource returned from resource detail endpoint
-class DataResource(BaseResource, OutputResourceInfo):
+# A single asset returned from asset detail endpoint
+class DataAsset(BaseAsset, OutputAssetInfo):
     creator: List[Organisation] | None = []
 
 
-# For the list endpoint, which returns only a summary of each resource
-class DataResourceSummary(BaseResourceSummary, OutputResourceInfo):
+# For the list endpoint, which returns only a summary of each asset
+class DataAssetSummary(BaseAssetSummary, OutputAssetInfo):
     pass
 
 
-class CreateResourceBody(BaseResource):
+class SearchAssetsResponse(BaseModel):
+    data: List[DataAssetSummary]
+    facets: SearchFacets
+
+
+class CreateAssetBody(BaseAsset):
     publisherID: organisationID
     creatorID: List[organisationID] | None = []
 
 
-def create(resource: CreateResourceBody):
-    data = dict(resource)
+def create(asset: CreateAssetBody):
+    data = dict(asset)
     data["publisher"] = lookup_organisation(data["publisherID"])
     data.pop("publisherID")
     creator = [lookup_organisation(o) for o in data["creatorID"]]
     data.pop("creatorID")
     data["id"] = uuid.uuid4()
-    return DataResource.parse_obj(data)
+    return DataAsset.parse_obj(data)

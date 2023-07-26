@@ -3,7 +3,6 @@ from typing import Annotated, List
 from fastapi import FastAPI, Body, Query, HTTPException
 from fastapi.responses import JSONResponse
 import src.model as m
-from pydantic import BaseModel, field_validator
 
 app = FastAPI()
 
@@ -21,22 +20,18 @@ async def list_organisations() -> List[m.Organisation]:
 
 # TODO: add theme query param
 @app.get("/catalogue")
-async def list_catalogue_entries(
+async def search_catalogue(
     query: str = None,
-    publisherID: Annotated[List[m.organisationID], Query()] = [],
-    resourceType: Annotated[List[m.resourceType], Query()] = [],
-    _limit: int = 100,
-    _offset: int = 0,
-) -> list[m.DataResourceSummary]:
+    topic: Annotated[List[str], Query()] = [],
+    organisation: Annotated[List[m.organisationID], Query()] = [],
+    assetType: Annotated[List[m.assetType], Query()] = [],
+    limit: int = 100,
+    offset: int = 0,
+) -> list[m.SearchAssetsResponse]:
     return []
 
 
-@app.get("/catalogue/{resource_id}")
-async def catalogue_entry_detail(resource_id: UUID) -> m.DataResource:
-    # Obviously, this would return the resource if it existed!
+@app.get("/catalogue/{asset_id}")
+async def catalogue_entry_detail(asset_id: UUID) -> m.DataAsset:
+    # Obviously, this would return the asset if it existed!
     raise HTTPException(status_code=404, detail="Item not found")
-
-
-@app.post("/dataset/new", include_in_schema=False)
-async def new_ds(resource: m.CreateResourceBody) -> m.DataResource:
-    return create(resource)

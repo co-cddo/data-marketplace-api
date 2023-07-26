@@ -1,10 +1,9 @@
 [tool.poetry]
-name = "catalogue-backend"
+name = "cddo-dm-api"
 version = "0.1.0"
 description = ""
 authors = ["Kiran Joshi <kiran.joshi@tpximpact.com>", "Madeline Kosse <madeline.kosse@tpximpact.com>"]
 readme = "README.md"
-packages = [{include = "catalogue_backend"}]
 
 [tool.poetry.dependencies]
 python = "^3.11"

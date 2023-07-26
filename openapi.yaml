@@ -19,8 +19,8 @@ paths:
                 title: Response List Organisations Organisations Get
   /catalogue:
     get:
-      summary: List Catalogue Entries
-      operationId: list_catalogue_entries_catalogue_get
+      summary: Search Catalogue
+      operationId: search_catalogue_catalogue_get
       parameters:
         - name: query
           in: query
@@ -28,7 +28,16 @@ paths:
           schema:
             type: string
             title: Query
-        - name: publisherID
+        - name: topic
+          in: query
+          required: false
+          schema:
+            type: array
+            items:
+              type: string
+            default: []
+            title: Topic
+        - name: organisation
           in: query
           required: false
           schema:
@@ -36,30 +45,30 @@ paths:
             items:
               $ref: '#/components/schemas/organisationID'
             default: []
-            title: Publisherid
-        - name: resourceType
+            title: Organisation
+        - name: assetType
           in: query
           required: false
           schema:
             type: array
             items:
-              $ref: '#/components/schemas/resourceType'
+              $ref: '#/components/schemas/assetType'
             default: []
-            title: Resourcetype
-        - name: _limit
+            title: Assettype
+        - name: limit
           in: query
           required: false
           schema:
             type: integer
             default: 100
-            title: ' Limit'
-        - name: _offset
+            title: Limit
+        - name: offset
           in: query
           required: false
           schema:
             type: integer
             default: 0
-            title: ' Offset'
+            title: Offset
       responses:
         "200":
           description: Successful Response
@@ -68,33 +77,33 @@ paths:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/DataResourceSummary'
-                title: Response List Catalogue Entries Catalogue Get
+                  $ref: '#/components/schemas/SearchAssetsResponse'
+                title: Response Search Catalogue Catalogue Get
         "422":
           description: Validation Error
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/HTTPValidationError'
-  /catalogue/{resource_id}:
+  /catalogue/{asset_id}:
     get:
       summary: Catalogue Entry Detail
-      operationId: catalogue_entry_detail_catalogue__resource_id__get
+      operationId: catalogue_entry_detail_catalogue__asset_id__get
       parameters:
-        - name: resource_id
+        - name: asset_id
           in: path
           required: true
           schema:
             type: string
             format: uuid
-            title: Resource Id
+            title: Asset Id
       responses:
         "200":
           description: Successful Response
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/DataResource'
+                $ref: '#/components/schemas/DataAsset'
         "422":
           description: Validation Error
           content:
@@ -121,7 +130,7 @@ components:
       required:
         - email
       title: ContactPoint
-    DataResource:
+    DataAsset:
       properties:
         id:
           type: string
@@ -140,7 +149,7 @@ components:
           format: date-time
           title: Created
         type:
-          $ref: '#/components/schemas/resourceType'
+          $ref: '#/components/schemas/assetType'
         modified:
           anyOf:
             - type: string
@@ -175,7 +184,7 @@ components:
             - type: "null"
           title: Keyword
           default: []
-        relatedResource:
+        relatedAssets:
           anyOf:
             - items:
                 type: string
@@ -183,7 +192,7 @@ components:
                 format: uri
               type: array
             - type: "null"
-          title: Relatedresource
+          title: Relatedassets
           default: []
         summary:
           anyOf:
@@ -236,8 +245,8 @@ components:
         - created
         - type
         - contactPoint
-      title: DataResource
-    DataResourceSummary:
+      title: DataAsset
+    DataAssetSummary:
       properties:
         id:
           type: string
@@ -256,7 +265,7 @@ components:
           format: date-time
           title: Created
         type:
-          $ref: '#/components/schemas/resourceType'
+          $ref: '#/components/schemas/assetType'
         modified:
           anyOf:
             - type: string
@@ -271,7 +280,7 @@ components:
         - description
         - created
         - type
-      title: DataResourceSummary
+      title: DataAssetSummary
     HTTPValidationError:
       properties:
         detail:
@@ -304,6 +313,56 @@ components:
         - acronym
         - homepage
       title: Organisation
+    SearchAssetsResponse:
+      properties:
+        data:
+          items:
+            $ref: '#/components/schemas/DataAssetSummary'
+          type: array
+          title: Data
+        facets:
+          $ref: '#/components/schemas/SearchFacets'
+      type: object
+      required:
+        - data
+        - facets
+      title: SearchAssetsResponse
+    SearchFacet:
+      properties:
+        title:
+          type: string
+          title: Title
+        id:
+          type: string
+          title: Id
+      type: object
+      required:
+        - title
+        - id
+      title: SearchFacet
+    SearchFacets:
+      properties:
+        topics:
+          items:
+            $ref: '#/components/schemas/SearchFacet'
+          type: array
+          title: Topics
+        organisations:
+          items:
+            $ref: '#/components/schemas/SearchFacet'
+          type: array
+          title: Organisations
+        assetTypes:
+          items:
+            $ref: '#/components/schemas/SearchFacet'
+          type: array
+          title: Assettypes
+      type: object
+      required:
+        - topics
+        - organisations
+        - assetTypes
+      title: SearchFacets
     ValidationError:
       properties:
         loc:
@@ -325,6 +384,12 @@ components:
         - msg
         - type
       title: ValidationError
+    assetType:
+      type: string
+      enum:
+        - dataService
+        - dataset
+      title: assetType
     organisationID:
       type: string
       enum:
@@ -333,12 +398,6 @@ components:
         - nhs-digital
         - ordnance-survey
       title: organisationID
-    resourceType:
-      type: string
-      enum:
-        - dataService
-        - dataset
-      title: resourceType
     rightsStatement:
       type: string
       enum:
