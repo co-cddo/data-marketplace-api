@@ -128,7 +128,7 @@ class BaseAsset(BaseAssetSummary):
 # Common class for assetss returned from the server
 class OutputAssetInfo(BaseModel):
     id: uuid.UUID
-    publisher: Organisation
+    organisation: Organisation
 
 
 # A single asset returned from asset detail endpoint
@@ -147,14 +147,14 @@ class SearchAssetsResponse(BaseModel):
 
 
 class CreateAssetBody(BaseAsset):
-    publisherID: organisationID
+    organisationID: organisationID
     creatorID: List[organisationID] | None = []
 
 
 def create(asset: CreateAssetBody):
     data = dict(asset)
-    data["publisher"] = lookup_organisation(data["publisherID"])
-    data.pop("publisherID")
+    data["organisation"] = lookup_organisation(data["organisationID"])
+    data.pop("organisationID")
     creator = [lookup_organisation(o) for o in data["creatorID"]]
     data.pop("creatorID")
     data["id"] = uuid.uuid4()
