@@ -4,7 +4,7 @@ from fastapi import FastAPI, Body, Query, HTTPException
 from fastapi.responses import JSONResponse
 import src.model as m
 
-app = FastAPI()
+app = FastAPI(title="CDDO Data Marketplace API", version="0.1.0")
 
 
 # TODO: in order to find out what filters are available, we need

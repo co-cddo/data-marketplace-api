@@ -1,8 +1,11 @@
 run:
 	poetry run uvicorn src.main:app --reload
 
-fuseki-docker:
+start-fuseki:
   docker compose up --build -d
+
+stop-fuseki:
+  docker compose down
 
 setup-hooks:
   poetry run pre-commit install
