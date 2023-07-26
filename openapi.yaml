@@ -1,6 +1,6 @@
 openapi: 3.1.0
 info:
-  title: FastAPI
+  title: CDDO Data Marketplace API
   version: 0.1.0
 paths:
   /organisations:
@@ -136,7 +136,7 @@ components:
           type: string
           format: uuid
           title: Id
-        publisher:
+        organisation:
           $ref: '#/components/schemas/Organisation'
         title:
           type: string
@@ -239,7 +239,7 @@ components:
       type: object
       required:
         - id
-        - publisher
+        - organisation
         - title
         - description
         - created
@@ -252,7 +252,7 @@ components:
           type: string
           format: uuid
           title: Id
-        publisher:
+        organisation:
           $ref: '#/components/schemas/Organisation'
         title:
           type: string
@@ -275,7 +275,7 @@ components:
       type: object
       required:
         - id
-        - publisher
+        - organisation
         - title
         - description
         - created
