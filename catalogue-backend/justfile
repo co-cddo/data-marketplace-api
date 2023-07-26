@@ -15,4 +15,4 @@ start-db:
   (cd localdb && ./fuseki/fuseki-server --config=fuseki-config.ttl)
 
 generate-spec-file:
-	curl localhost:8000/openapi.json --output openapi.json
+  curl localhost:8000/openapi.json | yq eval -P > openapi.yaml

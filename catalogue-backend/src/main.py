@@ -8,18 +8,13 @@ from pydantic import BaseModel, field_validator
 app = FastAPI()
 
 
-@app.get("/")
-async def root():
-    return {"greeting": "Hello world"}
-
-
 # TODO: in order to find out what filters are available, we need
 # and endpoint to return all of the available organisations, themes, and types.
 # Something like this, except we'll need to figure out how themes work.
 # May not need it for types seeing as we only have 2
 
 
-@app.get("/list/organisations")
+@app.get("/organisations")
 async def list_organisations() -> List[m.Organisation]:
     return [m.Organisation.parse_obj(o) for o in m.organisations.values()]
 
@@ -42,6 +37,6 @@ async def catalogue_entry_detail(resource_id: UUID) -> m.DataResource:
     raise HTTPException(status_code=404, detail="Item not found")
 
 
-@app.post("/dataset/new")
+@app.post("/dataset/new", include_in_schema=False)
 async def new_ds(resource: m.CreateResourceBody) -> m.DataResource:
     return create(resource)
