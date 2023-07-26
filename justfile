@@ -1,5 +1,5 @@
 run:
-	poetry run uvicorn src.main:app --reload
+  poetry run uvicorn src.main:app --reload
 
 start-fuseki:
   docker compose up --build -d
