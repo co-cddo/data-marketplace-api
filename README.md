@@ -41,4 +41,6 @@ The OpenAPI/Swagger documentation will be served at: http://localhost:8000/docs
 
 Running `just start-fuseki` will start up Fuseki with the data in `fuseki/data` pre-loaded in the database.
 
-Use `just stop-fuseki` to stop it again.
+The Fuseki web UI will be served at http://localhost:3030, the username is `admin` and the password is printed in the Docker container logs which can be accessed by: `docker compose logs fuseki`
+
+Use `just stop-fuseki` to stop the Fuseki container again.

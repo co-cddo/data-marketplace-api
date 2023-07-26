@@ -1,6 +1,7 @@
 FROM secoresearch/fuseki
 
 COPY --chown=9008 data /tmp/data
+COPY assembler.ttl /fuseki-base/configuration/assembler.ttl
 
 RUN cat /tmp/data/*.ttl > /tmp/data.ttl
 
