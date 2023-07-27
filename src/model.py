@@ -74,6 +74,18 @@ class securityClass(str, Enum):
     na = "NOT_APPLICABLE"
 
 
+# TODO Update this to allow any IANA media type:
+#  https://www.iana.org/assignments/media-types/media-types.xhtml
+# or service type:
+#  https://github.com/co-cddo/data-catalogue-schemas/blob/linkml/src/model/uk_cross_government_metadata_exchange_model.yaml#L466
+class MediaType(str, Enum):
+    csv = "CSV"
+    xml = "XML"
+    rest = "REST"
+    event = "EVENT"
+    soap = "SOAP"
+
+
 class SearchFacet(BaseModel):
     title: str
     id: str
@@ -101,6 +113,7 @@ class BaseAssetSummary(BaseModel):
     created: datetime
     type: assetType  # TODO I reckon this should be a uri - dcat:DataService, dcat:DataSet
     modified: datetime | None = None
+    mediaType: List[MediaType]
 
 
 class BaseAsset(BaseAssetSummary):
