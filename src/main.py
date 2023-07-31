@@ -1,5 +1,5 @@
 from uuid import UUID
-from typing import Annotated, List
+from typing import Annotated, List, Union
 from fastapi import FastAPI, Body, Query, HTTPException
 from fastapi.responses import JSONResponse
 import src.model as m
@@ -31,7 +31,7 @@ async def search_catalogue(
     return []
 
 
-@app.get("/catalogue/{asset_id}")
-async def catalogue_entry_detail(asset_id: UUID) -> m.DataAsset:
+@app.get("/catalogue/{asset_id}", response_model=Union[m.DataService, m.Dataset])
+async def catalogue_entry_detail(asset_id: UUID):
     # Obviously, this would return the asset if it existed!
     raise HTTPException(status_code=404, detail="Item not found")
