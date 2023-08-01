@@ -32,15 +32,10 @@ Installation instructions are [here](https://github.com/mikefarah/yq/#install) (
 -  Install the `pre-commit` hooks if you're planning on contributing to this repository: `just setup-hooks`
 
 ### API
-Start the API with `just run`.
+Start the API and Fuseki database with `just run`.
 
-The OpenAPI/Swagger documentation will be served at: http://localhost:8000/docs
+The OpenAPI/Swagger documentation will be served at: http://localhost:8000/docs.
 
-### SPARQL server (Fuseki)
-:warning: Currently the API does not serve any data, so there's not really any need to start up fuseki. :warning:
+Fuseki will be initialised with the data in `fuseki/data` pre-loaded in the database.
 
-Running `just start-fuseki` will start up Fuseki with the data in `fuseki/data` pre-loaded in the database.
-
-The Fuseki web UI will be served at http://localhost:3030, the username is `admin` and the password is printed in the Docker container logs which can be accessed by: `docker compose logs fuseki`
-
-Use `just stop-fuseki` to stop the Fuseki container again.
+The Fuseki web UI will be served at http://localhost:3030, the username is `admin` and the password is printed in the Docker compose logs.
