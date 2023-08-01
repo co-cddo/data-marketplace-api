@@ -4,8 +4,19 @@ version: "3"
   # fuseki_storage:
 
 services:
+
+  api:
+    build:
+      context: api
+      dockerfile: Dockerfile
+    ports:
+      - 8000:8000
+    working_dir: /code
+    volumes:
+      - ./api/app:/code/app
+
+
   fuseki:
-    container_name: cddo-fuseki
     build:
       context: fuseki
       dockerfile: Dockerfile

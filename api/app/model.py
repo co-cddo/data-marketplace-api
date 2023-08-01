@@ -1,7 +1,7 @@
 import uuid
 from datetime import datetime
 from enum import Enum
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, EmailStr
 from typing import List, Literal
 from pydantic.networks import AnyUrl
 
@@ -115,13 +115,10 @@ class SearchFacets(BaseModel):
 
 
 class ContactPoint(BaseModel):
-    contactName: str | None = None
-    email: str = Field(
-        # TODO use some kinda library for this so it generates something sensible
-        pattern=r"([A-Za-z0-9]+[.-_])*[A-Za-z0-9]+@[A-Za-z0-9-]+(\.[A-Z|a-z]{2,})+",
-        json_schema_extra={"description": "Valid email address"},
-        examples=["user@domain.com"],
-    )
+    name: str | None = None
+    email: EmailStr
+    telephone: str | None = None
+    address: str | None = None
 
 
 class DistributionSummary(BaseModel):
@@ -131,7 +128,7 @@ class DistributionSummary(BaseModel):
 
 
 class BaseAssetSummary(BaseModel):
-    created: datetime
+    created: datetime | None = None
     description: str
     modified: datetime | None = None
     title: str
@@ -161,7 +158,7 @@ class BaseAsset(BaseAssetSummary):
 class OutputAssetInfo(BaseModel):
     catalogueCreated: datetime
     catalogueModified: datetime
-    creator: List[Organisation] | None = []
+    creator: List[Organisation]
     identifier: uuid.UUID
     organisation: Organisation
 
@@ -177,7 +174,7 @@ class DataService(BaseAsset, OutputAssetInfo):
     endpointURL: str | None = None
     servesData: list[AnyUrl]
     serviceStatus: ServiceStatus
-    serviceType: list[ServiceType]
+    serviceType: ServiceType
     type: Literal[assetType.service]
 
     model_config = {
@@ -191,8 +188,15 @@ class DataService(BaseAsset, OutputAssetInfo):
                         "contactName": "DWP Integration Team",
                         "email": "integration.technologyplatforms@dwp.gsi.gov.uk",
                     },
-                    "creator": ["department-for-work-pensions"],
-                    "description": 'The location-service provides endpoints to perform a range of address based queries for UK locations. The reference data used is provided by Ordnance Survey and covers Great Britain Northern Ireland and the Channel Islands.\n\nThe API currently supports the following functions:\n\n- Postcode Lookup and filtering\n- Fuzzy address searching\n- Unique Property Reference Number (UPRN) lookup\n- Address matching\n- Data provided\n\n## Postcode lookup and fuzzy address search\n\nThis endpoint serves as both the standard postcode lookup and the fuzzy lookup. If you call the endpoint with just a search string query parameter the service will perform a fuzzy search against your string and bring back the closest matching results.\n\nFor example sending a request to the lookup endpoint with the search string "holy island castle" will return the following address as the top result:\n\n- `NATIONAL TRUST`\n- `LINDISFARNE CASTLE`\n- `HOLY ISLAND`\n- `BERWICK-UPON-TWEED`\n- `TD15 2SH`\n  \nAlternatively if you want to limit your search to a specific postcode you can call the endpoint with the postcode query parameter set. If you call the endpoint with just the postcode then the service will return all addresses for that postcode.\n  \nIf you call the endpoint with both postcode and search string the service will return only addresses that match the provided postcode and search string.\n  \nThere is also one further parameter for this endpoint (excludeBusiness) which if set will restrict the returned result list to non-commercial addresses.\n  \n## Unique Property Reference Number lookup\n  \nThis endpoint will take a unique property reference number (UPRN) as a query parameter and return the specific address record for that ID if present in the data set. As the data set contains a snapshot of current addresses it may be the case that UPRNs which are no longer valid get removed from the data set by Ordnance Survey.\n  \n## Address matching\n  \nThis endpoint provides an address matching function. It will take an unstructured address string along with a postcode and try to find an exact match in the data set. If the service can find an exact match then that specific record will be returned. If no match is found then no records are returned. This endpoint also uses fuzzy matching algorithms which allow it to cope with spelling mistakes transposed characters and other errors within the search string.',
+                    "creator": [
+                        {
+                            "id": "department-for-work-pensions",
+                            "title": "Department for Work & Pensions",
+                            "acronym": "DWP",
+                            "homepage": "https://www.gov.uk/government/organisations/department-for-work-pensions",
+                        }
+                    ],
+                    "description": "The location-service provides endpoints to perform a range of address based queries for UK locations....",
                     "endpointDescription": "https://engineering.dwp.gov.uk/apis/docs",
                     "endpointURL": "",
                     "identifier": "fcbc4d3f-0c05-4857-b0e3-eeec6bfea3a1",
@@ -214,7 +218,7 @@ class DataService(BaseAsset, OutputAssetInfo):
                         "https://www.data.gov.uk/dataset/92b32629-8ad4-43cb-9952-7d104971fa12/one-scotland-gazetteer",
                     ],
                     "serviceStatus": "LIVE",
-                    "serviceType": ["REST"],
+                    "serviceType": "REST",
                     "summary": "DWP single strategic solution for looking up addresses including fuzzy search and UPRN.",
                     "theme": [
                         "https://www.data.gov.uk/search?filters%5Btopic%5D=Mapping"

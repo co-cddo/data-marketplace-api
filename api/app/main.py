@@ -2,7 +2,7 @@ from uuid import UUID
 from typing import Annotated, List, Union
 from fastapi import FastAPI, Body, Query, HTTPException
 from fastapi.responses import JSONResponse
-import src.model as m
+from . import model as m
 
 app = FastAPI(title="CDDO Data Marketplace API", version="0.1.0")
 

@@ -12,10 +12,13 @@ uvicorn = {extras = ["standard"], version = "^0.23.1"}
 rdflib = "^6.3.2"
 SPARQLWrapper = "^2.0.0"
 python-dotenv = "^1.0.0"
+pydantic = {extras = ["email"], version = "^2.1.1"}
+faker = "^19.2.0"
 
 [tool.poetry.group.dev.dependencies]
 black = "^23.7.0"
 pre-commit = "^3.3.3"
+polyfactory = "^2.7.0"
 
 [build-system]
 requires = ["poetry-core"]
