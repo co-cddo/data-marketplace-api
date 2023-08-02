@@ -91,7 +91,7 @@ class ContactPoint(BaseModel):
 class DistributionSummary(BaseModel):
     title: str
     modified: datetime
-    mediaType: MediaType
+    mediaType: str
 
 
 class BaseAssetSummary(BaseModel):
@@ -261,7 +261,7 @@ class DataService(BaseAsset, OutputAssetInfo):
 # For the list endpoint, which returns only a summary of each asset
 class DatasetSummary(BaseAssetSummary, OutputAssetInfo):
     type: Literal[assetType.dataset]
-    mediaType: List[MediaType]
+    mediaType: List[str]
 
 
 class DataServiceSummary(BaseAssetSummary, OutputAssetInfo):

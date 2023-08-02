@@ -38,31 +38,37 @@ def lookup_organisation(org_id: m.organisationID) -> m.Organisation:
     return m.Organisation.model_validate(org_data)
 
 
-def queryResultToDict(result):
+def search_query_result_to_dict(result):
     d = {}
     for k, v in result.items():
-        if k in [
-            "catalogueCreated",
-            "catalogueModified",
-            "created",
-            "modified",
-            "issued",
-        ]:
-            d[k] = datetime.fromisoformat(v["value"])
-        elif k == "organisation":
-            d[k] = lookup_organisation(v["value"])
-        else:
-            d[k] = v["value"]
+        match k:
+            case "catalogueCreated" | "catalogueModified" | "created" | "modified" | "issued":
+                d[k] = datetime.fromisoformat(v["value"])
+            case "organisation":
+                d[k] = lookup_organisation(v["value"])
+            case "creator":
+                creators = v["value"]
+                if not isinstance(creators, list):
+                    creators = [creators]
+                d[k] = [lookup_organisation(c) for c in creators]
+            case "type":
+                if v["value"].startswith("dcat:"):
+                    d[k] = v["value"].replace("dcat:", "")
+            case _:
+                d[k] = v["value"]
+
     return d
 
 
-def normaliseValues(result_dict):
+def munge_asset_summary_response(result_dict):
     r = result_dict.copy()
-    # Choose summary instead of description, if summary exists
-    if "summary" in r:
-        r["description"] = r["summary"]
-        del r["summary"]
-    else:
-        r["description"] = r["description"][:100]
+    # If summary doesn't exist, set it to be a truncated description
+    if "summary" not in r:
+        r["summary"] = r["description"][:100]
+    del r["description"]
 
     return r
+
+
+def sanitise_search_query(q: str):
+    return q.strip('"')

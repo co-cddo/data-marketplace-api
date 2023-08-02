@@ -20,7 +20,6 @@ from . import utils
 import json
 
 load_dotenv()
-print(os.getenv("UPDATE_URL"))
 
 sparql_writer = SPARQLWrapper(os.environ.get("UPDATE_URL"))
 sparql_writer.setReturnFormat(JSON)
@@ -57,12 +56,34 @@ sparql_reader = SPARQLWrapper(os.environ.get("QUERY_URL"))
 sparql_reader.setReturnFormat(JSON)
 
 
-def search(q=""):
+def mediatypes_for_dataset(identifier: str):
+    query = f"""{PREFIX}
+    SELECT ?mediaType
+    WHERE {{
+        ?s dct:identifier "{identifier}" ;
+            dcat:distribution ?distribution .
+        BIND(URI(STR(?distribution)) AS ?dist)
+        ?dist dcat:mediaType ?mediaType .
+    }}"""
+
+    sparql_reader.setQuery(query)
+    results = sparql_reader.queryAndConvert()["results"]["bindings"]
+    result_dicts = [utils.search_query_result_to_dict(r) for r in results]
+    media_types = [r["mediaType"] for r in result_dicts]
+    return media_types
+
+
+def search(q: str = ""):
     if q == "":
         q = "*"
 
+    # TODO What else do we need to do to sanitise the query string?
+    q = utils.sanitise_search_query(q)
+
     query = f"""{PREFIX}
-    SELECT ?identifier ?type ?title ?description ?organisation ?creator ?catalogueCreated ?catalogueModified ?created ?issued ?modified ?summary
+    SELECT ?identifier ?type ?title ?description ?organisation ?creator 
+            ?catalogueCreated ?catalogueModified ?created ?issued ?modified 
+            ?summary ?serviceType
     WHERE {{
         ?s text:query "{q}" ;
             dct:identifier ?identifier ;
@@ -77,15 +98,20 @@ def search(q=""):
       	OPTIONAL {{ ?s dct:issued ?issued }} .
       	OPTIONAL {{ ?s dct:modified ?modified }} .
       	OPTIONAL {{ ?s rdfs:comment ?summary }} .
+        OPTIONAL {{ ?s dct:type ?serviceType }} .
     }}
     """
 
     sparql_reader.setQuery(query)
     result = sparql_reader.queryAndConvert()["results"]["bindings"]
 
-    result_dicts = [utils.queryResultToDict(r) for r in result]
+    result_dicts = [utils.search_query_result_to_dict(r) for r in result]
 
-    result_dicts = [utils.normaliseValues(r) for r in result_dicts]
+    for r in result_dicts:
+        if r["type"] == "Dataset":
+            r["mediaType"] = mediatypes_for_dataset(r["identifier"])
+
+    result_dicts = [utils.munge_asset_summary_response(r) for r in result_dicts]
 
     return result_dicts
 

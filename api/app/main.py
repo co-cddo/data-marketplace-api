@@ -29,12 +29,11 @@ async def search_catalogue(
     assetType: Annotated[List[m.assetType], Query()] = [],
     limit: int = 100,
     offset: int = 0,
-) -> list[m.SearchAssetsResponse]:
+) -> m.SearchAssetsResponse:
     data = db.search(query)
     facets = {"topics": [], "organisations": [], "assetTypes": []}
 
     response = {"data": data, "facets": facets}
-    # print(json.dumps(response, indent=4))
 
     r = m.SearchAssetsResponse.model_validate(response)
     return r
