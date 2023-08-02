@@ -28,7 +28,7 @@ Installation instructions are [here](https://github.com/mikefarah/yq/#install) (
 ## Usage
 ### Initial setup
 -  Install the prerequisites listed above.
--  Install the python dependencies: `poetry install`.
+-  Install the python dependencies for the API: `cd api && poetry install`.
 -  Install the `pre-commit` hooks if you're planning on contributing to this repository: `just setup-hooks`
 
 ### API
