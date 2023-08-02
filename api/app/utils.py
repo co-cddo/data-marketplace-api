@@ -72,3 +72,15 @@ def munge_asset_summary_response(result_dict):
 
 def sanitise_search_query(q: str):
     return q.strip('"')
+
+
+MEDIATYPES = {
+    "text/csv": "CSV",
+    "application/geopackage+sqlite3": "GeoPackage",
+    "application/vnd.ms-excel": "XLS",
+}
+
+
+# TODO What happens if the media type isn't in the dict? We can't make nice names for all types...
+def remap_media_type(t: str):
+    return MEDIATYPES.get(t, t)

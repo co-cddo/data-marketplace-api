@@ -69,7 +69,7 @@ def mediatypes_for_dataset(identifier: str):
     sparql_reader.setQuery(query)
     results = sparql_reader.queryAndConvert()["results"]["bindings"]
     result_dicts = [utils.search_query_result_to_dict(r) for r in results]
-    media_types = [r["mediaType"] for r in result_dicts]
+    media_types = [utils.remap_media_type(r["mediaType"]) for r in result_dicts]
     return media_types
 
 
