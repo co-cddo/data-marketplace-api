@@ -27,6 +27,7 @@ paths:
           required: false
           schema:
             type: string
+            default: ""
             title: Query
         - name: topic
           in: query
@@ -75,10 +76,7 @@ paths:
           content:
             application/json:
               schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/SearchAssetsResponse'
-                title: Response Search Catalogue Catalogue Get
+                $ref: '#/components/schemas/SearchAssetsResponse'
         "422":
           description: Validation Error
           content:
@@ -103,7 +101,10 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/DataAsset'
+                anyOf:
+                  - $ref: '#/components/schemas/DataService'
+                  - $ref: '#/components/schemas/Dataset'
+                title: Response Catalogue Entry Detail Catalogue  Asset Id  Get
         "422":
           description: Validation Error
           content:
@@ -114,48 +115,77 @@ components:
   schemas:
     ContactPoint:
       properties:
-        contactName:
+        name:
           anyOf:
             - type: string
             - type: "null"
-          title: Contactname
+          title: Name
         email:
           type: string
-          pattern: ([A-Za-z0-9]+[.-_])*[A-Za-z0-9]+@[A-Za-z0-9-]+(\.[A-Z|a-z]{2,})+
+          format: email
           title: Email
-          description: Valid email address
-          examples:
-            - user@domain.com
+        telephone:
+          anyOf:
+            - type: string
+            - type: "null"
+          title: Telephone
+        address:
+          anyOf:
+            - type: string
+            - type: "null"
+          title: Address
       type: object
       required:
         - email
       title: ContactPoint
-    DataAsset:
+    DataService:
       properties:
-        id:
-          type: string
-          format: uuid
-          title: Id
-        organisation:
-          $ref: '#/components/schemas/Organisation'
-        title:
-          type: string
-          title: Title
-        description:
-          type: string
-          title: Description
-        created:
+        catalogueCreated:
           type: string
           format: date-time
+          title: Cataloguecreated
+        catalogueModified:
+          type: string
+          format: date-time
+          title: Cataloguemodified
+        creator:
+          items:
+            $ref: '#/components/schemas/Organisation'
+          type: array
+          title: Creator
+        identifier:
+          type: string
+          format: uuid
+          title: Identifier
+        organisation:
+          $ref: '#/components/schemas/Organisation'
+        created:
+          anyOf:
+            - type: string
+              format: date-time
+            - type: "null"
           title: Created
-        type:
-          $ref: '#/components/schemas/assetType'
+        summary:
+          anyOf:
+            - type: string
+            - type: "null"
+          title: Summary
         modified:
           anyOf:
             - type: string
               format: date-time
             - type: "null"
           title: Modified
+        title:
+          type: string
+          title: Title
+        type:
+          const: DataService
+          title: Type
+        accessRights:
+          anyOf:
+            - $ref: '#/components/schemas/rightsStatement'
+            - type: "null"
         alternativeTitle:
           anyOf:
             - items:
@@ -164,18 +194,14 @@ components:
             - type: "null"
           title: Alternativetitle
           default: []
+        contactPoint:
+          $ref: '#/components/schemas/ContactPoint'
         issued:
           anyOf:
             - type: string
               format: date-time
             - type: "null"
           title: Issued
-        accessRights:
-          anyOf:
-            - $ref: '#/components/schemas/rightsStatement'
-            - type: "null"
-        contactPoint:
-          $ref: '#/components/schemas/ContactPoint'
         keyword:
           anyOf:
             - items:
@@ -184,6 +210,14 @@ components:
             - type: "null"
           title: Keyword
           default: []
+        licence:
+          anyOf:
+            - type: string
+              minLength: 1
+              format: uri
+            - type: "null"
+          title: Licence
+          default: https://www.nationalarchives.gov.uk/doc/open-government-licence/version/3/
         relatedAssets:
           anyOf:
             - items:
@@ -194,11 +228,11 @@ components:
             - type: "null"
           title: Relatedassets
           default: []
-        summary:
+        securityClassification:
           anyOf:
-            - type: string
+            - $ref: '#/components/schemas/securityClass'
             - type: "null"
-          title: Summary
+          default: OFFICIAL
         theme:
           anyOf:
             - items:
@@ -209,6 +243,215 @@ components:
             - type: "null"
           title: Theme
           default: []
+        version:
+          anyOf:
+            - type: string
+            - type: "null"
+          title: Version
+          default: "1.0"
+        endpointDescription:
+          type: string
+          title: Endpointdescription
+        endpointURL:
+          anyOf:
+            - type: string
+            - type: "null"
+          title: Endpointurl
+        servesData:
+          items:
+            type: string
+            minLength: 1
+            format: uri
+          type: array
+          title: Servesdata
+        serviceStatus:
+          $ref: '#/components/schemas/ServiceStatus'
+        serviceType:
+          $ref: '#/components/schemas/ServiceType'
+      type: object
+      required:
+        - catalogueCreated
+        - catalogueModified
+        - creator
+        - identifier
+        - organisation
+        - title
+        - type
+        - contactPoint
+        - endpointDescription
+        - servesData
+        - serviceStatus
+        - serviceType
+      title: DataService
+      examples:
+        - accessRights: INTERNAL
+          catalogueCreated: "2023-07-31T11:26:50.383Z"
+          catalogueModified: "2023-07-31T11:26:50.383Z"
+          contactPoint:
+            contactName: DWP Integration Team
+            email: integration.technologyplatforms@dwp.gsi.gov.uk
+          creator:
+            - acronym: DWP
+              homepage: https://www.gov.uk/government/organisations/department-for-work-pensions
+              id: department-for-work-pensions
+              title: Department for Work & Pensions
+          description: The location-service provides endpoints to perform a range of address based queries for UK locations....
+          endpointDescription: https://engineering.dwp.gov.uk/apis/docs
+          endpointURL: ""
+          identifier: fcbc4d3f-0c05-4857-b0e3-eeec6bfea3a1
+          issued: "2022-01-23"
+          keyword:
+            - Address Search
+            - UPRN
+          licence: https://opensource.org/license/isc-license-txt/
+          modified: "2023-01-30"
+          organisation:
+            acronym: DWP
+            homepage: https://www.gov.uk/government/organisations/department-for-work-pensions
+            id: department-for-work-pensions
+            title: Department for Work & Pensions
+          relatedAssets: []
+          securityClassification: OFFICIAL
+          servesData:
+            - https://www.data.gov.uk/dataset/2dfb82b4-741a-4b93-807e-11abb4bb0875/os-postcodes-data
+            - https://www.data.gov.uk/dataset/03d48dba-529b-4bd5-93a5-6d41d1b20ff9/national-address-gazetteer
+            - https://www.data.gov.uk/dataset/92b32629-8ad4-43cb-9952-7d104971fa12/one-scotland-gazetteer
+          serviceStatus: LIVE
+          serviceType: REST
+          summary: DWP single strategic solution for looking up addresses including fuzzy search and UPRN.
+          theme:
+            - https://www.data.gov.uk/search?filters%5Btopic%5D=Mapping
+          title: Address Lookup
+          type: DataService
+          version: 2.0.0
+    DataServiceSummary:
+      properties:
+        catalogueCreated:
+          type: string
+          format: date-time
+          title: Cataloguecreated
+        catalogueModified:
+          type: string
+          format: date-time
+          title: Cataloguemodified
+        creator:
+          items:
+            $ref: '#/components/schemas/Organisation'
+          type: array
+          title: Creator
+        identifier:
+          type: string
+          format: uuid
+          title: Identifier
+        organisation:
+          $ref: '#/components/schemas/Organisation'
+        created:
+          anyOf:
+            - type: string
+              format: date-time
+            - type: "null"
+          title: Created
+        summary:
+          type: string
+          title: Summary
+        modified:
+          anyOf:
+            - type: string
+              format: date-time
+            - type: "null"
+          title: Modified
+        title:
+          type: string
+          title: Title
+        type:
+          const: DataService
+          title: Type
+        serviceType:
+          $ref: '#/components/schemas/ServiceType'
+      type: object
+      required:
+        - catalogueCreated
+        - catalogueModified
+        - creator
+        - identifier
+        - organisation
+        - summary
+        - title
+        - type
+        - serviceType
+      title: DataServiceSummary
+    Dataset:
+      properties:
+        catalogueCreated:
+          type: string
+          format: date-time
+          title: Cataloguecreated
+        catalogueModified:
+          type: string
+          format: date-time
+          title: Cataloguemodified
+        creator:
+          items:
+            $ref: '#/components/schemas/Organisation'
+          type: array
+          title: Creator
+        identifier:
+          type: string
+          format: uuid
+          title: Identifier
+        organisation:
+          $ref: '#/components/schemas/Organisation'
+        created:
+          anyOf:
+            - type: string
+              format: date-time
+            - type: "null"
+          title: Created
+        summary:
+          anyOf:
+            - type: string
+            - type: "null"
+          title: Summary
+        modified:
+          anyOf:
+            - type: string
+              format: date-time
+            - type: "null"
+          title: Modified
+        title:
+          type: string
+          title: Title
+        type:
+          const: Dataset
+          title: Type
+        accessRights:
+          anyOf:
+            - $ref: '#/components/schemas/rightsStatement'
+            - type: "null"
+        alternativeTitle:
+          anyOf:
+            - items:
+                type: string
+              type: array
+            - type: "null"
+          title: Alternativetitle
+          default: []
+        contactPoint:
+          $ref: '#/components/schemas/ContactPoint'
+        issued:
+          anyOf:
+            - type: string
+              format: date-time
+            - type: "null"
+          title: Issued
+        keyword:
+          anyOf:
+            - items:
+                type: string
+              type: array
+            - type: "null"
+          title: Keyword
+          default: []
         licence:
           anyOf:
             - type: string
@@ -217,70 +460,176 @@ components:
             - type: "null"
           title: Licence
           default: https://www.nationalarchives.gov.uk/doc/open-government-licence/version/3/
+        relatedAssets:
+          anyOf:
+            - items:
+                type: string
+                minLength: 1
+                format: uri
+              type: array
+            - type: "null"
+          title: Relatedassets
+          default: []
         securityClassification:
           anyOf:
             - $ref: '#/components/schemas/securityClass'
             - type: "null"
           default: OFFICIAL
+        theme:
+          anyOf:
+            - items:
+                type: string
+                minLength: 1
+                format: uri
+              type: array
+            - type: "null"
+          title: Theme
+          default: []
         version:
           anyOf:
             - type: string
             - type: "null"
           title: Version
           default: "1.0"
-        creator:
-          anyOf:
-            - items:
-                $ref: '#/components/schemas/Organisation'
-              type: array
-            - type: "null"
-          title: Creator
-          default: []
+        distributions:
+          items:
+            $ref: '#/components/schemas/DistributionSummary'
+          type: array
+          title: Distributions
+        updateFrequency:
+          type: string
+          title: Updatefrequency
       type: object
       required:
-        - id
+        - catalogueCreated
+        - catalogueModified
+        - creator
+        - identifier
         - organisation
         - title
-        - description
-        - created
         - type
         - contactPoint
-      title: DataAsset
-    DataAssetSummary:
+        - distributions
+        - updateFrequency
+      title: Dataset
+      examples:
+        - accessRights: INTERNAL
+          catalogueCreated: "2023-07-31T11:26:50.383Z"
+          catalogueModified: "2023-07-31T11:26:50.383Z"
+          contactPoint:
+            contactName: DWP Integration Team
+            email: integration.technologyplatforms@dwp.gsi.gov.uk
+          creator:
+            - acronym: DWP
+              homepage: https://www.gov.uk/government/organisations/department-for-work-pensions
+              id: department-for-work-pensions
+              title: Department for Work & Pensions
+          description: The location-service provides endpoints to perform a range of address based queries for UK locations....
+          distributions:
+            - mediaType: CSV
+              modified: "2023-08-01"
+              title: document1
+            - mediaType: XLS
+              modified: "2023-08-01"
+              title: document2
+          identifier: fcbc4d3f-0c05-4857-b0e3-eeec6bfea3a1
+          issued: "2022-01-23"
+          keyword:
+            - Address Search
+            - UPRN
+          licence: https://opensource.org/license/isc-license-txt/
+          modified: "2023-01-30"
+          organisation:
+            acronym: DWP
+            homepage: https://www.gov.uk/government/organisations/department-for-work-pensions
+            id: department-for-work-pensions
+            title: Department for Work & Pensions
+          relatedAssets: []
+          securityClassification: OFFICIAL
+          summary: DWP single strategic solution for looking up addresses including fuzzy search and UPRN.
+          theme:
+            - https://www.data.gov.uk/search?filters%5Btopic%5D=Mapping
+          title: Address Lookup
+          type: Dataset
+          updateFrequency: Monthly
+          version: 2.0.0
+    DatasetSummary:
       properties:
-        id:
-          type: string
-          format: uuid
-          title: Id
-        organisation:
-          $ref: '#/components/schemas/Organisation'
-        title:
-          type: string
-          title: Title
-        description:
-          type: string
-          title: Description
-        created:
+        catalogueCreated:
           type: string
           format: date-time
+          title: Cataloguecreated
+        catalogueModified:
+          type: string
+          format: date-time
+          title: Cataloguemodified
+        creator:
+          items:
+            $ref: '#/components/schemas/Organisation'
+          type: array
+          title: Creator
+        identifier:
+          type: string
+          format: uuid
+          title: Identifier
+        organisation:
+          $ref: '#/components/schemas/Organisation'
+        created:
+          anyOf:
+            - type: string
+              format: date-time
+            - type: "null"
           title: Created
-        type:
-          $ref: '#/components/schemas/assetType'
+        summary:
+          type: string
+          title: Summary
         modified:
           anyOf:
             - type: string
               format: date-time
             - type: "null"
           title: Modified
+        title:
+          type: string
+          title: Title
+        type:
+          const: Dataset
+          title: Type
+        mediaType:
+          items:
+            type: string
+          type: array
+          title: Mediatype
       type: object
       required:
-        - id
+        - catalogueCreated
+        - catalogueModified
+        - creator
+        - identifier
         - organisation
+        - summary
         - title
-        - description
-        - created
         - type
-      title: DataAssetSummary
+        - mediaType
+      title: DatasetSummary
+    DistributionSummary:
+      properties:
+        title:
+          type: string
+          title: Title
+        modified:
+          type: string
+          format: date-time
+          title: Modified
+        mediaType:
+          type: string
+          title: Mediatype
+      type: object
+      required:
+        - title
+        - modified
+        - mediaType
+      title: DistributionSummary
     HTTPValidationError:
       properties:
         detail:
@@ -317,7 +666,9 @@ components:
       properties:
         data:
           items:
-            $ref: '#/components/schemas/DataAssetSummary'
+            anyOf:
+              - $ref: '#/components/schemas/DatasetSummary'
+              - $ref: '#/components/schemas/DataServiceSummary'
           type: array
           title: Data
         facets:
@@ -363,6 +714,25 @@ components:
         - organisations
         - assetTypes
       title: SearchFacets
+    ServiceStatus:
+      type: string
+      enum:
+        - DISCOVERY
+        - ALPHA
+        - BETA
+        - PRIVATE_BETA
+        - PUBLIC_BETA
+        - LIVE
+        - DEPRECATED
+        - WITHDRAWN
+      title: ServiceStatus
+    ServiceType:
+      type: string
+      enum:
+        - REST
+        - EVENT
+        - SOAP
+      title: ServiceType
     ValidationError:
       properties:
         loc:
@@ -387,8 +757,8 @@ components:
     assetType:
       type: string
       enum:
-        - dataService
-        - dataset
+        - DataService
+        - Dataset
       title: assetType
     organisationID:
       type: string
