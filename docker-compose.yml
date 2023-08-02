@@ -14,7 +14,11 @@ services:
     working_dir: /code
     volumes:
       - ./api/app:/code/app
-
+    environment:
+      - TRIPLESTORE_URL
+      - DATASET_NAME
+      - UPDATE_URL
+      - QUERY_URL
 
   fuseki:
     build:
