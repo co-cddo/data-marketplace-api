@@ -62,6 +62,9 @@ class ServiceType(str, Enum):
 class MediaType(str, Enum):
     csv = "CSV"
     xml = "XML"
+
+
+class ServiceType(str, Enum):
     rest = "REST"
     event = "EVENT"
     soap = "SOAP"
@@ -93,7 +96,7 @@ class DistributionSummary(BaseModel):
 
 class BaseAssetSummary(BaseModel):
     created: datetime | None = None
-    description: str
+    summary: str
     modified: datetime | None = None
     title: str
     type: assetType  # TODO I reckon this should be a uri - dcat:DataService, dcat:DataSet
@@ -256,14 +259,18 @@ class DataService(BaseAsset, OutputAssetInfo):
 
 
 # For the list endpoint, which returns only a summary of each asset
-class DataAssetSummary(BaseAssetSummary, OutputAssetInfo):
-    # mediaType technically only belongs to Distributions, but we're
-    # using is here also as a synonym for a DataService's serviceType
+class DatasetSummary(BaseAssetSummary, OutputAssetInfo):
+    type: Literal[assetType.dataset]
     mediaType: List[MediaType]
 
 
+class DataServiceSummary(BaseAssetSummary, OutputAssetInfo):
+    type: Literal[assetType.service]
+    serviceType: ServiceType
+
+
 class SearchAssetsResponse(BaseModel):
-    data: List[DataAssetSummary]
+    data: List[DatasetSummary | DataServiceSummary]
     facets: SearchFacets
 
 
