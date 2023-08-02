@@ -5,8 +5,10 @@
 @prefix uk_cross_government_metadata_exchange_model: <https://w3id.org/co-cddo/uk-cross-government-metadata-exchange-model/> .
 @prefix vcard: <http://www.w3.org/2006/vcard/ns#> .
 @prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix cddo: <http://marketplace.cddo.gov.uk/asset/> .
 
-<http://marketplace.cddo.gov.uk/asset/fcbc4d3f-0c05-4857-b0e3-eeec6bfea3a1> a "dcat:DataService"^^xsd:anyURI ;
+cddo:fcbc4d3f-0c05-4857-b0e3-eeec6bfea3a1 a "dcat:DataService"^^xsd:anyURI ;
+    dct:identifier "fcbc4d3f-0c05-4857-b0e3-eeec6bfea3a1" ;
     dct:accessRights "INTERNAL" ;
     dct:creator "department-for-work-pensions" ;
     dct:description """The location-service provides endpoints to perform a range of address based queries for UK locations. The reference data used is provided by Ordnance Survey and covers Great Britain Northern Ireland and the Channel Islands.
@@ -47,6 +49,8 @@ This endpoint provides an address matching function. It will take an unstructure
     dct:issued "2022-01-23"^^xsd:date ;
     dct:license "https://opensource.org/license/isc-license-txt/" ;
     dct:modified "2023-01-30"^^xsd:date ;
+    cddo:created "2023-07-28"^^xsd:date ;
+    cddo:modified "2023-08-01"^^xsd:date ;
     dct:publisher "department-for-work-pensions" ;
     dct:title "Address Lookup" ;
     dct:type "REST" ;

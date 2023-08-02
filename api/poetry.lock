@@ -688,6 +688,17 @@ files = [
 ]
 
 [[package]]
+name = "sparql-burger"
+version = "1.0.2"
+description = "A Python SPARQL query builder that automates the generation of SPARQL graph patterns, SPARQL Select and SPARQL Update queries."
+optional = false
+python-versions = "*"
+files = [
+    {file = "SPARQL-Burger-1.0.2.tar.gz", hash = "sha256:88ec0a9aeb001d5c3dd08b82405059ae7a0365e7839efee3cbe57123f0ed7bce"},
+    {file = "SPARQL_Burger-1.0.2-py3-none-any.whl", hash = "sha256:845ff407692027f7b977ad07204d2c55b7d476b34a4e35bfbea91f6c3a8ed3f9"},
+]
+
+[[package]]
 name = "sparqlwrapper"
 version = "2.0.0"
 description = "SPARQL Endpoint interface to Python"
@@ -940,4 +951,4 @@ files = [
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.11"
-content-hash = "98606836e26aed2f126c6da797d7cddd197ec392bd8df4ba3ebb88aea2051bd3"
+content-hash = "62ba1a765a1eebab4044efaa68099e53042eb82a156b4f161ed8377e1c3be3e9"

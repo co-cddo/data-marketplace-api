@@ -17,34 +17,6 @@ class assetType(str, Enum):
     dataset = "Dataset"
 
 
-organisations = {
-    "department-for-work-pensions": {
-        "id": "department-for-work-pensions",
-        "title": "Department for Work & Pensions",
-        "acronym": "DWP",
-        "homepage": "https://www.gov.uk/government/organisations/department-for-work-pensions",
-    },
-    "food-standards-agency": {
-        "id": "food-standards-agency",
-        "title": "Food Standards Agency",
-        "acronym": "FSA",
-        "homepage": "https://www.food.gov.uk/",
-    },
-    "nhs-digital": {
-        "id": "nhs-digital",
-        "title": "NHS Digital",
-        "acronym": "NHS Digital",
-        "homepage": "https://digital.nhs.uk/",
-    },
-    "ordnance-survey": {
-        "id": "ordnance-survey",
-        "title": "Ordnance Survey",
-        "acronym": "OS",
-        "homepage": "https://www.gov.uk/government/organisations/ordnance-survey",
-    },
-}
-
-
 class Organisation(BaseModel):
     title: str
     id: str
@@ -57,14 +29,6 @@ class organisationID(str, Enum):
     fsa = "food-standards-agency"
     nhsd = "nhs-digital"
     os = "ordnance-survey"
-
-
-def lookup_organisation(org_id: organisationID) -> Organisation:
-    try:
-        org_data = organisations[org_id]
-    except:
-        raise ValueError("Organisation does not exist")
-    return Organisation.parse_obj(org_data)
 
 
 class securityClass(str, Enum):
@@ -166,7 +130,66 @@ class OutputAssetInfo(BaseModel):
 # A single dataset returned from asset detail endpoint
 class Dataset(BaseAsset, OutputAssetInfo):
     distributions: list[DistributionSummary]
+    updateFrequency: str
     type: Literal[assetType.dataset]
+
+    model_config = {
+        "json_schema_extra": {
+            "examples": [
+                {
+                    "accessRights": "INTERNAL",
+                    "catalogueCreated": "2023-07-31T11:26:50.383Z",
+                    "catalogueModified": "2023-07-31T11:26:50.383Z",
+                    "contactPoint": {
+                        "contactName": "DWP Integration Team",
+                        "email": "integration.technologyplatforms@dwp.gsi.gov.uk",
+                    },
+                    "creator": [
+                        {
+                            "id": "department-for-work-pensions",
+                            "title": "Department for Work & Pensions",
+                            "acronym": "DWP",
+                            "homepage": "https://www.gov.uk/government/organisations/department-for-work-pensions",
+                        }
+                    ],
+                    "description": "The location-service provides endpoints to perform a range of address based queries for UK locations....",
+                    "distributions": [
+                        {
+                            "title": "document1",
+                            "modified": "2023-08-01",
+                            "mediaType": "CSV",
+                        },
+                        {
+                            "title": "document2",
+                            "modified": "2023-08-01",
+                            "mediaType": "XLS",
+                        },
+                    ],
+                    "identifier": "fcbc4d3f-0c05-4857-b0e3-eeec6bfea3a1",
+                    "issued": "2022-01-23",
+                    "keyword": ["Address Search", "UPRN"],
+                    "licence": "https://opensource.org/license/isc-license-txt/",
+                    "modified": "2023-01-30",
+                    "organisation": {
+                        "id": "department-for-work-pensions",
+                        "title": "Department for Work & Pensions",
+                        "acronym": "DWP",
+                        "homepage": "https://www.gov.uk/government/organisations/department-for-work-pensions",
+                    },
+                    "relatedAssets": [],
+                    "securityClassification": "OFFICIAL",
+                    "summary": "DWP single strategic solution for looking up addresses including fuzzy search and UPRN.",
+                    "theme": [
+                        "https://www.data.gov.uk/search?filters%5Btopic%5D=Mapping"
+                    ],
+                    "title": "Address Lookup",
+                    "type": "Dataset",
+                    "updateFrequency": "Monthly",
+                    "version": "2.0.0",
+                }
+            ]
+        }
+    }
 
 
 class DataService(BaseAsset, OutputAssetInfo):

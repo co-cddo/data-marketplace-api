@@ -48,10 +48,6 @@
     text:uidField "uid" ;
     text:langField "lang" ;
     text:map (
-         [ text:field "text" ; text:predicate skos:prefLabel ]
-         [ text:field "text" ; text:predicate skos:altLabel ]
-         [ text:field "text" ; text:predicate skos:hiddenLabel ]
-         [ text:field "text" ; text:predicate rdfs:label ]
          [ text:field "text" ; text:predicate dct:title ]
          )
     .

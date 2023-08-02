@@ -1,8 +1,10 @@
 from uuid import UUID
+import json
 from typing import Annotated, List, Union
 from fastapi import FastAPI, Body, Query, HTTPException
 from fastapi.responses import JSONResponse
 from . import model as m
+from . import db
 
 app = FastAPI(title="CDDO Data Marketplace API", version="0.1.0")
 
@@ -21,14 +23,21 @@ async def list_organisations() -> List[m.Organisation]:
 # TODO: add theme query param
 @app.get("/catalogue")
 async def search_catalogue(
-    query: str = None,
+    query: str = "",
     topic: Annotated[List[str], Query()] = [],
     organisation: Annotated[List[m.organisationID], Query()] = [],
     assetType: Annotated[List[m.assetType], Query()] = [],
     limit: int = 100,
     offset: int = 0,
 ) -> list[m.SearchAssetsResponse]:
-    return []
+    data = db.search(query)
+    facets = {"topics": [], "organisations": [], "assetTypes": []}
+
+    response = {"data": data, "facets": facets}
+    # print(json.dumps(response, indent=4))
+
+    r = m.SearchAssetsResponse.model_validate(response)
+    return r
 
 
 @app.get("/catalogue/{asset_id}", response_model=Union[m.DataService, m.Dataset])
