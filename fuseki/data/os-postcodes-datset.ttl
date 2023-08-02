@@ -1,0 +1,32 @@
+@prefix dcat: <http://www.w3.org/ns/dcat#> .
+@prefix dct: <http://purl.org/dc/terms/> .
+@prefix freq: <http://purl.org/cld/freq/> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix uk_cross_government_metadata_exchange_model: <https://w3id.org/co-cddo/uk-cross-government-metadata-exchange-model/> .
+@prefix vcard: <http://www.w3.org/2006/vcard/ns#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+
+<https://www.data.gov.uk/dataset/2dfb82b4-741a-4b93-807e-11abb4bb0875/os-postcodes-data> a "dcat:Dataset"^^xsd:anyURI ;
+    dct:identifier "2dfb82b4-741a-4b93-807e-11abb4bb0875" ;
+    dct:accessRights "OPEN" ;
+    dct:accrualPeriodicity freq:quarterly ;
+    dct:creator "ordnance-survey" ;
+    dct:description "The United Kingdom's (England, Scotland, Wales, Northern Ireland) postcodes represented as points and polygons. This data is often used for service delivery and statistical analysis. OS Postcodes Data is made available in a number of Ordnance Survey Products: Codepoint (point geometry), Codepoint Open (point geometry) and Codepoint with Polygons (polygon geometry). The postcode is sourced from Royal Mail. The polygon geometry is calculated using address geometry provided by Local Authority Land and Property Gazetteer custodians as a base." ;
+    dct:issued "2022-02-01"^^xsd:date ;
+    dct:license "http://www.nationalarchives.gov.uk/doc/open-government-licence/version/3/" ;
+    dct:modified "2023-02-01"^^xsd:date ;
+    cddo:created "2023-07-28"^^xsd:date ;
+    cddo:modified "2023-08-01"^^xsd:date ;
+    dct:publisher "department-for-work-pensions" ;
+    dct:title "OS Postcodes Data" ;
+    rdfs:comment "Free and open postcode location data. Can be used for geographical analysis simple route planning asset management and much more." ;
+    dcat:contactPoint [ a vcard:Kind ;
+            vcard:fn "Ordnance Survey Customer Service Centre" ;
+            vcard:hasEmail "customerservices@os.uk" ] ;
+    dcat:distribution "https://api.os.uk/downloads/v1/products/CodePointOpen/downloads?area=GB&format=CSV&redirect"^^xsd:anyURI,
+        "https://api.os.uk/downloads/v1/products/CodePointOpen/downloads?area=GB&format=GeoPackage&redirect"^^xsd:anyURI ;
+    dcat:keyword "Address", "Postcode" ;
+    dcat:theme "https://www.data.gov.uk/search?filters%5Btopic%5D=Mapping"^^xsd:anyURI ;
+    dcat:version "2023-02" ;
+    uk_cross_government_metadata_exchange_model:securityClassification "OFFICIAL" .
+
