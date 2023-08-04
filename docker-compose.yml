@@ -19,6 +19,8 @@ services:
       - DATASET_NAME
       - UPDATE_URL
       - QUERY_URL
+    networks:
+      - marketplace
 
   fuseki:
     build:
@@ -32,4 +34,9 @@ services:
       - ENABLE_UPDATE=true
       - ENABLE_DATA_WRITE=true
       - ENABLE_UPLOAD=true
+    networks:
+      - marketplace
       
+networks:
+  marketplace:
+    name: marketplace

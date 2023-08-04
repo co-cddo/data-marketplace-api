@@ -131,7 +131,6 @@ def search(q: str = ""):
     result = sparql_reader.queryAndConvert()["results"]["bindings"]
 
     result_dicts = [utils.search_query_result_to_dict(r) for r in result]
-    print(result_dicts)
 
     for r in result_dicts:
         if r["type"] == "Dataset":

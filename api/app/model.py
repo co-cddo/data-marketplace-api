@@ -270,7 +270,7 @@ class DataServiceSummary(BaseAssetSummary, OutputAssetInfo):
 
 
 class SearchAssetsResponse(BaseModel):
-    data: List[DatasetSummary | DataServiceSummary]
+    assets: List[DatasetSummary | DataServiceSummary]
     facets: SearchFacets
 
 

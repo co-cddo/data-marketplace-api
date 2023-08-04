@@ -30,10 +30,10 @@ def search_catalogue(
     limit: int = 100,
     offset: int = 0,
 ) -> m.SearchAssetsResponse:
-    data = db.search(query)
+    assets = db.search(query)
     facets = {"topics": [], "organisations": [], "assetTypes": []}
 
-    response = {"data": data, "facets": facets}
+    response = {"assets": assets, "facets": facets}
 
     r = m.SearchAssetsResponse.model_validate(response)
     return r
