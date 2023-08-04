@@ -82,7 +82,7 @@ class SearchFacets(BaseModel):
 
 
 class ContactPoint(BaseModel):
-    name: str | None = None
+    name: str
     email: EmailStr
     telephone: str | None = None
     address: str | None = None

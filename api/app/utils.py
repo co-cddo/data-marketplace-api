@@ -46,14 +46,16 @@ def search_query_result_to_dict(result):
                 d[k] = datetime.fromisoformat(v["value"])
             case "organisation":
                 d[k] = lookup_organisation(v["value"])
-            case "creator":
-                creators = v["value"]
-                if not isinstance(creators, list):
-                    creators = [creators]
-                d[k] = [lookup_organisation(c) for c in creators]
             case "type":
                 if v["value"].startswith("dcat:"):
                     d[k] = v["value"].replace("dcat:", "")
+            case "creator":
+                creators = v["value"].split("|")
+                d[k] = [lookup_organisation(c) for c in creators]
+            case "keyword" | "alternativeTitle" | "relatedResource" | "theme" | "servesData" | "distributions":
+                d[k] = v["value"].split("|")
+            case "mediaType":
+                d[k] = remap_media_type(v["value"])
             case _:
                 d[k] = v["value"]
 
@@ -84,3 +86,15 @@ MEDIATYPES = {
 # TODO What happens if the media type isn't in the dict? We can't make nice names for all types...
 def remap_media_type(t: str):
     return MEDIATYPES.get(t, t)
+
+
+def select_keys(d: dict, keys: list):
+    """Similar to select-keys in Clojure.
+    Returns a new dictionary only containing the specified keys"""
+    return {k: d[k] for k in keys}
+
+
+def remove_keys(d: dict, keys: list):
+    """Similar to remove-keys in Clojure.
+    Returns a new dictionary with the specified keys removed"""
+    return {k: d[k] for k in d.keys() if k not in keys}

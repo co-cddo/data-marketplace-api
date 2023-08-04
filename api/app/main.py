@@ -22,7 +22,7 @@ async def list_organisations() -> List[m.Organisation]:
 
 # TODO: add theme query param
 @app.get("/catalogue")
-async def search_catalogue(
+def search_catalogue(
     query: str = "",
     topic: Annotated[List[str], Query()] = [],
     organisation: Annotated[List[m.organisationID], Query()] = [],
@@ -41,5 +41,10 @@ async def search_catalogue(
 
 @app.get("/catalogue/{asset_id}", response_model=Union[m.DataService, m.Dataset])
 async def catalogue_entry_detail(asset_id: UUID):
-    # Obviously, this would return the asset if it existed!
-    raise HTTPException(status_code=404, detail="Item not found")
+    asset = db.asset_detail(asset_id)
+    if asset["type"] == "Dataset":
+        return m.Dataset.model_validate(asset)
+    elif asset["type"] == "DataService":
+        return m.DataService.model_validate(asset)
+    else:
+        raise HTTPException(status_code=404, detail="Item not found")
