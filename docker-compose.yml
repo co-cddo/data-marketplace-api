@@ -17,8 +17,6 @@ services:
     environment:
       - TRIPLESTORE_URL
       - DATASET_NAME
-      - UPDATE_URL
-      - QUERY_URL
     networks:
       - marketplace
 

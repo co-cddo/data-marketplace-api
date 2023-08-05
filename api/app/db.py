@@ -15,14 +15,11 @@ from rdflib.namespace import (
 from rdflib import Namespace
 from SPARQLWrapper import SPARQLWrapper, JSON, POST
 
-from dotenv import load_dotenv
+from . import config
 from . import utils
 from . import model as m
-import json
 
-load_dotenv()
-
-sparql_writer = SPARQLWrapper(os.environ.get("UPDATE_URL"))
+sparql_writer = SPARQLWrapper(config.UPDATE_URL)
 sparql_writer.setReturnFormat(JSON)
 sparql_writer.method = POST
 
@@ -56,7 +53,7 @@ def add_entry(ds_uri_slug, name, description):
     return ret
 
 
-sparql_reader = SPARQLWrapper(os.environ.get("QUERY_URL"))
+sparql_reader = SPARQLWrapper(config.QUERY_URL)
 sparql_reader.setReturnFormat(JSON)
 
 
