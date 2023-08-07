@@ -39,12 +39,14 @@ def search_catalogue(
     return r
 
 
-@app.get("/catalogue/{asset_id}", response_model=Union[m.DataService, m.Dataset])
-async def catalogue_entry_detail(asset_id: UUID):
+@app.get("/catalogue/{asset_id}")
+async def catalogue_entry_detail(asset_id: UUID) -> m.AssetDetailResponse:
     asset = db.asset_detail(asset_id)
     if asset["type"] == "Dataset":
-        return m.Dataset.model_validate(asset)
+        asset = m.Dataset.model_validate(asset)
     elif asset["type"] == "DataService":
-        return m.DataService.model_validate(asset)
+        asset = m.DataService.model_validate(asset)
     else:
         raise HTTPException(status_code=404, detail="Item not found")
+
+    return {"asset": asset}

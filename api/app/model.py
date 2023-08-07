@@ -274,6 +274,10 @@ class SearchAssetsResponse(BaseModel):
     facets: SearchFacets
 
 
+class AssetDetailResponse(BaseModel):
+    asset: Dataset | DataService
+
+
 class CreateAssetBody(BaseAsset):
     organisationID: organisationID
     creatorID: List[organisationID] | None = []
