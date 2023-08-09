@@ -13,8 +13,8 @@ For python version and dependency management.
 
 Installation instructions are [here](https://python-poetry.org/docs/#installing-with-the-official-installer).
 
-### docker (optional)
-For running the local [Fuseki](https://jena.apache.org/documentation/fuseki2/) SPARQL server.
+### docker (required)
+For running the local API and [Fuseki](https://jena.apache.org/documentation/fuseki2/) SPARQL server.
 
 Installation instructions for macOS [here](https://docs.docker.com/desktop/install/mac-install/).
 
