@@ -34,8 +34,11 @@ Installation instructions are [here](https://github.com/mikefarah/yq/#install) (
 ### API
 Start the API and Fuseki database with `just run`.
 
+You should then be able to run `curl http://localhost:8000/catalogue` to list the data assets in the triplestore.
+
 The OpenAPI/Swagger documentation will be served at: http://localhost:8000/docs.
 
+### Triplestore 
 Fuseki will be initialised with the data in `fuseki/data` pre-loaded in the database.
 
 The Fuseki web UI will be served at http://localhost:3030, the username is `admin` and the password is printed in the Docker compose logs.
