@@ -7,7 +7,7 @@
 @prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
 @prefix cddo: <http://marketplace.cddo.gov.uk/asset/> .
 
-cddo:fcbc4d3f-0c05-4857-b0e3-eeec6bfea3a1 a "dcat:DataService"^^xsd:anyURI ;
+cddo:fcbc4d3f-0c05-4857-b0e3-eeec6bfea3a1 a dcat:DataService ;
     dct:identifier "fcbc4d3f-0c05-4857-b0e3-eeec6bfea3a1" ;
     dct:accessRights "INTERNAL" ;
     dct:creator "department-for-work-pensions" ;
@@ -61,10 +61,10 @@ This endpoint provides an address matching function. It will take an unstructure
     dcat:endpointDescription "https://engineering.dwp.gov.uk/apis/docs"^^xsd:anyURI ;
     dcat:keyword "Address Search",
         "UPRN" ;
-    dcat:servesData "https://www.data.gov.uk/dataset/03d48dba-529b-4bd5-93a5-6d41d1b20ff9/national-address-gazetteer"^^xsd:anyURI,
-        "https://www.data.gov.uk/dataset/2dfb82b4-741a-4b93-807e-11abb4bb0875/os-postcodes-data"^^xsd:anyURI,
-        "https://www.data.gov.uk/dataset/92b32629-8ad4-43cb-9952-7d104971fa12/one-scotland-gazetteer"^^xsd:anyURI ;
-    dcat:theme "https://www.data.gov.uk/search?filters%5Btopic%5D=Mapping"^^xsd:anyURI ;
+    dcat:servesData <https://www.data.gov.uk/dataset/03d48dba-529b-4bd5-93a5-6d41d1b20ff9/national-address-gazetteer>,
+        <https://www.data.gov.uk/dataset/2dfb82b4-741a-4b93-807e-11abb4bb0875/os-postcodes-data>,
+        <https://www.data.gov.uk/dataset/92b32629-8ad4-43cb-9952-7d104971fa12/one-scotland-gazetteer> ;
+    dcat:theme <https://www.data.gov.uk/search?filters%5Btopic%5D=Mapping> ;
     dcat:version "2.0.0" ;
     uk_cross_government_metadata_exchange_model:securityClassification "OFFICIAL" ;
     adms:status "LIVE" .

@@ -6,7 +6,7 @@
 @prefix vcard: <http://www.w3.org/2006/vcard/ns#> .
 @prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
 
-<https://www.data.gov.uk/dataset/2dfb82b4-741a-4b93-807e-11abb4bb0875/os-postcodes-data> a "dcat:Dataset"^^xsd:anyURI ;
+<https://www.data.gov.uk/dataset/2dfb82b4-741a-4b93-807e-11abb4bb0875/os-postcodes-data> a dcat:Dataset ;
     dct:identifier "2dfb82b4-741a-4b93-807e-11abb4bb0875" ;
     dct:accessRights "OPEN" ;
     dct:accrualPeriodicity freq:quarterly ;
@@ -23,10 +23,10 @@
     dcat:contactPoint [ a vcard:Kind ;
             vcard:fn "Ordnance Survey Customer Service Centre" ;
             vcard:hasEmail "customerservices@os.uk" ] ;
-    dcat:distribution "https://api.os.uk/downloads/v1/products/CodePointOpen/downloads?area=GB&format=CSV&redirect"^^xsd:anyURI,
-        "https://api.os.uk/downloads/v1/products/CodePointOpen/downloads?area=GB&format=GeoPackage&redirect"^^xsd:anyURI ;
+    dcat:distribution <https://api.os.uk/downloads/v1/products/CodePointOpen/downloads?area=GB&format=CSV&redirect>,
+        <https://api.os.uk/downloads/v1/products/CodePointOpen/downloads?area=GB&format=GeoPackage&redirect> ;
     dcat:keyword "Address", "Postcode" ;
-    dcat:theme "https://www.data.gov.uk/search?filters%5Btopic%5D=Mapping"^^xsd:anyURI ;
+    dcat:theme <https://www.data.gov.uk/search?filters%5Btopic%5D=Mapping> ;
     dcat:version "2023-02" ;
     uk_cross_government_metadata_exchange_model:securityClassification "OFFICIAL" .
 
