@@ -1,0 +1,12 @@
+PREFIX dcat: <http://www.w3.org/ns/dcat#>
+PREFIX dct: <http://purl.org/dc/terms/>
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+
+SELECT ?distribution ?title ?modified ?mediaType
+WHERE {{
+    VALUES ?distribution { $distribution }
+    ?distribution dct:title ?title ;
+                  dct:modified ?modified ;
+                  dcat:mediaType ?mediaTypeUri .
+    ?mediaTypeUri rdfs:label ?mediaType .
+}}

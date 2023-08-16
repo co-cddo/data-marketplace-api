@@ -1,0 +1,12 @@
+@prefix dcat: <http://www.w3.org/ns/dcat#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix application: <https://www.iana.org/assignments/media-types/application/> .
+@prefix text: <https://www.iana.org/assignments/media-types/text/> .
+
+dcat:Distribution rdfs:label "Distribution"@en .
+dcat:Dataset rdfs:label "Dataset"@en .
+dcat:DataService rdfs:label "DataService"@en .
+
+<application:geopackage+sqlite3> rdfs:label "GeoPackage" .
+<application:vnd.ms-excel> rdfs:label "XLS".
+text:csv rdfs:label "CSV" .

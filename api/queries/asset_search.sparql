@@ -1,0 +1,30 @@
+PREFIX text: <http://jena.apache.org/text#>
+PREFIX dcat: <http://www.w3.org/ns/dcat#>
+PREFIX dct: <http://purl.org/dc/terms/>
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+PREFIX cddo: <http://marketplace.cddo.gov.uk/asset/>
+
+SELECT ?identifier ?type ?title ?description ?organisation 
+        ?catalogueCreated ?catalogueModified ?created ?issued ?modified 
+        ?summary ?serviceType ?creator ?mediaType
+WHERE {{
+    ?s text:query "$q" ;
+        dct:identifier ?identifier ;
+        a ?typeURI ;
+        dct:title ?title ;
+        dct:description ?description ;
+        dct:publisher ?organisation ;
+        cddo:created ?catalogueCreated ;
+        cddo:modified ?catalogueModified ;
+        .
+    ?typeURI rdfs:label ?type .
+    OPTIONAL {{ ?s dcat:distribution ?distribution }
+              { ?distribution dcat:mediaType ?mediaTypeUri }
+              { ?mediaTypeUri rdfs:label ?mediaType }} .
+    OPTIONAL {{ ?s dct:creator ?creator }} .
+    OPTIONAL {{ ?s dct:created ?created }} .
+    OPTIONAL {{ ?s dct:issued ?issued }} .
+    OPTIONAL {{ ?s dct:modified ?modified }} .
+    OPTIONAL {{ ?s rdfs:comment ?summary }} .
+    OPTIONAL {{ ?s dct:type ?serviceType }} .
+}}
