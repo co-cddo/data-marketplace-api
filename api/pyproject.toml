@@ -4,6 +4,7 @@ version = "0.1.0"
 description = ""
 authors = ["Kiran Joshi <kiran.joshi@tpximpact.com>", "Madeline Kosse <madeline.kosse@tpximpact.com>"]
 readme = "README.md"
+packages = [{include = "api"}]
 
 [tool.poetry.dependencies]
 python = "^3.11"
