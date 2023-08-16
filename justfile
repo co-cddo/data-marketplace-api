@@ -4,8 +4,8 @@ run:
   # poetry run uvicorn api.app.main:app --reload
 
 setup-hooks:
-  poetry run pre-commit install
-  poetry run pre-commit run --all-files
+  cd api && poetry run pre-commit install
+  cd api && poetry run pre-commit run --all-files
 
 generate-spec-file:
   curl localhost:8000/openapi.json | yq eval -P > openapi.yaml

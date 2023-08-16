@@ -37,15 +37,18 @@ def lookup_organisation(org_id: m.organisationID) -> m.Organisation:
         raise ValueError("Organisation does not exist")
     return m.Organisation.model_validate(org_data)
 
+
 def _convert_multival_fields_to_lists(asset_result_dict):
-    for k in ["creator",
-              "keyword",
-              "alternativeTitle",
-              "relatedResource",
-              "theme",
-              "servesData",
-              "distribution",
-              "mediaType"]:
+    for k in [
+        "creator",
+        "keyword",
+        "alternativeTitle",
+        "relatedResource",
+        "theme",
+        "servesData",
+        "distribution",
+        "mediaType",
+    ]:
         current_val = asset_result_dict.get(k)
         if current_val is None:
             pass
@@ -53,6 +56,7 @@ def _convert_multival_fields_to_lists(asset_result_dict):
             asset_result_dict[k] = sorted(list(current_val))
         else:
             asset_result_dict[k] = [current_val]
+
 
 def enrich_query_result_dict(asset_result_dict):
     enriched = {k: v for k, v in asset_result_dict.items() if k != "resourceUri"}
@@ -62,6 +66,7 @@ def enrich_query_result_dict(asset_result_dict):
     if "creator" in enriched:
         enriched["creator"] = [lookup_organisation(o) for o in enriched["creator"]]
     return enriched
+
 
 def munge_asset_summary_response(result_dict):
     r = result_dict.copy()
@@ -76,10 +81,12 @@ def munge_asset_summary_response(result_dict):
 def sanitise_search_query(q: str):
     return q.strip('"')
 
+
 def select_keys(d: dict, keys: list):
     """Similar to select-keys in Clojure.
     Returns a new dictionary only containing the specified keys"""
     return {k: d[k] for k in keys}
+
 
 def remove_keys(d: dict, keys: list):
     """Similar to remove-keys in Clojure.

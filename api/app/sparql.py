@@ -19,10 +19,12 @@ def _prep_query(query_file_name, bindings):
         template = Template(f.read())
     return template.substitute(bindings)
 
+
 def run_query(query_file_name, **bindings):
     q = _prep_query(query_file_name, bindings)
     sparql_reader.setQuery(q)
     return sparql_reader.queryAndConvert()["results"]["bindings"]
+
 
 def _query_result_to_dict(result):
     d = {}
@@ -59,5 +61,7 @@ def _aggregate_results(results):
 def aggregate_query_results_by_key(results, group_key="resourceUri"):
     """Groups the result by given key and aggregates the groups into a single dictionary for each"""
     get_uri = lambda result: result[group_key]["value"]
-    return [_aggregate_results(results_for_resource)
-            for _, results_for_resource in groupby(results, get_uri)]
+    return [
+        _aggregate_results(results_for_resource)
+        for _, results_for_resource in groupby(results, get_uri)
+    ]
