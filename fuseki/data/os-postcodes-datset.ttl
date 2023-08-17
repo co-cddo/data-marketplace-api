@@ -5,6 +5,7 @@
 @prefix uk_cross_government_metadata_exchange_model: <https://w3id.org/co-cddo/uk-cross-government-metadata-exchange-model/> .
 @prefix vcard: <http://www.w3.org/2006/vcard/ns#> .
 @prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix cddo_asset: <http://marketplace.cddo.gov.uk/asset/> .
 
 <https://www.data.gov.uk/dataset/2dfb82b4-741a-4b93-807e-11abb4bb0875/os-postcodes-data> a dcat:Dataset ;
     dct:identifier "2dfb82b4-741a-4b93-807e-11abb4bb0875" ;
@@ -15,8 +16,8 @@
     dct:issued "2022-02-01"^^xsd:date ;
     dct:license "http://www.nationalarchives.gov.uk/doc/open-government-licence/version/3/" ;
     dct:modified "2023-02-01"^^xsd:date ;
-    cddo:created "2023-07-28"^^xsd:date ;
-    cddo:modified "2023-08-01"^^xsd:date ;
+    cddo_asset:created "2023-07-28"^^xsd:date ;
+    cddo_asset:modified "2023-08-01"^^xsd:date ;
     dct:publisher "department-for-work-pensions" ;
     dct:title "OS Postcodes Data" ;
     rdfs:comment "Free and open postcode location data. Can be used for geographical analysis simple route planning asset management and much more." ;
