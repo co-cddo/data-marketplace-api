@@ -1,7 +1,6 @@
 @prefix dcat: <http://www.w3.org/ns/dcat#> .
 @prefix dct: <http://purl.org/dc/terms/> .
 @prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
-@prefix application: <https://www.iana.org/assignments/media-types/application/> .
 
 <https://api.os.uk/downloads/v1/products/CodePointOpen/downloads?area=GB&format=GeoPackage&redirect> a dcat:Distribution;
     dct:accessRights "OPEN" ;
@@ -13,5 +12,5 @@
     dcat:accessService "retirement-bereavement-care-address-lookup-location-service-v2.0.0"^^xsd:anyURI ;
     dcat:byteSize 55410000 ;
     dcat:downloadURL "https://api.os.uk/downloads/v1/products/CodePointOpen/downloads?area=GB&format=CSV&redirect"^^xsd:anyURI ;
-    dcat:mediaType <application:geopackage+sqlite3> .
+    dcat:mediaType <https://w3id.org/uri4uri/mime/application/geopackage+sqlite3> .
 
