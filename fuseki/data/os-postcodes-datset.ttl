@@ -23,8 +23,8 @@
     dcat:contactPoint [ a vcard:Kind ;
             vcard:fn "Ordnance Survey Customer Service Centre" ;
             vcard:hasEmail "customerservices@os.uk" ] ;
-    dcat:distribution <https://api.os.uk/downloads/v1/products/CodePointOpen/downloads?area=GB&format=CSV&redirect>,
-        <https://api.os.uk/downloads/v1/products/CodePointOpen/downloads?area=GB&format=GeoPackage&redirect> ;
+    dcat:distribution <https://www.data.gov.uk/distribution/os-postcodes-data/csv-distribution-id/>,
+                      <https://www.data.gov.uk/distribution/os-postcodes-data/geopackage-distribution-id/> ;
     dcat:keyword "Address", "Postcode" ;
     dcat:theme <https://www.data.gov.uk/search?filters%5Btopic%5D=Mapping> ;
     dcat:version "2023-02" ;

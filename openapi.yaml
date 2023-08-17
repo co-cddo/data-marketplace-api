@@ -101,10 +101,7 @@ paths:
           content:
             application/json:
               schema:
-                anyOf:
-                  - $ref: '#/components/schemas/DataService'
-                  - $ref: '#/components/schemas/Dataset'
-                title: Response Catalogue Entry Detail Catalogue  Asset Id  Get
+                $ref: '#/components/schemas/AssetDetailResponse'
         "422":
           description: Validation Error
           content:
@@ -113,12 +110,21 @@ paths:
                 $ref: '#/components/schemas/HTTPValidationError'
 components:
   schemas:
+    AssetDetailResponse:
+      properties:
+        asset:
+          anyOf:
+            - $ref: '#/components/schemas/DatasetResponse'
+            - $ref: '#/components/schemas/DataServiceResponse'
+          title: Asset
+      type: object
+      required:
+        - asset
+      title: AssetDetailResponse
     ContactPoint:
       properties:
         name:
-          anyOf:
-            - type: string
-            - type: "null"
+          type: string
           title: Name
         email:
           type: string
@@ -136,9 +142,10 @@ components:
           title: Address
       type: object
       required:
+        - name
         - email
       title: ContactPoint
-    DataService:
+    DataServiceResponse:
       properties:
         catalogueCreated:
           type: string
@@ -149,10 +156,7 @@ components:
           format: date-time
           title: Cataloguemodified
         creator:
-          items:
-            $ref: '#/components/schemas/Organisation'
-          type: array
-          title: Creator
+          $ref: '#/components/schemas/Organisation'
         identifier:
           type: string
           format: uuid
@@ -282,7 +286,7 @@ components:
         - servesData
         - serviceStatus
         - serviceType
-      title: DataService
+      title: DataServiceResponse
       examples:
         - accessRights: INTERNAL
           catalogueCreated: "2023-07-31T11:26:50.383Z"
@@ -291,10 +295,10 @@ components:
             contactName: DWP Integration Team
             email: integration.technologyplatforms@dwp.gsi.gov.uk
           creator:
-            - acronym: DWP
-              homepage: https://www.gov.uk/government/organisations/department-for-work-pensions
-              id: department-for-work-pensions
-              title: Department for Work & Pensions
+            acronym: DWP
+            homepage: https://www.gov.uk/government/organisations/department-for-work-pensions
+            id: department-for-work-pensions
+            title: Department for Work & Pensions
           description: The location-service provides endpoints to perform a range of address based queries for UK locations....
           endpointDescription: https://engineering.dwp.gov.uk/apis/docs
           endpointURL: ""
@@ -335,10 +339,7 @@ components:
           format: date-time
           title: Cataloguemodified
         creator:
-          items:
-            $ref: '#/components/schemas/Organisation'
-          type: array
-          title: Creator
+          $ref: '#/components/schemas/Organisation'
         identifier:
           type: string
           format: uuid
@@ -380,7 +381,7 @@ components:
         - type
         - serviceType
       title: DataServiceSummary
-    Dataset:
+    DatasetResponse:
       properties:
         catalogueCreated:
           type: string
@@ -391,10 +392,7 @@ components:
           format: date-time
           title: Cataloguemodified
         creator:
-          items:
-            $ref: '#/components/schemas/Organisation'
-          type: array
-          title: Creator
+          $ref: '#/components/schemas/Organisation'
         identifier:
           type: string
           format: uuid
@@ -511,7 +509,7 @@ components:
         - contactPoint
         - distributions
         - updateFrequency
-      title: Dataset
+      title: DatasetResponse
       examples:
         - accessRights: INTERNAL
           catalogueCreated: "2023-07-31T11:26:50.383Z"
@@ -520,10 +518,10 @@ components:
             contactName: DWP Integration Team
             email: integration.technologyplatforms@dwp.gsi.gov.uk
           creator:
-            - acronym: DWP
-              homepage: https://www.gov.uk/government/organisations/department-for-work-pensions
-              id: department-for-work-pensions
-              title: Department for Work & Pensions
+            acronym: DWP
+            homepage: https://www.gov.uk/government/organisations/department-for-work-pensions
+            id: department-for-work-pensions
+            title: Department for Work & Pensions
           description: The location-service provides endpoints to perform a range of address based queries for UK locations....
           distributions:
             - mediaType: CSV
@@ -564,10 +562,7 @@ components:
           format: date-time
           title: Cataloguemodified
         creator:
-          items:
-            $ref: '#/components/schemas/Organisation'
-          type: array
-          title: Creator
+          $ref: '#/components/schemas/Organisation'
         identifier:
           type: string
           format: uuid
@@ -624,11 +619,39 @@ components:
         mediaType:
           type: string
           title: Mediatype
+        accessService:
+          anyOf:
+            - type: string
+            - type: "null"
+          title: Accessservice
+        identifier:
+          type: string
+          title: Identifier
+        issued:
+          anyOf:
+            - type: string
+              format: date-time
+            - type: "null"
+          title: Issued
+        licence:
+          anyOf:
+            - type: string
+              minLength: 1
+              format: uri
+            - type: "null"
+          title: Licence
+          default: https://www.nationalarchives.gov.uk/doc/open-government-licence/version/3/
+        byteSize:
+          anyOf:
+            - type: integer
+            - type: "null"
+          title: Bytesize
       type: object
       required:
         - title
         - modified
         - mediaType
+        - identifier
       title: DistributionSummary
     HTTPValidationError:
       properties:
