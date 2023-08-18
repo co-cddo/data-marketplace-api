@@ -94,7 +94,6 @@ class DistributionSummary(BaseModel):
     byteSize: int | None = None
 
 
-
 class BaseAssetSummary(BaseModel):
     created: datetime | None = None
     summary: str
@@ -137,6 +136,7 @@ class Dataset(BaseAsset):
     updateFrequency: str
     type: Literal[assetType.dataset]
 
+
 # A single dataset returned from asset detail endpoint
 class DatasetResponse(Dataset, OutputAssetInfo):
     model_config = {
@@ -151,12 +151,11 @@ class DatasetResponse(Dataset, OutputAssetInfo):
                         "email": "integration.technologyplatforms@dwp.gsi.gov.uk",
                     },
                     "creator": {
-                            "id": "department-for-work-pensions",
-                            "title": "Department for Work & Pensions",
-                            "acronym": "DWP",
-                            "homepage": "https://www.gov.uk/government/organisations/department-for-work-pensions",
-                        }
-,
+                        "id": "department-for-work-pensions",
+                        "title": "Department for Work & Pensions",
+                        "acronym": "DWP",
+                        "homepage": "https://www.gov.uk/government/organisations/department-for-work-pensions",
+                    },
                     "description": "The location-service provides endpoints to perform a range of address based queries for UK locations....",
                     "distributions": [
                         {
@@ -205,6 +204,7 @@ class DataService(BaseAsset):
     serviceType: ServiceType
     type: Literal[assetType.service]
 
+
 class DataServiceResponse(DataService, OutputAssetInfo):
     model_config = {
         "json_schema_extra": {
@@ -218,12 +218,11 @@ class DataServiceResponse(DataService, OutputAssetInfo):
                         "email": "integration.technologyplatforms@dwp.gsi.gov.uk",
                     },
                     "creator": {
-                            "id": "department-for-work-pensions",
-                            "title": "Department for Work & Pensions",
-                            "acronym": "DWP",
-                            "homepage": "https://www.gov.uk/government/organisations/department-for-work-pensions",
-                        }
-,
+                        "id": "department-for-work-pensions",
+                        "title": "Department for Work & Pensions",
+                        "acronym": "DWP",
+                        "homepage": "https://www.gov.uk/government/organisations/department-for-work-pensions",
+                    },
                     "description": "The location-service provides endpoints to perform a range of address based queries for UK locations....",
                     "endpointDescription": "https://engineering.dwp.gov.uk/apis/docs",
                     "endpointURL": "",
@@ -284,11 +283,14 @@ class CreateAssetBody(BaseAsset):
     organisationID: organisationID
     creatorID: organisationID
 
+
 class CreateDatasetBody(CreateAssetBody, Dataset):
     pass
 
+
 class CreateDataServiceBody(CreateAssetBody, DataService):
     pass
+
 
 class publishJobStatus(str, Enum):
     created = "CREATED"
@@ -300,3 +302,7 @@ class CreateMultipleAssetsJob(BaseModel):
     data: List[CreateDatasetBody | CreateDataServiceBody]
     jobID: uuid.UUID
     jobStatus: publishJobStatus
+
+
+class BeginBatchPublishJobResponse(BatchPublishJob):
+    data: List[CreateDatasetBody | CreateDataServiceBody]
