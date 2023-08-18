@@ -294,12 +294,13 @@ class CreateDataServiceBody(CreateAssetBody, DataService):
 
 class publishJobStatus(str, Enum):
     created = "CREATED"
-    running = "RUNNING"
     draft = "DRAFT"
     published = "PUBLISHED"
+    error = "ERROR"
+    aborted = "ABORTED"
 
-class CreateMultipleAssetsJob(BaseModel):
-    data: List[CreateDatasetBody | CreateDataServiceBody]
+
+class BatchPublishJob(BaseModel):
     jobID: uuid.UUID
     jobStatus: publishJobStatus
 

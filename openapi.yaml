@@ -108,15 +108,15 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/HTTPValidationError'
-  /publish/batch:
+  /publish/batch/create_job:
     post:
-      summary: Publish From File
-      operationId: publish_from_file_publish_batch_post
+      summary: Create Batch Publish Job
+      operationId: create_batch_publish_job_publish_batch_create_job_post
       requestBody:
         content:
           multipart/form-data:
             schema:
-              $ref: '#/components/schemas/Body_publish_from_file_publish_batch_post'
+              $ref: '#/components/schemas/Body_create_batch_publish_job_publish_batch_create_job_post'
         required: true
       responses:
         "201":
@@ -124,7 +124,82 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/CreateMultipleAssetsJob'
+                $ref: '#/components/schemas/BeginBatchPublishJobResponse'
+        "422":
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /publish/batch/{jobID}/status:
+    get:
+      summary: Get Publish Job Status
+      operationId: get_publish_job_status_publish_batch__jobID__status_get
+      parameters:
+        - name: jobID
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+            title: Jobid
+      responses:
+        "200":
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BatchPublishJob'
+        "422":
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /publish/batch/{jobID}/publish:
+    post:
+      summary: Publish Draft
+      operationId: publish_draft_publish_batch__jobID__publish_post
+      parameters:
+        - name: jobID
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+            title: Jobid
+      responses:
+        "200":
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BatchPublishJob'
+        "422":
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /publish/batch/{jobID}/abort:
+    post:
+      summary: Abort Job
+      operationId: abort_job_publish_batch__jobID__abort_post
+      parameters:
+        - name: jobID
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+            title: Jobid
+      responses:
+        "200":
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BatchPublishJob'
         "422":
           description: Validation Error
           content:
@@ -144,7 +219,41 @@ components:
       required:
         - asset
       title: AssetDetailResponse
-    Body_publish_from_file_publish_batch_post:
+    BatchPublishJob:
+      properties:
+        jobID:
+          type: string
+          format: uuid
+          title: Jobid
+        jobStatus:
+          $ref: '#/components/schemas/publishJobStatus'
+      type: object
+      required:
+        - jobID
+        - jobStatus
+      title: BatchPublishJob
+    BeginBatchPublishJobResponse:
+      properties:
+        jobID:
+          type: string
+          format: uuid
+          title: Jobid
+        jobStatus:
+          $ref: '#/components/schemas/publishJobStatus'
+        data:
+          items:
+            anyOf:
+              - $ref: '#/components/schemas/CreateDatasetBody'
+              - $ref: '#/components/schemas/CreateDataServiceBody'
+          type: array
+          title: Data
+      type: object
+      required:
+        - jobID
+        - jobStatus
+        - data
+      title: BeginBatchPublishJobResponse
+    Body_create_batch_publish_job_publish_batch_create_job_post:
       properties:
         datasets:
           type: string
@@ -160,7 +269,7 @@ components:
       required:
         - datasets
         - dataservices
-      title: Body_publish_from_file_publish_batch_post
+      title: Body_create_batch_publish_job_publish_batch_create_job_post
     ContactPoint:
       properties:
         name:
@@ -424,27 +533,6 @@ components:
         - organisationID
         - creatorID
       title: CreateDatasetBody
-    CreateMultipleAssetsJob:
-      properties:
-        data:
-          items:
-            anyOf:
-              - $ref: '#/components/schemas/CreateDatasetBody'
-              - $ref: '#/components/schemas/CreateDataServiceBody'
-          type: array
-          title: Data
-        jobID:
-          type: string
-          format: uuid
-          title: Jobid
-        jobStatus:
-          $ref: '#/components/schemas/publishJobStatus'
-      type: object
-      required:
-        - data
-        - jobID
-        - jobStatus
-      title: CreateMultipleAssetsJob
     DataServiceResponse:
       properties:
         catalogueCreated:
@@ -1095,9 +1183,10 @@ components:
       type: string
       enum:
         - CREATED
-        - RUNNING
         - DRAFT
         - PUBLISHED
+        - ERROR
+        - ABORTED
       title: publishJobStatus
     rightsStatement:
       type: string

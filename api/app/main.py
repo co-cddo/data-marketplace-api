@@ -1,10 +1,10 @@
-from uuid import UUID, uuid4
+from uuid import UUID
 import json
 from typing import Annotated, List, Union
 from fastapi import FastAPI, Body, Query, HTTPException, File, UploadFile
 from app import model as m
 from app import db
-from app.publish import csv as pubcsv
+from app.publish import csv as pubcsv, batch
 from . import utils
 
 app = FastAPI(title="CDDO Data Marketplace API", version="0.1.0")
@@ -57,9 +57,9 @@ async def catalogue_entry_detail(asset_id: UUID) -> m.AssetDetailResponse:
 
 
 # multipart/form-data endpoint
-# curl -F "datasets=@dataset.csv" -F "dataservices=@dataservice.csv" localhost:8000/publish/batch
-@app.post("/publish/batch", status_code=201)
-async def publish_from_file(
+# curl -F "datasets=@dataset.csv" -F "dataservices=@dataservice.csv" localhost:8000/publish/batch/create_job
+@app.post("/publish/batch/create_job", status_code=201)
+async def create_batch_publish_job(
     datasets: Annotated[
         UploadFile,
         File(description="The Dataset tab from the spreadsheet template in CSV format"),
@@ -70,10 +70,26 @@ async def publish_from_file(
             description="The DataService tab from the spreadsheet template in CSV format"
         ),
     ],
-) -> m.CreateMultipleAssetsJob:
+) -> m.BeginBatchPublishJobResponse:
     try:
         services = pubcsv.parse_dataservice_file(dataservices.file)
         datasets = pubcsv.parse_dataset_file(datasets.file)
     except pubcsv.FileContentException as e:
         raise HTTPException(status_code=422, detail=str(e))
-    return {"data": datasets + services, "jobID": uuid4(), "jobStatus": "CREATED"}
+    job = batch.create_job(datasets + services)
+    return {**job, "data": datasets + services}
+
+
+@app.get("/publish/batch/{jobID}/status")
+async def get_publish_job_status(jobID: UUID) -> m.BatchPublishJob:
+    return batch.job_state(jobID)
+
+
+@app.post("/publish/batch/{jobID}/publish")
+async def publish_draft(jobID: UUID) -> m.BatchPublishJob:
+    return batch.publish_draft_job(jobID)
+
+
+@app.post("/publish/batch/{jobID}/abort")
+async def abort_job(jobID: UUID) -> m.BatchPublishJob:
+    return batch.abort_job(jobID)
