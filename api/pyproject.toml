@@ -17,6 +17,7 @@ pydantic = {extras = ["email"], version = "^2.1.1"}
 faker = "^19.2.0"
 sparql-burger = "^1.0.2"
 requests = "^2.31.0"
+python-multipart = "^0.0.6"
 
 [tool.poetry.group.dev.dependencies]
 black = "^23.7.0"

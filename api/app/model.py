@@ -57,10 +57,6 @@ class ServiceType(str, Enum):
     soap = "SOAP"
 
 
-# TODO Update this to allow any IANA media type:
-#  https://www.iana.org/assignments/media-types/media-types.xhtml
-# or service type:
-#  https://github.com/co-cddo/data-catalogue-schemas/blob/linkml/src/model/uk_cross_government_metadata_exchange_model.yaml#L466
 class ServiceType(str, Enum):
     rest = "REST"
     event = "EVENT"
@@ -287,3 +283,20 @@ class AssetDetailResponse(BaseModel):
 class CreateAssetBody(BaseAsset):
     organisationID: organisationID
     creatorID: organisationID
+
+class CreateDatasetBody(CreateAssetBody, Dataset):
+    pass
+
+class CreateDataServiceBody(CreateAssetBody, DataService):
+    pass
+
+class publishJobStatus(str, Enum):
+    created = "CREATED"
+    running = "RUNNING"
+    draft = "DRAFT"
+    published = "PUBLISHED"
+
+class CreateMultipleAssetsJob(BaseModel):
+    data: List[CreateDatasetBody | CreateDataServiceBody]
+    jobID: uuid.UUID
+    jobStatus: publishJobStatus

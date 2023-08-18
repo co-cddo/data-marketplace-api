@@ -1,10 +1,10 @@
-from uuid import UUID
+from uuid import UUID, uuid4
 import json
 from typing import Annotated, List, Union
-from fastapi import FastAPI, Body, Query, HTTPException
-from fastapi.responses import JSONResponse
-from . import model as m
-from . import db
+from fastapi import FastAPI, Body, Query, HTTPException, File, UploadFile
+from app import model as m
+from app import db
+from app.publish import csv as pubcsv
 from . import utils
 
 app = FastAPI(title="CDDO Data Marketplace API", version="0.1.0")
@@ -54,3 +54,26 @@ async def catalogue_entry_detail(asset_id: UUID) -> m.AssetDetailResponse:
         raise HTTPException(status_code=404, detail="Item not found")
 
     return {"asset": asset}
+
+
+# multipart/form-data endpoint
+# curl -F "datasets=@dataset.csv" -F "dataservices=@dataservice.csv" localhost:8000/publish/batch
+@app.post("/publish/batch", status_code=201)
+async def publish_from_file(
+    datasets: Annotated[
+        UploadFile,
+        File(description="The Dataset tab from the spreadsheet template in CSV format"),
+    ],
+    dataservices: Annotated[
+        UploadFile,
+        File(
+            description="The DataService tab from the spreadsheet template in CSV format"
+        ),
+    ],
+) -> m.CreateMultipleAssetsJob:
+    try:
+        services = pubcsv.parse_dataservice_file(dataservices.file)
+        datasets = pubcsv.parse_dataset_file(datasets.file)
+    except pubcsv.FileContentException as e:
+        raise HTTPException(status_code=422, detail=str(e))
+    return {"data": datasets + services, "jobID": uuid4(), "jobStatus": "CREATED"}

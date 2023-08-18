@@ -108,6 +108,29 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/HTTPValidationError'
+  /publish/batch:
+    post:
+      summary: Publish From File
+      operationId: publish_from_file_publish_batch_post
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Body_publish_from_file_publish_batch_post'
+        required: true
+      responses:
+        "201":
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CreateMultipleAssetsJob'
+        "422":
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
 components:
   schemas:
     AssetDetailResponse:
@@ -121,6 +144,23 @@ components:
       required:
         - asset
       title: AssetDetailResponse
+    Body_publish_from_file_publish_batch_post:
+      properties:
+        datasets:
+          type: string
+          format: binary
+          title: Datasets
+          description: The Dataset tab from the spreadsheet template in CSV format
+        dataservices:
+          type: string
+          format: binary
+          title: Dataservices
+          description: The DataService tab from the spreadsheet template in CSV format
+      type: object
+      required:
+        - datasets
+        - dataservices
+      title: Body_publish_from_file_publish_batch_post
     ContactPoint:
       properties:
         name:
@@ -145,6 +185,266 @@ components:
         - name
         - email
       title: ContactPoint
+    CreateDataServiceBody:
+      properties:
+        created:
+          anyOf:
+            - type: string
+              format: date-time
+            - type: "null"
+          title: Created
+        summary:
+          anyOf:
+            - type: string
+            - type: "null"
+          title: Summary
+        modified:
+          anyOf:
+            - type: string
+              format: date-time
+            - type: "null"
+          title: Modified
+        title:
+          type: string
+          title: Title
+        type:
+          $ref: '#/components/schemas/assetType'
+        accessRights:
+          anyOf:
+            - $ref: '#/components/schemas/rightsStatement'
+            - type: "null"
+        alternativeTitle:
+          anyOf:
+            - items:
+                type: string
+              type: array
+            - type: "null"
+          title: Alternativetitle
+          default: []
+        contactPoint:
+          $ref: '#/components/schemas/ContactPoint'
+        issued:
+          anyOf:
+            - type: string
+              format: date-time
+            - type: "null"
+          title: Issued
+        keyword:
+          anyOf:
+            - items:
+                type: string
+              type: array
+            - type: "null"
+          title: Keyword
+          default: []
+        licence:
+          anyOf:
+            - type: string
+              minLength: 1
+              format: uri
+            - type: "null"
+          title: Licence
+          default: https://www.nationalarchives.gov.uk/doc/open-government-licence/version/3/
+        relatedAssets:
+          anyOf:
+            - items:
+                type: string
+                minLength: 1
+                format: uri
+              type: array
+            - type: "null"
+          title: Relatedassets
+          default: []
+        securityClassification:
+          anyOf:
+            - $ref: '#/components/schemas/securityClass'
+            - type: "null"
+          default: OFFICIAL
+        theme:
+          anyOf:
+            - items:
+                type: string
+                minLength: 1
+                format: uri
+              type: array
+            - type: "null"
+          title: Theme
+          default: []
+        version:
+          anyOf:
+            - type: string
+            - type: "null"
+          title: Version
+          default: "1.0"
+        endpointDescription:
+          type: string
+          title: Endpointdescription
+        endpointURL:
+          anyOf:
+            - type: string
+            - type: "null"
+          title: Endpointurl
+        servesData:
+          items:
+            type: string
+            minLength: 1
+            format: uri
+          type: array
+          title: Servesdata
+        serviceStatus:
+          $ref: '#/components/schemas/ServiceStatus'
+        serviceType:
+          $ref: '#/components/schemas/ServiceType'
+        organisationID:
+          $ref: '#/components/schemas/organisationID'
+        creatorID:
+          $ref: '#/components/schemas/organisationID'
+      type: object
+      required:
+        - title
+        - type
+        - contactPoint
+        - endpointDescription
+        - servesData
+        - serviceStatus
+        - serviceType
+        - organisationID
+        - creatorID
+      title: CreateDataServiceBody
+    CreateDatasetBody:
+      properties:
+        created:
+          anyOf:
+            - type: string
+              format: date-time
+            - type: "null"
+          title: Created
+        summary:
+          anyOf:
+            - type: string
+            - type: "null"
+          title: Summary
+        modified:
+          anyOf:
+            - type: string
+              format: date-time
+            - type: "null"
+          title: Modified
+        title:
+          type: string
+          title: Title
+        type:
+          $ref: '#/components/schemas/assetType'
+        accessRights:
+          anyOf:
+            - $ref: '#/components/schemas/rightsStatement'
+            - type: "null"
+        alternativeTitle:
+          anyOf:
+            - items:
+                type: string
+              type: array
+            - type: "null"
+          title: Alternativetitle
+          default: []
+        contactPoint:
+          $ref: '#/components/schemas/ContactPoint'
+        issued:
+          anyOf:
+            - type: string
+              format: date-time
+            - type: "null"
+          title: Issued
+        keyword:
+          anyOf:
+            - items:
+                type: string
+              type: array
+            - type: "null"
+          title: Keyword
+          default: []
+        licence:
+          anyOf:
+            - type: string
+              minLength: 1
+              format: uri
+            - type: "null"
+          title: Licence
+          default: https://www.nationalarchives.gov.uk/doc/open-government-licence/version/3/
+        relatedAssets:
+          anyOf:
+            - items:
+                type: string
+                minLength: 1
+                format: uri
+              type: array
+            - type: "null"
+          title: Relatedassets
+          default: []
+        securityClassification:
+          anyOf:
+            - $ref: '#/components/schemas/securityClass'
+            - type: "null"
+          default: OFFICIAL
+        theme:
+          anyOf:
+            - items:
+                type: string
+                minLength: 1
+                format: uri
+              type: array
+            - type: "null"
+          title: Theme
+          default: []
+        version:
+          anyOf:
+            - type: string
+            - type: "null"
+          title: Version
+          default: "1.0"
+        distributions:
+          items:
+            $ref: '#/components/schemas/DistributionSummary'
+          type: array
+          title: Distributions
+        updateFrequency:
+          type: string
+          title: Updatefrequency
+        organisationID:
+          $ref: '#/components/schemas/organisationID'
+        creatorID:
+          $ref: '#/components/schemas/organisationID'
+      type: object
+      required:
+        - title
+        - type
+        - contactPoint
+        - distributions
+        - updateFrequency
+        - organisationID
+        - creatorID
+      title: CreateDatasetBody
+    CreateMultipleAssetsJob:
+      properties:
+        data:
+          items:
+            anyOf:
+              - $ref: '#/components/schemas/CreateDatasetBody'
+              - $ref: '#/components/schemas/CreateDataServiceBody'
+          type: array
+          title: Data
+        jobID:
+          type: string
+          format: uuid
+          title: Jobid
+        jobStatus:
+          $ref: '#/components/schemas/publishJobStatus'
+      type: object
+      required:
+        - data
+        - jobID
+        - jobStatus
+      title: CreateMultipleAssetsJob
     DataServiceResponse:
       properties:
         catalogueCreated:
@@ -791,6 +1091,14 @@ components:
         - nhs-digital
         - ordnance-survey
       title: organisationID
+    publishJobStatus:
+      type: string
+      enum:
+        - CREATED
+        - RUNNING
+        - DRAFT
+        - PUBLISHED
+      title: publishJobStatus
     rightsStatement:
       type: string
       enum:
