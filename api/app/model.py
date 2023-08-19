@@ -18,10 +18,12 @@ class assetType(str, Enum):
 
 
 class Organisation(BaseModel):
-    title: str
     id: str
-    acronym: str
-    homepage: AnyUrl
+    title: str
+    abbreviation: str | None
+    slug: str
+    format: str
+    web_url: AnyUrl
 
 
 class organisationID(str, Enum):
