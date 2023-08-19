@@ -1,4 +1,4 @@
-from SPARQLWrapper import SPARQLWrapper, JSON
+from SPARQLWrapper import SPARQLWrapper, JSON, POST
 from datetime import datetime
 from . import config
 from string import Template
@@ -7,8 +7,11 @@ from rdflib.namespace import XSD
 
 
 sparql_reader = SPARQLWrapper(config.QUERY_URL)
-
 sparql_reader.setReturnFormat(JSON)
+
+sparql_writer = SPARQLWrapper(config.UPDATE_URL)
+sparql_writer.setReturnFormat(JSON)
+sparql_writer.method = POST
 
 
 def _prep_query(query_file_name, bindings):
@@ -24,6 +27,12 @@ def run_query(query_file_name, **bindings):
     q = _prep_query(query_file_name, bindings)
     sparql_reader.setQuery(q)
     return sparql_reader.queryAndConvert()["results"]["bindings"]
+
+
+def run_update(filename, **bindings):
+    q = _prep_query(filename, bindings)
+    sparql_writer.setQuery(q)
+    return sparql_writer.queryAndConvert()
 
 
 def _query_result_to_dict(result):

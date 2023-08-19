@@ -1,10 +1,10 @@
 from uuid import UUID
-import json
 from typing import Annotated, List, Union
 from fastapi import FastAPI, Body, Query, HTTPException
 from fastapi.responses import JSONResponse
 from . import model as m
 from . import db
+from . import utils
 
 app = FastAPI(title="CDDO Data Marketplace API", version="0.1.0")
 
@@ -50,3 +50,30 @@ async def catalogue_entry_detail(asset_id: UUID) -> m.AssetDetailResponse:
         raise HTTPException(status_code=404, detail="Item not found")
 
     return {"asset": asset}
+
+
+@app.put("/user")
+async def upsert_user(jwt: m.JWT):
+    decoded_jwt = utils.decodeJWT(jwt.token)
+    user_email = decoded_jwt.get("email", None)
+    if not user_email:
+        raise HTTPException(status_code=401, detail="Unauthorised")
+
+    user_id = utils.user_id_from_email(user_email)
+
+    local_user = db.get_user_by_id(user_id)
+
+    if len(local_user) == 0:
+        db.new_user(user_id, user_email)
+
+    return {"user_id": user_id}
+
+
+@app.put("/formdata")
+async def upsert_form_data(req: m.FormDataRequest):
+    print(req)
+    decoded_jwt = utils.decodeJWT(req.jwt)
+    user_id = utils.user_id_from_email(decoded_jwt.get("email"))
+    res = db.upsert_formdata(user_id, req.formdata)
+    print(res)
+    return {"status": "success"}

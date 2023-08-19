@@ -106,6 +106,7 @@ class BaseAsset(BaseAssetSummary):
     accessRights: rightsStatement | None = None
     alternativeTitle: List[str] | None = []
     contactPoint: ContactPoint
+    description: str
     issued: datetime | None = None
     keyword: List[str] | None = []
     licence: AnyUrl | None = (
@@ -281,6 +282,15 @@ class AssetDetailResponse(BaseModel):
 class CreateAssetBody(BaseAsset):
     organisationID: organisationID
     creatorID: List[organisationID] | None = []
+
+
+class JWT(BaseModel):
+    token: str
+
+
+class FormDataRequest(BaseModel):
+    jwt: str
+    formdata: str
 
 
 # def create(asset: CreateAssetBody):

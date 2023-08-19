@@ -1,6 +1,12 @@
 from datetime import datetime
+import hashlib
+import json
+
+import jwt
+import requests
 
 from . import model as m
+from . import config
 
 organisations = {
     "department-for-work-pensions": {
@@ -92,3 +98,30 @@ def remove_keys(d: dict, keys: list):
     """Similar to remove-keys in Clojure.
     Returns a new dictionary with the specified keys removed"""
     return {k: d[k] for k in d.keys() if k not in keys}
+
+
+def user_id_from_email(email):
+    return hashlib.md5(email.encode("utf-8")).hexdigest()
+
+
+def decodeJWT(token: str):
+    try:
+        # Extract the JWT's header and payload
+        header = jwt.get_unverified_header(token)
+
+        # Find the appropriate key from JWKS based on the key ID (kid) in JWT header
+        key_id = header["kid"]
+        jwks_data = requests.get(config.JWKS_URL).json()
+        keys = jwks_data["keys"]
+        matching_keys = [key for key in keys if key["kid"] == key_id]
+
+        assert len(matching_keys) == 1
+
+        secret = jwt.algorithms.RSAAlgorithm.from_jwk(json.dumps(matching_keys[0]))
+        decoded = jwt.decode(
+            token, key=secret, audience=config.JWT_AUD, algorithms=["RS256"]
+        )
+        return decoded
+    except Exception as err:
+        print(err)
+        return {}

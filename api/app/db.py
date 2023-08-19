@@ -1,3 +1,5 @@
+import json
+from datetime import datetime
 from . import utils
 from . import model as m
 from . import sparql
@@ -56,3 +58,29 @@ def asset_detail(asset_id: str):
             m.DistributionSummary.model_validate(d) for d in distributions
         ]
     return asset
+
+
+def new_user(user_id: str, user_email: str):
+    query_results = sparql.run_update(
+        "new_user.sparql", user_id=user_id, user_email=user_email
+    )
+    return query_results
+
+
+def get_user_request_forms(user_id: str):
+    query_results = sparql.run_query("get_user_request_forms.sparql", user_id=user_id)
+    return query_results
+
+
+def upsert_formdata(user_id: str, form_str: str):
+    form_dict = json.loads(form_str)
+    query_results = sparql.run_update(
+        "update_share_request_form.sparql",
+        id=form_dict["requestId"],
+        user_id=user_id,
+        asset_id=form_dict["dataAsset"],
+        formdata=form_str,
+        current_time=datetime.now().isoformat(),
+        status=form_dict["status"],
+    )
+    return query_results

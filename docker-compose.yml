@@ -17,6 +17,8 @@ services:
     environment:
       - TRIPLESTORE_URL
       - DATASET_NAME
+      - JWKS_URL
+      - JWT_AUD
     networks:
       - marketplace
 

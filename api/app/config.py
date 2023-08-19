@@ -12,3 +12,6 @@ if not DATASET_NAME:
 
 QUERY_URL = f"{TRIPLESTORE_URL}/{DATASET_NAME}/sparql"
 UPDATE_URL = f"{TRIPLESTORE_URL}/{DATASET_NAME}/update"
+
+JWKS_URL = os.environ.get("JWKS_URL", None)
+JWT_AUD = os.environ.get("JWT_AUD", None)
