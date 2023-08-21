@@ -18,10 +18,12 @@ class assetType(str, Enum):
 
 
 class Organisation(BaseModel):
-    title: str
     id: str
-    acronym: str
-    homepage: AnyUrl
+    title: str
+    abbreviation: str | None
+    slug: str
+    format: str
+    web_url: AnyUrl
 
 
 class organisationID(str, Enum):
@@ -106,6 +108,7 @@ class BaseAsset(BaseAssetSummary):
     accessRights: rightsStatement | None = None
     alternativeTitle: List[str] | None = []
     contactPoint: ContactPoint
+    description: str
     issued: datetime | None = None
     keyword: List[str] | None = []
     licence: AnyUrl | None = (
