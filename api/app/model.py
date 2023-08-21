@@ -108,6 +108,7 @@ class BaseAsset(BaseAssetSummary):
     accessRights: rightsStatement | None = None
     alternativeTitle: List[str] | None = []
     contactPoint: ContactPoint
+    description: str
     issued: datetime | None = None
     keyword: List[str] | None = []
     licence: AnyUrl | None = (
