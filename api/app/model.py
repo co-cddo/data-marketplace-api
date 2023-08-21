@@ -279,9 +279,6 @@ class AssetDetailResponse(BaseModel):
     asset: DatasetResponse | DataServiceResponse
 
 
-# Publish responses
-
-
 class CreateAssetBody(BaseAsset):
     organisationID: organisationID
     creatorID: organisationID
@@ -293,25 +290,3 @@ class CreateDatasetBody(CreateAssetBody, Dataset):
 
 class CreateDataServiceBody(CreateAssetBody, DataService):
     pass
-
-
-class publishResponseStatus(str, Enum):
-    ok = "SUCCESS"
-    error = "ERROR"
-
-
-class PostResponseBody(BaseModel):
-    status: publishResponseStatus
-    errors: List | None = None  # TODO make this something
-
-
-class CreateAssetsRequestBody(BaseModel):
-    data: List[CreateDatasetBody | CreateDataServiceBody]
-
-
-class ParseFilesResponse(CreateAssetsRequestBody, PostResponseBody):
-    pass
-
-
-class CreateAssetsResponseBody(PostResponseBody):
-    data: List[DatasetResponse | DataServiceResponse]
