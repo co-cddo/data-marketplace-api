@@ -20,12 +20,6 @@ def _prep_query(query_file_name, bindings):
     return template.substitute(bindings)
 
 
-def run_query(query_file_name, **bindings):
-    q = _prep_query(query_file_name, bindings)
-    sparql_reader.setQuery(q)
-    return sparql_reader.queryAndConvert()["results"]["bindings"]
-
-
 def _query_result_to_dict(result):
     d = {}
     for k, v in result.items():
@@ -36,10 +30,16 @@ def _query_result_to_dict(result):
     return d
 
 
-def _aggregate_results(results):
+def run_query(query_file_name, **bindings):
+    q = _prep_query(query_file_name, bindings)
+    sparql_reader.setQuery(q)
+    results = sparql_reader.queryAndConvert()["results"]["bindings"]
+    return [_query_result_to_dict(r) for r in results]
+
+
+def _aggregate_results(result_dicts):
     """Assuming all results relate to a single item, aggregate them to include a list of values for
     any key with multiple values"""
-    result_dicts = [_query_result_to_dict(r) for r in results]
     match len(result_dicts):
         case 0:
             return {}
@@ -60,8 +60,7 @@ def _aggregate_results(results):
 
 def aggregate_query_results_by_key(results, group_key="resourceUri"):
     """Groups the result by given key and aggregates the groups into a single dictionary for each"""
-    get_uri = lambda result: result[group_key]["value"]
     return [
-        _aggregate_results(results_for_resource)
-        for _, results_for_resource in groupby(results, get_uri)
+        _aggregate_results(list(results_for_resource))
+        for _, results_for_resource in groupby(results, lambda r: r[group_key])
     ]
