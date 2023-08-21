@@ -22,7 +22,8 @@ WHERE {{
    cddo:created ?catalogueCreated ;
    cddo:modified ?catalogueModified .
   ?typeURI rdfs:label ?type .
-  OPTIONAL {{ ?resourceUri dct:accrualPeriodicity ?updateFrequency }} .
+  OPTIONAL {{ ?resourceUri dct:accrualPeriodicity ?freq }
+            { ?freq rdfs:label ?updateFrequency }} .
   OPTIONAL {{ ?resourceUri dcat:distribution ?distribution }}.
   OPTIONAL {{ ?resourceUri dcat:endpointDescription ?endpointDescription }}.
   OPTIONAL {{ ?resourceUri dcat:endpointURL ?endpointURL }}.
