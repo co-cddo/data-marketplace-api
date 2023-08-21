@@ -279,6 +279,9 @@ class AssetDetailResponse(BaseModel):
     asset: DatasetResponse | DataServiceResponse
 
 
+# Publish responses
+
+
 class CreateAssetBody(BaseAsset):
     organisationID: organisationID
     creatorID: organisationID
@@ -292,18 +295,23 @@ class CreateDataServiceBody(CreateAssetBody, DataService):
     pass
 
 
-class publishJobStatus(str, Enum):
-    created = "CREATED"
-    draft = "DRAFT"
-    published = "PUBLISHED"
+class publishResponseStatus(str, Enum):
+    ok = "SUCCESS"
     error = "ERROR"
-    aborted = "ABORTED"
 
 
-class BatchPublishJob(BaseModel):
-    jobID: uuid.UUID
-    jobStatus: publishJobStatus
+class PostResponseBody(BaseModel):
+    status: publishResponseStatus
+    errors: List | None = None  # TODO make this something
 
 
-class BeginBatchPublishJobResponse(BatchPublishJob):
+class CreateAssetsRequestBody(BaseModel):
     data: List[CreateDatasetBody | CreateDataServiceBody]
+
+
+class ParseFilesResponse(CreateAssetsRequestBody, PostResponseBody):
+    pass
+
+
+class CreateAssetsResponseBody(PostResponseBody):
+    data: List[DatasetResponse | DataServiceResponse]
