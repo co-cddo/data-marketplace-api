@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "cddo-dm-api"
-version = "0.1.0"
+version = "0.1.1"
 description = ""
 authors = ["Kiran Joshi <kiran.joshi@tpximpact.com>", "Madeline Kosse <madeline.kosse@tpximpact.com>"]
 readme = "README.md"
@@ -23,6 +23,7 @@ pyjwt = {extras = ["crypto"], version = "^2.8.0"}
 black = "^23.7.0"
 pre-commit = "^3.3.3"
 polyfactory = "^2.7.0"
+pyjwt = "^2.8.0"
 
 [build-system]
 requires = ["poetry-core"]

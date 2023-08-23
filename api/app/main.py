@@ -17,7 +17,10 @@ app = FastAPI(title="CDDO Data Marketplace API", version="0.1.0")
 
 @app.get("/organisations")
 async def list_organisations() -> List[m.Organisation]:
-    return [m.Organisation.parse_obj(o) for o in m.organisations.values()]
+    return sorted(
+        [m.Organisation.model_validate(utils.orgs[o]) for o in utils.MVP_ORGS],
+        key=lambda o: o.title,
+    )
 
 
 # TODO: add theme query param
