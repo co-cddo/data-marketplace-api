@@ -4,8 +4,8 @@ PREFIX cddo: <http://marketplace.cddo.gov.uk#>
 PREFIX cddo_user: <http://marketplace.cddo.gov.uk/user/>
 PREFIX cddo_graph: <http://marketplace.cddo.gov.uk/graph/>
 
-SELECT ?forms
+SELECT ?email
 FROM cddo_graph:users
 WHERE {
-    cddo_user:$user_id cddo:requestForms ?forms
+    cddo_user:$user_id vcard:hasEmail ?email
 }

@@ -67,9 +67,16 @@ def new_user(user_id: str, user_email: str):
     return query_results
 
 
-def get_user_request_forms(user_id: str):
-    query_results = sparql.run_query("get_user_request_forms.sparql", user_id=user_id)
+def get_user_by_id(user_id: str):
+    query_results = sparql.run_query("get_user_by_id.sparql", user_id=user_id)
     return query_results
+
+
+def get_share_request_forms(user_id: str):
+    query_results = sparql.run_query("get_share_request_forms.sparql", user_id=user_id)
+    forms = {r["assetId"]["value"]: r["sharedata"]["value"] for r in query_results}
+    print(forms)
+    return forms
 
 
 def upsert_formdata(user_id: str, form_str: str):

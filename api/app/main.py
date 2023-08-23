@@ -65,15 +65,15 @@ async def upsert_user(jwt: m.JWT):
 
     if len(local_user) == 0:
         db.new_user(user_id, user_email)
+        return {"user_id": user_id, "request_forms": {}}
 
-    return {"user_id": user_id}
+    share_request_forms = db.get_share_request_forms(user_id)
+    return {"user_id": user_id, "request_forms": share_request_forms}
 
 
 @app.put("/formdata")
 async def upsert_form_data(req: m.FormDataRequest):
-    print(req)
     decoded_jwt = utils.decodeJWT(req.jwt)
     user_id = utils.user_id_from_email(decoded_jwt.get("email"))
     res = db.upsert_formdata(user_id, req.formdata)
-    print(res)
-    return {"status": "success"}
+    return res
