@@ -84,8 +84,7 @@ def get_user_by_id(user_id: str):
 
 def get_share_request_forms(user_id: str):
     query_results = sparql.run_query("get_share_request_forms.sparql", user_id=user_id)
-    forms = {r["assetId"]["value"]: r["sharedata"]["value"] for r in query_results}
-    print(forms)
+    forms = {r["assetId"]: r["sharedata"] for r in query_results}
     return forms
 
 
