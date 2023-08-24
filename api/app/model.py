@@ -288,9 +288,9 @@ class JWT(BaseModel):
     token: str
 
 
-class FormDataRequest(BaseModel):
+class sharedataRequest(BaseModel):
     jwt: str
-    formdata: str
+    sharedata: str
 
 
 # def create(asset: CreateAssetBody):

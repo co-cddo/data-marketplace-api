@@ -88,14 +88,14 @@ def get_share_request_forms(user_id: str):
     return forms
 
 
-def upsert_formdata(user_id: str, form_str: str):
+def upsert_sharedata(user_id: str, form_str: str):
     form_dict = json.loads(form_str)
     query_results = sparql.run_update(
         "update_share_request_form.sparql",
         id=form_dict["requestId"],
         user_id=user_id,
         asset_id=form_dict["dataAsset"],
-        formdata=form_str,
+        sharedata=form_str,
         current_time=datetime.now().isoformat(),
         status=form_dict["status"],
     )

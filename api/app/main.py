@@ -75,11 +75,11 @@ async def upsert_user(jwt: m.JWT):
     return {"user_id": user_id, "request_forms": share_request_forms}
 
 
-@app.put("/formdata")
-async def upsert_form_data(req: m.FormDataRequest):
+@app.put("/sharedata")
+async def upsert_sharedata(req: m.sharedataRequest):
     decoded_jwt = utils.decodeJWT(req.jwt)
     user_id = utils.user_id_from_email(decoded_jwt.get("email"))
-    res = db.upsert_formdata(user_id, req.formdata)
+    res = db.upsert_sharedata(user_id, req.sharedata)
     return res
 
 
