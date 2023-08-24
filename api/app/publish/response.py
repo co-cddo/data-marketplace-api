@@ -1,3 +1,4 @@
+# TODO rename this - it's not just responses!
 from pydantic import BaseModel
 from app import model as m
 from enum import Enum
@@ -14,13 +15,12 @@ class PostResponseBody(BaseModel):
 
 class CreateAssetsRequestBody(BaseModel):
     data: List[m.CreateDatasetBody | m.CreateDataServiceBody]
-    errors: List[
-        err.FileErrorInfo | err.AssetValidationErrorInfo | err.FieldValidationErrorInfo
-    ]
 
 
 class ParseFilesResponseBody(CreateAssetsRequestBody, PostResponseBody):
-    pass
+    errors: List[
+        err.FileErrorInfo | err.AssetValidationErrorInfo | err.FieldValidationErrorInfo
+    ]
 
 
 class CreateAssetsResponseBody(PostResponseBody):

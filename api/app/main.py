@@ -4,7 +4,7 @@ from fastapi import FastAPI, Body, Query, HTTPException, File, UploadFile
 from fastapi.responses import JSONResponse
 from app import model as m
 from app.db import asset as asset_db, user as user_db, share as share_db
-from app.publish import csv as pubcsv, response as pubres
+from app.publish import csv as pubcsv, response as pubres, create_asset as publish
 from . import utils
 
 app = FastAPI(title="CDDO Data Marketplace API", version="0.1.0")
@@ -87,7 +87,13 @@ async def upsert_sharedata(req: m.UpsertShareDataRequest):
 async def publish_assets(
     body: pubres.CreateAssetsRequestBody,
 ) -> pubres.CreateAssetsResponseBody:
-    return
+    data = body.dict()["data"]
+    result = pubres.CreateAssetsResponseBody.model_validate(publish.create_assets(data))
+    # TODO sort out this "ok" situation - too complicated!
+    if result.ok:
+        return result
+    else:
+        return JSONResponse(status_code=422, content=result)
 
 
 # multipart/form-data endpoint
