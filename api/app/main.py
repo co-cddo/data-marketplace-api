@@ -65,8 +65,8 @@ async def publish_assets(
 
 
 # multipart/form-data endpoint
-# curl -F "datasets=@dataset.csv" -F "dataservices=@dataservice.csv" localhost:8000/publish/batch/create_job
-@app.post("/publish/parse_file")
+# curl -F "datasets=@dataset.csv" -F "dataservices=@dataservice.csv" localhost:8000/publish/verify
+@app.post("/publish/verify")
 async def prepare_batch_publish_request(
     datasets: Annotated[
         UploadFile,

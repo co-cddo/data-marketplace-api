@@ -131,15 +131,15 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/HTTPValidationError'
-  /publish/parse_file:
+  /publish/verify:
     post:
       summary: Prepare Batch Publish Request
-      operationId: prepare_batch_publish_request_publish_parse_file_post
+      operationId: prepare_batch_publish_request_publish_verify_post
       requestBody:
         content:
           multipart/form-data:
             schema:
-              $ref: '#/components/schemas/Body_prepare_batch_publish_request_publish_parse_file_post'
+              $ref: '#/components/schemas/Body_prepare_batch_publish_request_publish_verify_post'
         required: true
       responses:
         "200":
@@ -202,7 +202,7 @@ components:
         - scope
       title: AssetValidationErrorInfo
       description: Error indicating that a single asset is not valid
-    Body_prepare_batch_publish_request_publish_parse_file_post:
+    Body_prepare_batch_publish_request_publish_verify_post:
       properties:
         datasets:
           type: string
@@ -218,7 +218,7 @@ components:
       required:
         - datasets
         - dataservices
-      title: Body_prepare_batch_publish_request_publish_parse_file_post
+      title: Body_prepare_batch_publish_request_publish_verify_post
     ContactPoint:
       properties:
         name:
