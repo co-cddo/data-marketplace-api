@@ -101,24 +101,128 @@ paths:
           content:
             application/json:
               schema:
-                anyOf:
-                  - $ref: '#/components/schemas/DataService'
-                  - $ref: '#/components/schemas/Dataset'
-                title: Response Catalogue Entry Detail Catalogue  Asset Id  Get
+                $ref: '#/components/schemas/AssetDetailResponse'
         "422":
           description: Validation Error
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/HTTPValidationError'
+  /publish:
+    post:
+      summary: Publish Assets
+      operationId: publish_assets_publish_post
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateAssetsRequestBody'
+        required: true
+      responses:
+        "200":
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CreateAssetsResponseBody'
+        "422":
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /publish/parse_file:
+    post:
+      summary: Prepare Batch Publish Request
+      operationId: prepare_batch_publish_request_publish_parse_file_post
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Body_prepare_batch_publish_request_publish_parse_file_post'
+        required: true
+      responses:
+        "200":
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ParseFilesResponseBody'
+        "422":
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ParseFilesResponseBody'
 components:
   schemas:
+    AssetDetailResponse:
+      properties:
+        asset:
+          anyOf:
+            - $ref: '#/components/schemas/DatasetResponse'
+            - $ref: '#/components/schemas/DataServiceResponse'
+          title: Asset
+      type: object
+      required:
+        - asset
+      title: AssetDetailResponse
+    AssetValidationErrorInfo:
+      properties:
+        message:
+          type: string
+          title: Message
+        location:
+          type: string
+          title: Location
+          description: The file, asset, or field that caused the error
+        extras:
+          anyOf:
+            - type: object
+            - type: "null"
+          title: Extras
+          description: Extra info about the error
+        scope:
+          const: ASSET
+          title: Scope
+        sub_errors:
+          anyOf:
+            - items:
+                $ref: '#/components/schemas/FieldValidationErrorInfo'
+              type: array
+            - type: "null"
+          title: Sub Errors
+          description: A list of the errors with individual fields within the asset
+          default: []
+      type: object
+      required:
+        - message
+        - location
+        - extras
+        - scope
+      title: AssetValidationErrorInfo
+      description: Error indicating that a single asset is not valid
+    Body_prepare_batch_publish_request_publish_parse_file_post:
+      properties:
+        datasets:
+          type: string
+          format: binary
+          title: Datasets
+          description: The Dataset tab from the spreadsheet template in CSV format
+        dataservices:
+          type: string
+          format: binary
+          title: Dataservices
+          description: The DataService tab from the spreadsheet template in CSV format
+      type: object
+      required:
+        - datasets
+        - dataservices
+      title: Body_prepare_batch_publish_request_publish_parse_file_post
     ContactPoint:
       properties:
         name:
-          anyOf:
-            - type: string
-            - type: "null"
+          type: string
           title: Name
         email:
           type: string
@@ -136,9 +240,298 @@ components:
           title: Address
       type: object
       required:
+        - name
         - email
       title: ContactPoint
-    DataService:
+    CreateAssetsRequestBody:
+      properties:
+        data:
+          items:
+            anyOf:
+              - $ref: '#/components/schemas/CreateDatasetBody'
+              - $ref: '#/components/schemas/CreateDataServiceBody'
+          type: array
+          title: Data
+        errors:
+          items:
+            anyOf:
+              - $ref: '#/components/schemas/FileErrorInfo'
+              - $ref: '#/components/schemas/AssetValidationErrorInfo'
+              - $ref: '#/components/schemas/FieldValidationErrorInfo'
+          type: array
+          title: Errors
+      type: object
+      required:
+        - data
+        - errors
+      title: CreateAssetsRequestBody
+    CreateAssetsResponseBody:
+      properties:
+        errors:
+          items:
+            $ref: '#/components/schemas/ErrorInfo'
+          type: array
+          title: Errors
+        data:
+          items:
+            anyOf:
+              - $ref: '#/components/schemas/DatasetResponse'
+              - $ref: '#/components/schemas/DataServiceResponse'
+          type: array
+          title: Data
+      type: object
+      required:
+        - errors
+        - data
+      title: CreateAssetsResponseBody
+    CreateDataServiceBody:
+      properties:
+        created:
+          anyOf:
+            - type: string
+              format: date-time
+            - type: "null"
+          title: Created
+        summary:
+          anyOf:
+            - type: string
+            - type: "null"
+          title: Summary
+        modified:
+          anyOf:
+            - type: string
+              format: date-time
+            - type: "null"
+          title: Modified
+        title:
+          type: string
+          title: Title
+        type:
+          $ref: '#/components/schemas/assetType'
+        accessRights:
+          anyOf:
+            - $ref: '#/components/schemas/rightsStatement'
+            - type: "null"
+        alternativeTitle:
+          anyOf:
+            - items:
+                type: string
+              type: array
+            - type: "null"
+          title: Alternativetitle
+          default: []
+        contactPoint:
+          $ref: '#/components/schemas/ContactPoint'
+        description:
+          type: string
+          title: Description
+        issued:
+          anyOf:
+            - type: string
+              format: date-time
+            - type: "null"
+          title: Issued
+        keyword:
+          anyOf:
+            - items:
+                type: string
+              type: array
+            - type: "null"
+          title: Keyword
+          default: []
+        licence:
+          anyOf:
+            - type: string
+              minLength: 1
+              format: uri
+            - type: "null"
+          title: Licence
+          default: https://www.nationalarchives.gov.uk/doc/open-government-licence/version/3/
+        relatedAssets:
+          anyOf:
+            - items:
+                type: string
+                minLength: 1
+                format: uri
+              type: array
+            - type: "null"
+          title: Relatedassets
+          default: []
+        securityClassification:
+          anyOf:
+            - $ref: '#/components/schemas/securityClass'
+            - type: "null"
+          default: OFFICIAL
+        theme:
+          anyOf:
+            - items:
+                type: string
+                minLength: 1
+                format: uri
+              type: array
+            - type: "null"
+          title: Theme
+          default: []
+        version:
+          anyOf:
+            - type: string
+            - type: "null"
+          title: Version
+          default: "1.0"
+        endpointDescription:
+          type: string
+          title: Endpointdescription
+        endpointURL:
+          anyOf:
+            - type: string
+            - type: "null"
+          title: Endpointurl
+        servesData:
+          items:
+            type: string
+            minLength: 1
+            format: uri
+          type: array
+          title: Servesdata
+        serviceStatus:
+          $ref: '#/components/schemas/ServiceStatus'
+        serviceType:
+          $ref: '#/components/schemas/ServiceType'
+        organisationID:
+          $ref: '#/components/schemas/organisationID'
+        creatorID:
+          $ref: '#/components/schemas/organisationID'
+      type: object
+      required:
+        - title
+        - type
+        - contactPoint
+        - description
+        - endpointDescription
+        - servesData
+        - serviceStatus
+        - serviceType
+        - organisationID
+        - creatorID
+      title: CreateDataServiceBody
+    CreateDatasetBody:
+      properties:
+        created:
+          anyOf:
+            - type: string
+              format: date-time
+            - type: "null"
+          title: Created
+        summary:
+          anyOf:
+            - type: string
+            - type: "null"
+          title: Summary
+        modified:
+          anyOf:
+            - type: string
+              format: date-time
+            - type: "null"
+          title: Modified
+        title:
+          type: string
+          title: Title
+        type:
+          $ref: '#/components/schemas/assetType'
+        accessRights:
+          anyOf:
+            - $ref: '#/components/schemas/rightsStatement'
+            - type: "null"
+        alternativeTitle:
+          anyOf:
+            - items:
+                type: string
+              type: array
+            - type: "null"
+          title: Alternativetitle
+          default: []
+        contactPoint:
+          $ref: '#/components/schemas/ContactPoint'
+        description:
+          type: string
+          title: Description
+        issued:
+          anyOf:
+            - type: string
+              format: date-time
+            - type: "null"
+          title: Issued
+        keyword:
+          anyOf:
+            - items:
+                type: string
+              type: array
+            - type: "null"
+          title: Keyword
+          default: []
+        licence:
+          anyOf:
+            - type: string
+              minLength: 1
+              format: uri
+            - type: "null"
+          title: Licence
+          default: https://www.nationalarchives.gov.uk/doc/open-government-licence/version/3/
+        relatedAssets:
+          anyOf:
+            - items:
+                type: string
+                minLength: 1
+                format: uri
+              type: array
+            - type: "null"
+          title: Relatedassets
+          default: []
+        securityClassification:
+          anyOf:
+            - $ref: '#/components/schemas/securityClass'
+            - type: "null"
+          default: OFFICIAL
+        theme:
+          anyOf:
+            - items:
+                type: string
+                minLength: 1
+                format: uri
+              type: array
+            - type: "null"
+          title: Theme
+          default: []
+        version:
+          anyOf:
+            - type: string
+            - type: "null"
+          title: Version
+          default: "1.0"
+        distributions:
+          items:
+            $ref: '#/components/schemas/DistributionSummary'
+          type: array
+          title: Distributions
+        updateFrequency:
+          type: string
+          title: Updatefrequency
+        organisationID:
+          $ref: '#/components/schemas/organisationID'
+        creatorID:
+          $ref: '#/components/schemas/organisationID'
+      type: object
+      required:
+        - title
+        - type
+        - contactPoint
+        - description
+        - distributions
+        - updateFrequency
+        - organisationID
+        - creatorID
+      title: CreateDatasetBody
+    DataServiceResponse:
       properties:
         catalogueCreated:
           type: string
@@ -149,10 +542,7 @@ components:
           format: date-time
           title: Cataloguemodified
         creator:
-          items:
-            $ref: '#/components/schemas/Organisation'
-          type: array
-          title: Creator
+          $ref: '#/components/schemas/Organisation'
         identifier:
           type: string
           format: uuid
@@ -196,6 +586,9 @@ components:
           default: []
         contactPoint:
           $ref: '#/components/schemas/ContactPoint'
+        description:
+          type: string
+          title: Description
         issued:
           anyOf:
             - type: string
@@ -278,11 +671,12 @@ components:
         - title
         - type
         - contactPoint
+        - description
         - endpointDescription
         - servesData
         - serviceStatus
         - serviceType
-      title: DataService
+      title: DataServiceResponse
       examples:
         - accessRights: INTERNAL
           catalogueCreated: "2023-07-31T11:26:50.383Z"
@@ -291,10 +685,10 @@ components:
             contactName: DWP Integration Team
             email: integration.technologyplatforms@dwp.gsi.gov.uk
           creator:
-            - acronym: DWP
-              homepage: https://www.gov.uk/government/organisations/department-for-work-pensions
-              id: department-for-work-pensions
-              title: Department for Work & Pensions
+            acronym: DWP
+            homepage: https://www.gov.uk/government/organisations/department-for-work-pensions
+            id: department-for-work-pensions
+            title: Department for Work & Pensions
           description: The location-service provides endpoints to perform a range of address based queries for UK locations....
           endpointDescription: https://engineering.dwp.gov.uk/apis/docs
           endpointURL: ""
@@ -335,10 +729,7 @@ components:
           format: date-time
           title: Cataloguemodified
         creator:
-          items:
-            $ref: '#/components/schemas/Organisation'
-          type: array
-          title: Creator
+          $ref: '#/components/schemas/Organisation'
         identifier:
           type: string
           format: uuid
@@ -380,7 +771,7 @@ components:
         - type
         - serviceType
       title: DataServiceSummary
-    Dataset:
+    DatasetResponse:
       properties:
         catalogueCreated:
           type: string
@@ -391,10 +782,7 @@ components:
           format: date-time
           title: Cataloguemodified
         creator:
-          items:
-            $ref: '#/components/schemas/Organisation'
-          type: array
-          title: Creator
+          $ref: '#/components/schemas/Organisation'
         identifier:
           type: string
           format: uuid
@@ -438,6 +826,9 @@ components:
           default: []
         contactPoint:
           $ref: '#/components/schemas/ContactPoint'
+        description:
+          type: string
+          title: Description
         issued:
           anyOf:
             - type: string
@@ -509,9 +900,10 @@ components:
         - title
         - type
         - contactPoint
+        - description
         - distributions
         - updateFrequency
-      title: Dataset
+      title: DatasetResponse
       examples:
         - accessRights: INTERNAL
           catalogueCreated: "2023-07-31T11:26:50.383Z"
@@ -520,10 +912,10 @@ components:
             contactName: DWP Integration Team
             email: integration.technologyplatforms@dwp.gsi.gov.uk
           creator:
-            - acronym: DWP
-              homepage: https://www.gov.uk/government/organisations/department-for-work-pensions
-              id: department-for-work-pensions
-              title: Department for Work & Pensions
+            acronym: DWP
+            homepage: https://www.gov.uk/government/organisations/department-for-work-pensions
+            id: department-for-work-pensions
+            title: Department for Work & Pensions
           description: The location-service provides endpoints to perform a range of address based queries for UK locations....
           distributions:
             - mediaType: CSV
@@ -564,10 +956,7 @@ components:
           format: date-time
           title: Cataloguemodified
         creator:
-          items:
-            $ref: '#/components/schemas/Organisation'
-          type: array
-          title: Creator
+          $ref: '#/components/schemas/Organisation'
         identifier:
           type: string
           format: uuid
@@ -624,12 +1013,120 @@ components:
         mediaType:
           type: string
           title: Mediatype
+        accessService:
+          anyOf:
+            - type: string
+            - type: "null"
+          title: Accessservice
+        identifier:
+          type: string
+          title: Identifier
+        issued:
+          anyOf:
+            - type: string
+              format: date-time
+            - type: "null"
+          title: Issued
+        licence:
+          anyOf:
+            - type: string
+              minLength: 1
+              format: uri
+            - type: "null"
+          title: Licence
+          default: https://www.nationalarchives.gov.uk/doc/open-government-licence/version/3/
+        byteSize:
+          anyOf:
+            - type: integer
+            - type: "null"
+          title: Bytesize
       type: object
       required:
         - title
         - modified
         - mediaType
+        - identifier
       title: DistributionSummary
+    ErrorInfo:
+      properties:
+        message:
+          type: string
+          title: Message
+        location:
+          type: string
+          title: Location
+          description: The file, asset, or field that caused the error
+        extras:
+          anyOf:
+            - type: object
+            - type: "null"
+          title: Extras
+          description: Extra info about the error
+        scope:
+          $ref: '#/components/schemas/errorScope'
+      type: object
+      required:
+        - message
+        - location
+        - extras
+        - scope
+      title: ErrorInfo
+    FieldValidationErrorInfo:
+      properties:
+        message:
+          type: string
+          title: Message
+        location:
+          type: string
+          title: Location
+          description: The file, asset, or field that caused the error
+        extras:
+          anyOf:
+            - type: object
+            - type: "null"
+          title: Extras
+          description: Extra info about the error
+        scope:
+          const: FIELD
+          title: Scope
+        value:
+          title: Value
+          description: The value that caused the error
+      type: object
+      required:
+        - message
+        - location
+        - extras
+        - scope
+        - value
+      title: FieldValidationErrorInfo
+      description: Error indicating that a single value is not valid
+    FileErrorInfo:
+      properties:
+        message:
+          type: string
+          title: Message
+        location:
+          type: string
+          title: Location
+          description: The file, asset, or field that caused the error
+        extras:
+          anyOf:
+            - type: object
+            - type: "null"
+          title: Extras
+          description: Extra info about the error
+        scope:
+          const: FILE
+          title: Scope
+      type: object
+      required:
+        - message
+        - location
+        - extras
+        - scope
+      title: FileErrorInfo
+      description: An error parsing the whole file
     HTTPValidationError:
       properties:
         detail:
@@ -641,27 +1138,59 @@ components:
       title: HTTPValidationError
     Organisation:
       properties:
-        title:
-          type: string
-          title: Title
         id:
           type: string
           title: Id
-        acronym:
+        title:
           type: string
-          title: Acronym
-        homepage:
+          title: Title
+        abbreviation:
+          anyOf:
+            - type: string
+            - type: "null"
+          title: Abbreviation
+        slug:
+          type: string
+          title: Slug
+        format:
+          type: string
+          title: Format
+        web_url:
           type: string
           minLength: 1
           format: uri
-          title: Homepage
+          title: Web Url
       type: object
       required:
-        - title
         - id
-        - acronym
-        - homepage
+        - title
+        - abbreviation
+        - slug
+        - format
+        - web_url
       title: Organisation
+    ParseFilesResponseBody:
+      properties:
+        errors:
+          items:
+            anyOf:
+              - $ref: '#/components/schemas/FileErrorInfo'
+              - $ref: '#/components/schemas/AssetValidationErrorInfo'
+              - $ref: '#/components/schemas/FieldValidationErrorInfo'
+          type: array
+          title: Errors
+        data:
+          items:
+            anyOf:
+              - $ref: '#/components/schemas/CreateDatasetBody'
+              - $ref: '#/components/schemas/CreateDataServiceBody'
+          type: array
+          title: Data
+      type: object
+      required:
+        - errors
+        - data
+      title: ParseFilesResponseBody
     SearchAssetsResponse:
       properties:
         data:
@@ -760,6 +1289,13 @@ components:
         - DataService
         - Dataset
       title: assetType
+    errorScope:
+      type: string
+      enum:
+        - FILE
+        - ASSET
+        - FIELD
+      title: errorScope
     organisationID:
       type: string
       enum:

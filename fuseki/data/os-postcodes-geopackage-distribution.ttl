@@ -1,9 +1,9 @@
 @prefix dcat: <http://www.w3.org/ns/dcat#> .
 @prefix dct: <http://purl.org/dc/terms/> .
 @prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
-@prefix application: <https://www.iana.org/assignments/media-types/application/> .
 
-<https://api.os.uk/downloads/v1/products/CodePointOpen/downloads?area=GB&format=GeoPackage&redirect> a dcat:Distribution;
+<https://www.data.gov.uk/distribution/os-postcodes-data/geopackage-distribution-id/> a dcat:Distribution;
+    dct:identifier "geopackage-distribution-id" ;
     dct:accessRights "OPEN" ;
     dct:description "Free and open postcode location data. Can be used for geographical analysis, simple route planning, asset management and much more." ;
     dct:issued "2023-02-01"^^xsd:date ;
@@ -13,5 +13,5 @@
     dcat:accessService "retirement-bereavement-care-address-lookup-location-service-v2.0.0"^^xsd:anyURI ;
     dcat:byteSize 55410000 ;
     dcat:downloadURL "https://api.os.uk/downloads/v1/products/CodePointOpen/downloads?area=GB&format=CSV&redirect"^^xsd:anyURI ;
-    dcat:mediaType <application:geopackage+sqlite3> .
+    dcat:mediaType <https://w3id.org/uri4uri/mime/application/geopackage+sqlite3> .
 

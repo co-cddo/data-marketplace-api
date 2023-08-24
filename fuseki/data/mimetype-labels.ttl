@@ -1,0 +1,18 @@
+@prefix skos: <http://www.w3.org/2004/02/skos/core#> .
+@prefix application: <https://w3id.org/uri4uri/mime/application/> 
+@prefix text: <https://w3id.org/uri4uri/mime/text/> 
+
+application:pdf skos:prefLabel "PDF" .
+application:vnd.ms-excel skos:prefLabel "XLSX" .
+application:vnd.ms-excel.addin.macroenabled.12 skos:prefLabel "XLSX" .
+application:vnd.ms-excel.sheet.binary.macroenabled.12 skos:prefLabel "XLSX" .
+application:vnd.ms-excel.sheet.macroenabled.12 skos:prefLabel "XLSX" .
+application:vnd.ms-excel.template.macroenabled.12 skos:prefLabel "XLSX" .
+application:vnd.ms-powerpoint skos:prefLabel "PPT" .
+application:vnd.ms-powerpoint.addin.macroenabled.12 skos:prefLabel "PPT" .
+application:vnd.ms-powerpoint.presentation.macroenabled.12 skos:prefLabel "PPT" .
+application:vnd.ms-powerpoint.slide.macroenabled.12 skos:prefLabel "PPT" .
+application:vnd.ms-powerpoint.slideshow.macroenabled.12 skos:prefLabel "PPT" .
+application:vnd.ms-powerpoint.template.macroenabled.12 skos:prefLabel "PPT" .
+text:csv skos:prefLabel "CSV" .
+<https://w3id.org/uri4uri/mime/application/geopackage+sqlite3> skos:prefLabel "GeoPackage" .
