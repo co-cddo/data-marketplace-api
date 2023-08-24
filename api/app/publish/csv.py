@@ -14,23 +14,6 @@ from app.publish.errors import (
 )
 
 
-class csvErrors:
-    def __init__(self):
-        self.__errors = []
-
-    def add(self, error_or_errors):
-        if isinstance(error_or_errors, list):
-            self.__errors = self.__errors + error_or_errors
-        elif error_or_errors is not None:
-            self.__errors.append(error_or_errors)
-
-    def has_error(self):
-        return self.__errors != []
-
-    def errors(self):
-        return [e for e in self.__errors]
-
-
 expected_headers = {
     m.assetType.dataset: [
         "title",
@@ -196,7 +179,7 @@ def _aggregate_distributions(row_dicts):
 
 
 def parse_input_file(
-    error_ctx: csvErrors, csv_file: SpooledTemporaryFile, asset_type: m.assetType
+    error_ctx: ErrorContainer, csv_file: SpooledTemporaryFile, asset_type: m.assetType
 ):
     rows, error = _to_row_dicts(csv_file, asset_type)
     error_ctx.add(error)
