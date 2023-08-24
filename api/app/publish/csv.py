@@ -97,6 +97,7 @@ list_fields = ["alternativeTitle", "theme", "keyword", "relatedAssets", "servesD
 def _to_row_dicts(csv_file: SpooledTemporaryFile, asset_type: m.assetType):
     temp_file_text = io.TextIOWrapper(csv_file, encoding="utf-8")
     reader = csv.reader(temp_file_text)
+    # Discard the extra header row that shows whether each field is optional/recommended/mandatory:
     _ = reader.__next__()
     headers = reader.__next__()
     if headers != expected_headers[asset_type]:
