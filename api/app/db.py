@@ -3,6 +3,12 @@ from . import model as m
 from . import sparql
 
 
+def _resolve_media_type_label(db_result_dict):
+    if "mediaTypeLabel" in db_result_dict:
+        db_result_dict["mediaType"] = db_result_dict["mediaTypeLabel"]
+        db_result_dict.pop("mediaTypeLabel")
+
+
 def search(q: str = ""):
     if q == "":
         q = "*"
@@ -10,6 +16,8 @@ def search(q: str = ""):
     # TODO What else do we need to do to sanitise the query string?
     q = utils.sanitise_search_query(q)
     query_results = sparql.run_query("asset_search.sparql", q=q)
+    for r in query_results:
+        _resolve_media_type_label(r)
     result_dicts = sparql.aggregate_query_results_by_key(
         query_results, group_key="identifier"
     )
@@ -24,6 +32,8 @@ def fetch_distribution_details(distribution_ids):
     results = sparql.run_query(
         "distribution_detail.sparql", distribution=distribution_ids
     )
+    for r in results:
+        _resolve_media_type_label(r)
     return sparql.aggregate_query_results_by_key(results, group_key="distribution")
 
 

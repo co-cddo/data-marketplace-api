@@ -87,7 +87,6 @@ def lookup_organisation(org_id: m.organisationID) -> m.Organisation:
 
 def _convert_multival_fields_to_lists(asset_result_dict):
     for k in [
-        "creator",
         "keyword",
         "alternativeTitle",
         "relatedResource",
@@ -111,7 +110,7 @@ def enrich_query_result_dict(asset_result_dict):
     if "organisation" in enriched:
         enriched["organisation"] = lookup_organisation(enriched["organisation"])
     if "creator" in enriched:
-        enriched["creator"] = [lookup_organisation(o) for o in enriched["creator"]]
+        enriched["creator"] = lookup_organisation(enriched["creator"])
     return enriched
 
 

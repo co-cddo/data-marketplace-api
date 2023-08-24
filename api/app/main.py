@@ -1,10 +1,11 @@
 from uuid import UUID
 import json
 from typing import Annotated, List, Union
-from fastapi import FastAPI, Body, Query, HTTPException
+from fastapi import FastAPI, Body, Query, HTTPException, File, UploadFile
 from fastapi.responses import JSONResponse
-from . import model as m
-from . import db
+from app import model as m
+from app import db
+from app.publish import csv as pubcsv, response as pubres
 from . import utils
 
 app = FastAPI(title="CDDO Data Marketplace API", version="0.1.0")
@@ -46,11 +47,45 @@ def search_catalogue(
 @app.get("/catalogue/{asset_id}")
 async def catalogue_entry_detail(asset_id: UUID) -> m.AssetDetailResponse:
     asset = db.asset_detail(asset_id)
-    if asset["type"] == "Dataset":
-        asset = m.Dataset.model_validate(asset)
-    elif asset["type"] == "DataService":
-        asset = m.DataService.model_validate(asset)
+    if asset["type"] == m.assetType.dataset:
+        asset = m.DatasetResponse.model_validate(asset)
+    elif asset["type"] == m.assetType.service:
+        asset = m.DataServiceResponse.model_validate(asset)
     else:
         raise HTTPException(status_code=404, detail="Item not found")
 
     return {"asset": asset}
+
+
+@app.post("/publish")
+async def publish_assets(
+    body: pubres.CreateAssetsRequestBody,
+) -> pubres.CreateAssetsResponseBody:
+    return
+
+
+# multipart/form-data endpoint
+# curl -F "datasets=@dataset.csv" -F "dataservices=@dataservice.csv" localhost:8000/publish/verify
+@app.post("/publish/verify")
+async def prepare_batch_publish_request(
+    datasets: Annotated[
+        UploadFile,
+        File(description="The Dataset tab from the spreadsheet template in CSV format"),
+    ],
+    dataservices: Annotated[
+        UploadFile,
+        File(
+            description="The DataService tab from the spreadsheet template in CSV format"
+        ),
+    ],
+) -> pubres.ParseFilesResponseBody:
+    parsed = pubcsv.parse_input_files(
+        datasets_file=datasets.file, services_file=dataservices.file
+    )
+    response = pubres.format_response(parsed)
+    if response.ok:
+        return response
+    # Annoyingly, the API specification for 422 response is hard-coded in openAPI so we can't override it
+    # here with the response specification. Maybe we can return 400 and include a flag for success/error state
+    else:
+        return JSONResponse(status_code=422, content=response)
