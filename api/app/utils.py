@@ -90,45 +90,6 @@ def lookup_organisation(org_id: m.organisationID) -> m.Organisation:
     return m.Organisation.model_validate(org_data)
 
 
-def _convert_multival_fields_to_lists(asset_result_dict):
-    for k in [
-        "keyword",
-        "alternativeTitle",
-        "relatedResource",
-        "theme",
-        "servesData",
-        "distribution",
-        "mediaType",
-    ]:
-        current_val = asset_result_dict.get(k)
-        if current_val is None:
-            pass
-        elif isinstance(current_val, set):
-            asset_result_dict[k] = sorted(list(current_val))
-        else:
-            asset_result_dict[k] = [current_val]
-
-
-def enrich_query_result_dict(asset_result_dict):
-    enriched = {k: v for k, v in asset_result_dict.items() if k != "resourceUri"}
-    _convert_multival_fields_to_lists(enriched)
-    if "organisation" in enriched:
-        enriched["organisation"] = lookup_organisation(enriched["organisation"])
-    if "creator" in enriched:
-        enriched["creator"] = lookup_organisation(enriched["creator"])
-    return enriched
-
-
-def munge_asset_summary_response(result_dict):
-    r = result_dict.copy()
-    # If summary doesn't exist, set it to be a truncated description
-    if "summary" not in r:
-        r["summary"] = r["description"][:100]
-    del r["description"]
-
-    return r
-
-
 def sanitise_search_query(q: str):
     return q.strip('"')
 

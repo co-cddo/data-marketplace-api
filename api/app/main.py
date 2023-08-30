@@ -3,7 +3,7 @@ from typing import Annotated, List, Union
 from fastapi import FastAPI, Body, Query, HTTPException, File, UploadFile
 from fastapi.responses import JSONResponse
 from app import model as m
-from app import db
+from app.db import asset as asset_db, user as user_db, share as share_db
 from app.publish import csv as pubcsv, response as pubres
 from . import utils
 
@@ -34,7 +34,7 @@ def search_catalogue(
     limit: int = 100,
     offset: int = 0,
 ) -> m.SearchAssetsResponse:
-    assets = db.search(query)
+    assets = asset_db.search(query)
     facets = {"topics": [], "organisations": [], "assetTypes": []}
 
     response = {"data": assets, "facets": facets}
@@ -45,7 +45,7 @@ def search_catalogue(
 
 @app.get("/catalogue/{asset_id}")
 async def catalogue_entry_detail(asset_id: UUID) -> m.AssetDetailResponse:
-    asset = db.asset_detail(asset_id)
+    asset = asset_db.detail(asset_id)
     if asset["type"] == m.assetType.dataset:
         asset = m.DatasetResponse.model_validate(asset)
     elif asset["type"] == m.assetType.service:
@@ -65,13 +65,13 @@ async def upsert_user(jwt: m.JWT):
 
     user_id = utils.user_id_from_email(user_email)
 
-    local_user = db.get_user_by_id(user_id)
+    local_user = user_db.get_by_id(user_id)
 
     if len(local_user) == 0:
-        db.new_user(user_id, user_email)
+        user_db.new_user(user_id, user_email)
         return {"user_id": user_id, "request_forms": {}}
 
-    share_request_forms = db.get_share_request_forms(user_id)
+    share_request_forms = share_db.get_request_forms(user_id)
     return {"user_id": user_id, "request_forms": share_request_forms}
 
 
@@ -79,7 +79,7 @@ async def upsert_user(jwt: m.JWT):
 async def upsert_sharedata(req: m.sharedataRequest):
     decoded_jwt = utils.decodeJWT(req.jwt)
     user_id = utils.user_id_from_email(decoded_jwt.get("email"))
-    res = db.upsert_sharedata(user_id, req.sharedata)
+    res = share_db.upsert_sharedata(user_id, req.sharedata)
     return res
 
 
