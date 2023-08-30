@@ -3,13 +3,11 @@ PREFIX dcat: <http://www.w3.org/ns/dcat#>
 PREFIX dct: <http://purl.org/dc/terms/>
 PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
 PREFIX cddo_asset: <http://marketplace.cddo.gov.uk/asset/>
-PREFIX cddo_graph: <http://marketplace.cddo.gov.uk/graph/>
 PREFIX skos: <http://www.w3.org/2004/02/skos/core#> 
 
 SELECT ?identifier ?type ?title ?description ?organisation 
         ?catalogueCreated ?catalogueModified ?created ?issued ?modified 
         ?summary ?serviceType ?creator ?mediaType ?mediaTypeLabel
-FROM cddo_graph:assets
 WHERE {{
     ?s text:query "$q" ;
         dct:identifier ?identifier ;
