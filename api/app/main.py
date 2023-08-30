@@ -76,7 +76,7 @@ async def upsert_user(jwt: m.JWT):
 
 
 @app.put("/sharedata")
-async def upsert_sharedata(req: m.sharedataRequest):
+async def upsert_sharedata(req: m.ShareDataRequest):
     decoded_jwt = utils.decodeJWT(req.jwt)
     user_id = utils.user_id_from_email(decoded_jwt.get("email"))
     res = share_db.upsert_sharedata(user_id, req.sharedata)

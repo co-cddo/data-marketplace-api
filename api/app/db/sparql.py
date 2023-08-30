@@ -6,16 +6,13 @@ from rdflib.namespace import XSD
 
 
 class Connection:
-    def __init__(
-        self, graph, query_url=None, update_url=None, query_template_dir="queries"
-    ):
+    def __init__(self, query_url=None, update_url=None, query_template_dir="queries"):
         self.query_dir = query_template_dir
-        self.graph = graph
         if query_url:
-            self.reader = SPARQLWrapper(query_url, defaultGraph=graph)
+            self.reader = SPARQLWrapper(query_url)
             self.reader.setReturnFormat(JSON)
         if update_url:
-            self.writer = SPARQLWrapper(update_url, defaultGraph=graph)
+            self.writer = SPARQLWrapper(update_url)
             self.writer.setReturnFormat(JSON)
             self.writer.method = POST
 
@@ -52,21 +49,18 @@ class Connection:
 
 
 assets_db = Connection(
-    config.ASSET_GRAPH,
     query_url=config.QUERY_URL,
     update_url=config.UPDATE_URL,
     query_template_dir="queries",
 )
 
 users_db = Connection(
-    config.USER_GRAPH,
     query_url=config.QUERY_URL,
     update_url=config.UPDATE_URL,
     query_template_dir="queries",
 )
 
 shares_db = Connection(
-    config.SHARE_GRAPH,
     query_url=config.QUERY_URL,
     update_url=config.UPDATE_URL,
     query_template_dir="queries",
