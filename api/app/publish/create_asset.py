@@ -1,14 +1,13 @@
 from app import model as m
 from typing import List
-from app.db.utils import lookup_organisation
 from app import utils
 from datetime import datetime
 import uuid
 
 
 def _add_organisations(asset):
-    creator = lookup_organisation(asset["creatorID"])
-    org = lookup_organisation(asset["organisationID"])
+    creator = utils.lookup_organisation(asset["creatorID"])
+    org = utils.lookup_organisation(asset["organisationID"])
     asset = utils.remove_keys(asset, ["creatorID", "organisationID"])
     asset["creator"] = creator
     asset["organisation"] = org
