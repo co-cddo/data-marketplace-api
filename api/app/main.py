@@ -88,12 +88,7 @@ async def publish_assets(
     body: pubres.CreateAssetsRequestBody,
 ) -> pubres.CreateAssetsResponseBody:
     data = body.dict()["data"]
-    result = pubres.CreateAssetsResponseBody.model_validate(publish.create_assets(data))
-    # TODO sort out this "ok" situation - too complicated!
-    if result.ok:
-        return result
-    else:
-        return JSONResponse(status_code=422, content=result)
+    return pubres.CreateAssetsResponseBody.model_validate(publish.create_assets(data))
 
 
 # multipart/form-data endpoint
@@ -114,10 +109,4 @@ async def prepare_batch_publish_request(
     parsed = pubcsv.parse_input_files(
         datasets_file=datasets.file, services_file=dataservices.file
     )
-    response = pubres.format_response(parsed)
-    if response.ok:
-        return response
-    # Annoyingly, the API specification for 422 response is hard-coded in openAPI so we can't override it
-    # here with the response specification. Maybe we can return 400 and include a flag for success/error state
-    else:
-        return JSONResponse(status_code=422, content=response)
+    return pubres.format_response(parsed)
