@@ -32,7 +32,7 @@
 <#tdb> rdf:type tdb:DatasetTDB ;
     tdb:location "/fuseki-base/databases/tdb" ;
     # Make the default graph be the union of all named graphs.
-    tdb:unionDefaultGraph true ;
+    tdb:unionDefaultGraph false ;
     .
 
 <#lucene> a text:TextIndexLucene ;

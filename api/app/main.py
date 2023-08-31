@@ -1,10 +1,9 @@
 from uuid import UUID
-import json
 from typing import Annotated, List, Union
 from fastapi import FastAPI, Body, Query, HTTPException, File, UploadFile
 from fastapi.responses import JSONResponse
 from app import model as m
-from app import db
+from app.db import asset as asset_db, user as user_db, share as share_db
 from app.publish import csv as pubcsv, response as pubres
 from . import utils
 
@@ -35,7 +34,7 @@ def search_catalogue(
     limit: int = 100,
     offset: int = 0,
 ) -> m.SearchAssetsResponse:
-    assets = db.search(query)
+    assets = asset_db.search(query)
     facets = {"topics": [], "organisations": [], "assetTypes": []}
 
     response = {"data": assets, "facets": facets}
@@ -46,7 +45,7 @@ def search_catalogue(
 
 @app.get("/catalogue/{asset_id}")
 async def catalogue_entry_detail(asset_id: UUID) -> m.AssetDetailResponse:
-    asset = db.asset_detail(asset_id)
+    asset = asset_db.detail(asset_id)
     if asset["type"] == m.assetType.dataset:
         asset = m.DatasetResponse.model_validate(asset)
     elif asset["type"] == m.assetType.service:
@@ -55,6 +54,33 @@ async def catalogue_entry_detail(asset_id: UUID) -> m.AssetDetailResponse:
         raise HTTPException(status_code=404, detail="Item not found")
 
     return {"asset": asset}
+
+
+@app.put("/user")
+async def upsert_user(jwt: m.JWT) -> m.UpsertUserResponse:
+    decoded_jwt = utils.decodeJWT(jwt.token)
+    user_email = decoded_jwt.get("email", None)
+    if not user_email:
+        raise HTTPException(status_code=401, detail="Unauthorised")
+
+    user_id = utils.user_id_from_email(user_email)
+
+    local_user = user_db.get_by_id(user_id)
+
+    if not local_user:
+        user_db.new_user(user_id, user_email)
+        return {"user_id": user_id, "sharedata": {}}
+
+    share_request_forms = share_db.get_request_forms(user_id)
+    return {"user_id": user_id, "sharedata": share_request_forms}
+
+
+@app.put("/sharedata")
+async def upsert_sharedata(req: m.UpsertShareDataRequest):
+    decoded_jwt = utils.decodeJWT(req.jwt)
+    user_id = utils.user_id_from_email(decoded_jwt.get("email"))
+    res = share_db.upsert_sharedata(user_id, req.sharedata)
+    return res
 
 
 @app.post("/publish")

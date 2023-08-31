@@ -1,14 +1,16 @@
 PREFIX adms: <https://www.w3.org/ns/adms#>
-PREFIX cddo: <http://marketplace.cddo.gov.uk/asset/>
 PREFIX dcat: <http://www.w3.org/ns/dcat#>
 PREFIX dct: <http://purl.org/dc/terms/>
 PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
 PREFIX vcard: <http://www.w3.org/2006/vcard/ns#>
 PREFIX uk_cross_government_metadata_exchange_model: <https://w3id.org/co-cddo/uk-cross-government-metadata-exchange-model/>
+PREFIX cddo_asset: <http://marketplace.cddo.gov.uk/asset/>
+PREFIX cddo_graph: <http://marketplace.cddo.gov.uk/graph/>
 
 SELECT ?resourceUri ?updateFrequency ?endpointDescription ?endpointURL ?serviceStatus ?serviceType ?accessRights
 ?contactName ?contactEmail ?contactAddress ?contactTelephone ?created ?description ?issued
 ?licence ?modified ?organisation ?securityClassification ?summary ?title ?type ?catalogueCreated ?catalogueModified ?creator ?keyword ?alternativeTitle ?relatedResource ?theme ?servesData ?distribution
+FROM cddo_graph:assets
 WHERE {{
 ?resourceUri dct:identifier "$asset_id" ;
    dcat:contactPoint ?contact ;
@@ -19,8 +21,8 @@ WHERE {{
    dct:title ?title ;
    a ?typeURI;
    dcat:version ?version ;
-   cddo:created ?catalogueCreated ;
-   cddo:modified ?catalogueModified .
+   cddo_asset:created ?catalogueCreated ;
+   cddo_asset:modified ?catalogueModified .
   ?typeURI rdfs:label ?type .
   OPTIONAL {{ ?resourceUri dct:accrualPeriodicity ?freq }
             { ?freq rdfs:label ?updateFrequency }} .

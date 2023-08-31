@@ -2,7 +2,7 @@ import uuid
 from datetime import datetime
 from enum import Enum
 from pydantic import BaseModel, Field, EmailStr
-from typing import List, Literal
+from typing import List, Literal, Any, Optional
 from pydantic.networks import AnyUrl
 
 
@@ -282,6 +282,46 @@ class AssetDetailResponse(BaseModel):
 class CreateAssetBody(BaseAsset):
     organisationID: organisationID
     creatorID: organisationID
+
+
+class JWT(BaseModel):
+    token: str
+
+
+class ShareDataSection(BaseModel):
+    name: str
+    steps: list[str]
+
+
+class ShareDataStep(BaseModel):
+    id: str
+    name: str
+    status: str
+    value: Any
+    nextStep: str
+    errorMessage: Optional[str] = None
+
+
+class ShareData(BaseModel):
+    requestId: str
+    assetTitle: str
+    dataAsset: str  # aka asset ID
+    ownedBy: str
+    completedSections: int
+    status: str
+    overviewSections: dict[str, ShareDataSection]
+    steps: dict[str, ShareDataStep]
+    stepHistory: list[str] | None
+
+
+class UpsertUserResponse(BaseModel):
+    user_id: str
+    sharedata: dict[str, ShareData]
+
+
+class UpsertShareDataRequest(BaseModel):
+    jwt: str
+    sharedata: ShareData
 
 
 class CreateDatasetBody(CreateAssetBody, Dataset):
