@@ -125,7 +125,11 @@ def decodeJWT(token: str):
 
         secret = jwt.algorithms.RSAAlgorithm.from_jwk(json.dumps(matching_keys[0]))
         decoded = jwt.decode(
-            token, key=secret, audience=config.JWT_AUD, algorithms=["RS256"]
+            token,
+            key=secret,
+            audience=config.JWT_AUD,
+            algorithms=["RS256"],
+            leeway=5,
         )
         return decoded
     except Exception as err:

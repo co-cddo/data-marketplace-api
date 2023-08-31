@@ -2,7 +2,7 @@ import uuid
 from datetime import datetime
 from enum import Enum
 from pydantic import BaseModel, Field, EmailStr
-from typing import List, Literal, Any
+from typing import List, Literal, Any, Optional
 from pydantic.networks import AnyUrl
 
 
@@ -299,13 +299,13 @@ class ShareDataStep(BaseModel):
     status: str
     value: Any
     nextStep: str
-    errorMessage: str | None
+    errorMessage: Optional[str] = None
 
 
 class ShareData(BaseModel):
     requestId: str
     assetTitle: str
-    dataAsset: str  # asset ID
+    dataAsset: str  # aka asset ID
     ownedBy: str
     completedSections: int
     status: str
@@ -314,19 +314,16 @@ class ShareData(BaseModel):
     stepHistory: list[str] | None
 
 
-class ShareDataRequest(BaseModel):
+class UpsertUserResponse(BaseModel):
+    user_id: str
+    sharedata: dict[str, ShareData]
+
+
+class UpsertShareDataRequest(BaseModel):
     jwt: str
     sharedata: ShareData
 
 
-# def create(asset: CreateAssetBody):
-#     data = dict(asset)
-#     data["organisation"] = lookup_organisation(data["organisationID"])
-#     data.pop("organisationID")
-#     creator = [lookup_organisation(o) for o in data["creatorID"]]
-#     data.pop("creatorID")
-#     data["id"] = uuid.uuid4()
-#     return DataAsset.parse_obj(data)
 class CreateDatasetBody(CreateAssetBody, Dataset):
     pass
 

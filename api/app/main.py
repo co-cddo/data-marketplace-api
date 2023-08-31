@@ -57,7 +57,7 @@ async def catalogue_entry_detail(asset_id: UUID) -> m.AssetDetailResponse:
 
 
 @app.put("/user")
-async def upsert_user(jwt: m.JWT):
+async def upsert_user(jwt: m.JWT) -> m.UpsertUserResponse:
     decoded_jwt = utils.decodeJWT(jwt.token)
     user_email = decoded_jwt.get("email", None)
     if not user_email:
@@ -67,16 +67,16 @@ async def upsert_user(jwt: m.JWT):
 
     local_user = user_db.get_by_id(user_id)
 
-    if len(local_user) == 0:
+    if not local_user:
         user_db.new_user(user_id, user_email)
-        return {"user_id": user_id, "request_forms": {}}
+        return {"user_id": user_id, "sharedata": {}}
 
     share_request_forms = share_db.get_request_forms(user_id)
-    return {"user_id": user_id, "request_forms": share_request_forms}
+    return {"user_id": user_id, "sharedata": share_request_forms}
 
 
 @app.put("/sharedata")
-async def upsert_sharedata(req: m.ShareDataRequest):
+async def upsert_sharedata(req: m.UpsertShareDataRequest):
     decoded_jwt = utils.decodeJWT(req.jwt)
     user_id = utils.user_id_from_email(decoded_jwt.get("email"))
     res = share_db.upsert_sharedata(user_id, req.sharedata)
