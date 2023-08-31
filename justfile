@@ -1,7 +1,12 @@
 run:
   cd api && poetry export -f requirements.txt --output requirements.txt
   docker compose up --build
-  # poetry run uvicorn api.app.main:app --reload
+
+shell-fuseki:
+  docker compose exec fuseki /bin/sh
+
+shell-api:
+  docker compose exec api /bin/sh
 
 setup-hooks:
   cd api && poetry run pre-commit install
