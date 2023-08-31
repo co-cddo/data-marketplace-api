@@ -1,0 +1,10 @@
+PREFIX cddo: <http://marketplace.cddo.gov.uk#>
+PREFIX cddo_graph: <http://marketplace.cddo.gov.uk/graph/>
+
+SELECT ?assetId ?sharedata
+FROM cddo_graph:shares
+WHERE {
+  ?share cddo:user "$user_id" ;
+         cddo:asset ?assetId ;
+         cddo:sharedata ?sharedata .
+}

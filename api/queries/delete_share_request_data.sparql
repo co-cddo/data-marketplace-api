@@ -1,0 +1,8 @@
+PREFIX cddo_share: <http://marketplace.cddo.gov.uk/share/>
+PREFIX cddo_graph: <http://marketplace.cddo.gov.uk/graph/>
+
+DELETE WHERE {
+    GRAPH cddo_graph:shares {
+        cddo_share:$id ?p ?o
+    }
+}
