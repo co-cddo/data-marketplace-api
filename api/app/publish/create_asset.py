@@ -1,4 +1,6 @@
 from app import model as m
+from app.db.model import asset_to_triples, triples_to_sparql
+from app.db.sparql import assets_db
 from typing import List
 from app import utils
 from datetime import datetime
@@ -9,18 +11,37 @@ def _add_organisations(asset):
     creator = utils.lookup_organisation(asset["creatorID"])
     org = utils.lookup_organisation(asset["organisationID"])
     asset = utils.remove_keys(asset, ["creatorID", "organisationID"])
-    asset["creator"] = creator
-    asset["organisation"] = org
+    asset["creator"] = dict(creator)
+    asset["organisation"] = dict(org)
     return asset
 
 
+# TODO add the external IDs in another field
 def _create_asset(asset):
-    asset = _add_organisations(asset)
     asset["catalogueCreated"] = datetime.now()
     asset["catalogueModified"] = datetime.now()
     asset["identifier"] = uuid.uuid4()
+    if asset["type"] == m.assetType.dataset:
+        asset["distributions"] = [_add_uuid(d) for d in asset["distributions"]]
     return asset
 
 
+# TODO actual errors
 def create_assets(assets: List[m.CreateDatasetBody | m.CreateDataServiceBody]):
-    return {"errors": [], "data": [_create_asset(a) for a in assets]}
+    assets = [_add_organisations(a) for a in assets]
+    assets = [_create_asset(a) for a in assets]
+    triples = []
+    for a in assets:
+        try:
+            triples = triples + asset_to_triples(a)
+        except Exception as e:
+            print("ERROR with asset")
+            print(e)
+            return {"errors": [], "data": []}
+    sparql = triples_to_sparql(triples)
+    print("TRIPLES:")
+    print(triples)
+    print("sparql")
+    print(sparql)
+    response = assets_db.run_update("create_asset", triples=sparql)
+    return {"errors": [], "data": assets}
