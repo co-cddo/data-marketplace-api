@@ -1,8 +1,18 @@
 from uuid import UUID
-from typing import Annotated, List, Union
-from fastapi import FastAPI, Body, Query, HTTPException, File, UploadFile
+from typing import Annotated, List, Union, Optional
+from fastapi import (
+    FastAPI,
+    Body,
+    Query,
+    HTTPException,
+    File,
+    UploadFile,
+    Header,
+    Depends,
+)
 from fastapi.responses import JSONResponse
 from app import model as m
+from app import config
 from app.db import asset as asset_db, user as user_db, share as share_db
 from app.publish import csv as pubcsv, response as pubres
 from . import utils
@@ -22,6 +32,17 @@ async def list_organisations() -> List[m.Organisation]:
         [m.Organisation.model_validate(utils.orgs[o]) for o in utils.MVP_ORGS],
         key=lambda o: o.title,
     )
+
+
+async def ops_user(x_api_key: Annotated[Optional[str], Header()]):
+    if not x_api_key:
+        return False
+    return x_api_key == config.OPS_API_KEY
+
+
+@app.get("/users")
+async def list_users(is_ops: Annotated[bool, Depends(ops_user)]):
+    return {"is_ops": is_ops}
 
 
 # TODO: add theme query param

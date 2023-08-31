@@ -16,6 +16,7 @@ UPDATE_URL = f"{TRIPLESTORE_URL}/{DATASET_NAME}/update"
 
 JWKS_URL = os.environ.get("JWKS_URL", None)
 JWT_AUD = os.environ.get("JWT_AUD", None)
+OPS_API_KEY = os.environ.get("OPS_API_KEY", None)
 
 cddo_graph = Namespace("http://marketplace.cddo.gov.uk/graph/")
 ASSET_GRAPH = cddo_graph.assets
