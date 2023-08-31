@@ -7,7 +7,7 @@ PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
 
 SELECT ?identifier ?type ?title ?description ?organisation 
         ?catalogueCreated ?catalogueModified ?created ?issued ?modified 
-        ?summary ?serviceType ?creator ?mediaType ?mediaTypeLabel
+        ?summary ?serviceType ?creator ?mediaType ?mediaTypeLabel ?theme
 WHERE {{
     ?s text:query "$q" ;
         dct:identifier ?identifier ;
@@ -29,4 +29,6 @@ WHERE {{
     OPTIONAL {{ ?s dct:modified ?modified }} .
     OPTIONAL {{ ?s rdfs:comment ?summary }} .
     OPTIONAL {{ ?s dct:type ?serviceType }} .
+    OPTIONAL {{ ?s dcat:theme ?themeURI }
+              {?themeURI skos:prefLabel ?theme }} .
 }}

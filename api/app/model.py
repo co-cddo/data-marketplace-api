@@ -100,6 +100,7 @@ class BaseAssetSummary(BaseModel):
     modified: datetime | None = None
     title: str
     type: assetType  # TODO I reckon this should be a uri - dcat:DataService, dcat:DataSet
+    theme: List[str] | None = []
 
 
 class BaseAsset(BaseAssetSummary):
@@ -115,7 +116,6 @@ class BaseAsset(BaseAssetSummary):
     relatedAssets: List[AnyUrl] | None = []
     securityClassification: securityClass | None = securityClass.official
     summary: str | None = None
-    theme: List[AnyUrl] | None = []
     version: str | None = "1.0"
 
     class Config:
