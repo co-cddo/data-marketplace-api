@@ -1,0 +1,15 @@
+@prefix skos: <http://www.w3.org/2004/02/skos/core#> .
+<https://www.data.gov.uk/search?filters%5Btopic%5D=Business+and+economy> skos:prefLabel "Business and economy"@en .
+<https://www.data.gov.uk/search?filters%5Btopic%5D=Crime+and+justice> skos:prefLabel "Crime and justice"@en .
+<https://www.data.gov.uk/search?filters%5Btopic%5D=Defence> skos:prefLabel "Defence"@en .
+<https://www.data.gov.uk/search?filters%5Btopic%5D=Digital+service+performance> skos:prefLabel "Digital service performance"@en .
+<https://www.data.gov.uk/search?filters%5Btopic%5D=Education> skos:prefLabel "Education"@en .
+<https://www.data.gov.uk/search?filters%5Btopic%5D=Environment> skos:prefLabel "Environment"@en .
+<https://www.data.gov.uk/search?filters%5Btopic%5D=Government> skos:prefLabel "Government"@en .
+<https://www.data.gov.uk/search?filters%5Btopic%5D=Government+reference+data> skos:prefLabel "Government reference data"@en .
+<https://www.data.gov.uk/search?filters%5Btopic%5D=Government+spending> skos:prefLabel "Government spending"@en .
+<https://www.data.gov.uk/search?filters%5Btopic%5D=Health> skos:prefLabel "Health"@en .
+<https://www.data.gov.uk/search?filters%5Btopic%5D=Mapping> skos:prefLabel "Mapping"@en .
+<https://www.data.gov.uk/search?filters%5Btopic%5D=Society> skos:prefLabel "Society"@en .
+<https://www.data.gov.uk/search?filters%5Btopic%5D=Towns+and+cities> skos:prefLabel "Towns and cities"@en .
+<https://www.data.gov.uk/search?filters%5Btopic%5D=Transport> skos:prefLabel "Transport"@en .
