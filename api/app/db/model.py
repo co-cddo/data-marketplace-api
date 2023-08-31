@@ -1,7 +1,7 @@
 from app import model as m
 from rdflib.term import URIRef, BNode
 from rdflib import Namespace
-from rdflib.namespace import RDF, RDFS, DCTERMS, DCAT
+from rdflib.namespace import RDF, RDFS, DCTERMS, DCAT, SKOS
 from pydantic.networks import AnyUrl
 from datetime import datetime
 from uuid import UUID, uuid4
@@ -23,7 +23,7 @@ def subject_uri(asset):
 
 
 def distribution_uri(distribution):
-    id = str(uuid4())
+    id = str(distribution["identifier"])
     return CDDO_DISTRIBUTION[id]
 
 
@@ -137,6 +137,7 @@ predicates_map = {
                 "issued": SimpleAttribute(CDDO_ASSET.issued),
                 "licence": SimpleAttribute(DCTERMS.license),
                 "byteSize": SimpleAttribute(DCAT.byteSize),
+                "externalIdentifier": SimpleAttribute(SKOS.notation),
             },
             object_id_fn=distribution_uri,
             object_type_uri=DCAT.Distribution,

@@ -62,6 +62,6 @@ def detail(asset_id: str):
             for r in _fetch_distribution_details(asset["distribution"])
         ]
         asset["distributions"] = [
-            m.DistributionSummary.model_validate(d) for d in distributions
+            m.DistributionResponse.model_validate(d) for d in distributions
         ]
     return asset

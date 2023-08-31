@@ -16,8 +16,12 @@ def _add_organisations(asset):
     return asset
 
 
-# TODO add the external IDs in another field
+def _add_uuid(asset_or_distribution):
+    return {**asset_or_distribution, "identifier": uuid.uuid4()}
+
+
 def _create_asset(asset):
+    asset = _add_uuid(asset)
     asset["catalogueCreated"] = datetime.now()
     asset["catalogueModified"] = datetime.now()
     asset["identifier"] = uuid.uuid4()
@@ -39,9 +43,5 @@ def create_assets(assets: List[m.CreateDatasetBody | m.CreateDataServiceBody]):
             print(e)
             return {"errors": [], "data": []}
     sparql = triples_to_sparql(triples)
-    print("TRIPLES:")
-    print(triples)
-    print("sparql")
-    print(sparql)
     response = assets_db.run_update("create_asset", triples=sparql)
     return {"errors": [], "data": assets}
