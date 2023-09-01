@@ -44,7 +44,7 @@ paths:
           schema:
             type: array
             items:
-              $ref: '#/components/schemas/organisationID'
+              type: string
             default: []
             title: Organisation
         - name: assetType
@@ -108,6 +108,51 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/HTTPValidationError'
+  /user:
+    put:
+      summary: Upsert User
+      operationId: upsert_user_user_put
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/JWT'
+        required: true
+      responses:
+        "200":
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UpsertUserResponse'
+        "422":
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /sharedata:
+    put:
+      summary: Upsert Sharedata
+      operationId: upsert_sharedata_sharedata_put
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpsertShareDataRequest'
+        required: true
+      responses:
+        "200":
+          description: Successful Response
+          content:
+            application/json:
+              schema: {}
+        "422":
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
   /publish:
     post:
       summary: Publish Assets
@@ -153,7 +198,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ParseFilesResponseBody'
+                $ref: '#/components/schemas/HTTPValidationError'
 components:
   schemas:
     AssetDetailResponse:
@@ -252,18 +297,9 @@ components:
               - $ref: '#/components/schemas/CreateDataServiceBody'
           type: array
           title: Data
-        errors:
-          items:
-            anyOf:
-              - $ref: '#/components/schemas/FileErrorInfo'
-              - $ref: '#/components/schemas/AssetValidationErrorInfo'
-              - $ref: '#/components/schemas/FieldValidationErrorInfo'
-          type: array
-          title: Errors
       type: object
       required:
         - data
-        - errors
       title: CreateAssetsRequestBody
     CreateAssetsResponseBody:
       properties:
@@ -308,6 +344,14 @@ components:
           title: Title
         type:
           $ref: '#/components/schemas/assetType'
+        theme:
+          anyOf:
+            - items:
+                type: string
+              type: array
+            - type: "null"
+          title: Theme
+          default: []
         accessRights:
           anyOf:
             - $ref: '#/components/schemas/rightsStatement'
@@ -362,22 +406,17 @@ components:
             - $ref: '#/components/schemas/securityClass'
             - type: "null"
           default: OFFICIAL
-        theme:
-          anyOf:
-            - items:
-                type: string
-                minLength: 1
-                format: uri
-              type: array
-            - type: "null"
-          title: Theme
-          default: []
         version:
           anyOf:
             - type: string
             - type: "null"
           title: Version
           default: "1.0"
+        externalIdentifier:
+          anyOf:
+            - type: string
+            - type: "null"
+          title: Externalidentifier
         endpointDescription:
           type: string
           title: Endpointdescription
@@ -398,9 +437,11 @@ components:
         serviceType:
           $ref: '#/components/schemas/ServiceType'
         organisationID:
-          $ref: '#/components/schemas/organisationID'
+          type: string
+          title: Organisationid
         creatorID:
-          $ref: '#/components/schemas/organisationID'
+          type: string
+          title: Creatorid
       type: object
       required:
         - title
@@ -438,6 +479,14 @@ components:
           title: Title
         type:
           $ref: '#/components/schemas/assetType'
+        theme:
+          anyOf:
+            - items:
+                type: string
+              type: array
+            - type: "null"
+          title: Theme
+          default: []
         accessRights:
           anyOf:
             - $ref: '#/components/schemas/rightsStatement'
@@ -492,22 +541,17 @@ components:
             - $ref: '#/components/schemas/securityClass'
             - type: "null"
           default: OFFICIAL
-        theme:
-          anyOf:
-            - items:
-                type: string
-                minLength: 1
-                format: uri
-              type: array
-            - type: "null"
-          title: Theme
-          default: []
         version:
           anyOf:
             - type: string
             - type: "null"
           title: Version
           default: "1.0"
+        externalIdentifier:
+          anyOf:
+            - type: string
+            - type: "null"
+          title: Externalidentifier
         distributions:
           items:
             $ref: '#/components/schemas/DistributionSummary'
@@ -517,9 +561,11 @@ components:
           type: string
           title: Updatefrequency
         organisationID:
-          $ref: '#/components/schemas/organisationID'
+          type: string
+          title: Organisationid
         creatorID:
-          $ref: '#/components/schemas/organisationID'
+          type: string
+          title: Creatorid
       type: object
       required:
         - title
@@ -572,6 +618,14 @@ components:
         type:
           const: DataService
           title: Type
+        theme:
+          anyOf:
+            - items:
+                type: string
+              type: array
+            - type: "null"
+          title: Theme
+          default: []
         accessRights:
           anyOf:
             - $ref: '#/components/schemas/rightsStatement'
@@ -626,22 +680,17 @@ components:
             - $ref: '#/components/schemas/securityClass'
             - type: "null"
           default: OFFICIAL
-        theme:
-          anyOf:
-            - items:
-                type: string
-                minLength: 1
-                format: uri
-              type: array
-            - type: "null"
-          title: Theme
-          default: []
         version:
           anyOf:
             - type: string
             - type: "null"
           title: Version
           default: "1.0"
+        externalIdentifier:
+          anyOf:
+            - type: string
+            - type: "null"
+          title: Externalidentifier
         endpointDescription:
           type: string
           title: Endpointdescription
@@ -757,6 +806,14 @@ components:
         type:
           const: DataService
           title: Type
+        theme:
+          anyOf:
+            - items:
+                type: string
+              type: array
+            - type: "null"
+          title: Theme
+          default: []
         serviceType:
           $ref: '#/components/schemas/ServiceType'
       type: object
@@ -812,6 +869,14 @@ components:
         type:
           const: Dataset
           title: Type
+        theme:
+          anyOf:
+            - items:
+                type: string
+              type: array
+            - type: "null"
+          title: Theme
+          default: []
         accessRights:
           anyOf:
             - $ref: '#/components/schemas/rightsStatement'
@@ -866,25 +931,20 @@ components:
             - $ref: '#/components/schemas/securityClass'
             - type: "null"
           default: OFFICIAL
-        theme:
-          anyOf:
-            - items:
-                type: string
-                minLength: 1
-                format: uri
-              type: array
-            - type: "null"
-          title: Theme
-          default: []
         version:
           anyOf:
             - type: string
             - type: "null"
           title: Version
           default: "1.0"
+        externalIdentifier:
+          anyOf:
+            - type: string
+            - type: "null"
+          title: Externalidentifier
         distributions:
           items:
-            $ref: '#/components/schemas/DistributionSummary'
+            $ref: '#/components/schemas/DistributionResponse'
           type: array
           title: Distributions
         updateFrequency:
@@ -984,6 +1044,14 @@ components:
         type:
           const: Dataset
           title: Type
+        theme:
+          anyOf:
+            - items:
+                type: string
+              type: array
+            - type: "null"
+          title: Theme
+          default: []
         mediaType:
           items:
             type: string
@@ -1001,6 +1069,58 @@ components:
         - type
         - mediaType
       title: DatasetSummary
+    DistributionResponse:
+      properties:
+        title:
+          type: string
+          title: Title
+        modified:
+          type: string
+          format: date-time
+          title: Modified
+        mediaType:
+          type: string
+          title: Mediatype
+        accessService:
+          anyOf:
+            - type: string
+            - type: "null"
+          title: Accessservice
+        externalIdentifier:
+          anyOf:
+            - type: string
+            - type: "null"
+          title: Externalidentifier
+        issued:
+          anyOf:
+            - type: string
+              format: date-time
+            - type: "null"
+          title: Issued
+        licence:
+          anyOf:
+            - type: string
+              minLength: 1
+              format: uri
+            - type: "null"
+          title: Licence
+          default: https://www.nationalarchives.gov.uk/doc/open-government-licence/version/3/
+        byteSize:
+          anyOf:
+            - type: integer
+            - type: "null"
+          title: Bytesize
+        identifier:
+          type: string
+          format: uuid
+          title: Identifier
+      type: object
+      required:
+        - title
+        - modified
+        - mediaType
+        - identifier
+      title: DistributionResponse
     DistributionSummary:
       properties:
         title:
@@ -1018,9 +1138,11 @@ components:
             - type: string
             - type: "null"
           title: Accessservice
-        identifier:
-          type: string
-          title: Identifier
+        externalIdentifier:
+          anyOf:
+            - type: string
+            - type: "null"
+          title: Externalidentifier
         issued:
           anyOf:
             - type: string
@@ -1045,7 +1167,6 @@ components:
         - title
         - modified
         - mediaType
-        - identifier
       title: DistributionSummary
     ErrorInfo:
       properties:
@@ -1136,6 +1257,15 @@ components:
           title: Detail
       type: object
       title: HTTPValidationError
+    JWT:
+      properties:
+        token:
+          type: string
+          title: Token
+      type: object
+      required:
+        - token
+      title: JWT
     Organisation:
       properties:
         id:
@@ -1262,6 +1392,126 @@ components:
         - EVENT
         - SOAP
       title: ServiceType
+    ShareData:
+      properties:
+        requestId:
+          type: string
+          title: Requestid
+        assetTitle:
+          type: string
+          title: Assettitle
+        dataAsset:
+          type: string
+          title: Dataasset
+        ownedBy:
+          type: string
+          title: Ownedby
+        completedSections:
+          type: integer
+          title: Completedsections
+        status:
+          type: string
+          title: Status
+        overviewSections:
+          additionalProperties:
+            $ref: '#/components/schemas/ShareDataSection'
+          type: object
+          title: Overviewsections
+        steps:
+          additionalProperties:
+            $ref: '#/components/schemas/ShareDataStep'
+          type: object
+          title: Steps
+        stepHistory:
+          anyOf:
+            - items:
+                type: string
+              type: array
+            - type: "null"
+          title: Stephistory
+      type: object
+      required:
+        - requestId
+        - assetTitle
+        - dataAsset
+        - ownedBy
+        - completedSections
+        - status
+        - overviewSections
+        - steps
+        - stepHistory
+      title: ShareData
+    ShareDataSection:
+      properties:
+        name:
+          type: string
+          title: Name
+        steps:
+          items:
+            type: string
+          type: array
+          title: Steps
+      type: object
+      required:
+        - name
+        - steps
+      title: ShareDataSection
+    ShareDataStep:
+      properties:
+        id:
+          type: string
+          title: Id
+        name:
+          type: string
+          title: Name
+        status:
+          type: string
+          title: Status
+        value:
+          title: Value
+        nextStep:
+          type: string
+          title: Nextstep
+        errorMessage:
+          anyOf:
+            - type: string
+            - type: "null"
+          title: Errormessage
+      type: object
+      required:
+        - id
+        - name
+        - status
+        - value
+        - nextStep
+      title: ShareDataStep
+    UpsertShareDataRequest:
+      properties:
+        jwt:
+          type: string
+          title: Jwt
+        sharedata:
+          $ref: '#/components/schemas/ShareData'
+      type: object
+      required:
+        - jwt
+        - sharedata
+      title: UpsertShareDataRequest
+    UpsertUserResponse:
+      properties:
+        user_id:
+          type: string
+          title: User Id
+        sharedata:
+          additionalProperties:
+            $ref: '#/components/schemas/ShareData'
+          type: object
+          title: Sharedata
+      type: object
+      required:
+        - user_id
+        - sharedata
+      title: UpsertUserResponse
     ValidationError:
       properties:
         loc:
@@ -1295,15 +1545,8 @@ components:
         - FILE
         - ASSET
         - FIELD
+        - BATCH
       title: errorScope
-    organisationID:
-      type: string
-      enum:
-        - department-for-work-pensions
-        - food-standards-agency
-        - nhs-digital
-        - ordnance-survey
-      title: organisationID
     rightsStatement:
       type: string
       enum:
