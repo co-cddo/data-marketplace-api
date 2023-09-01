@@ -23,8 +23,8 @@ WHERE {{
     ?typeURI rdfs:label ?type .
     OPTIONAL {{ ?s dcat:distribution ?distribution }
               { ?distribution dcat:mediaType ?mediaTypeUri }
-              { ?mediaTypeUri rdfs:label ?mediaType }} .
-    OPTIONAL {{ ?mediaTypeUri skos:prefLabel ?mediaTypeLabel }} .
+              { ?mediaTypeUri rdfs:label  ?mediaType }
+              OPTIONAL {{ ?mediaTypeUri skos:prefLabel ?mediaTypeLabel }}} .
     OPTIONAL {{ ?s dct:creator ?creator }} .
     OPTIONAL {{ ?s dct:created ?created }} .
     OPTIONAL {{ ?s dct:issued ?issued }} .
