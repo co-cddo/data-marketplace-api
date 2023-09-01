@@ -5,6 +5,7 @@ from typing import List
 from app import utils
 from datetime import datetime
 import uuid
+from app.publish.errors import errorScope
 
 
 def _add_organisations(asset):
@@ -30,18 +31,40 @@ def _create_asset(asset):
     return asset
 
 
-# TODO actual errors
 def create_assets(assets: List[m.CreateDatasetBody | m.CreateDataServiceBody]):
     assets = [_add_organisations(a) for a in assets]
     assets = [_create_asset(a) for a in assets]
     triples = []
+    errors = []
     for a in assets:
         try:
             triples = triples + asset_to_triples(a)
         except Exception as e:
-            print("ERROR with asset")
-            print(e)
-            return {"errors": [], "data": []}
-    sparql = triples_to_sparql(triples)
-    response = assets_db.run_update("create_asset", triples=sparql)
-    return {"errors": [], "data": assets}
+            errors.append(
+                {
+                    "message": "Can't store asset data",
+                    "scope": errorScope.asset,
+                    "location": a["externalIdentifier"]
+                    if a["externalIdentifier"] is not None
+                    else a["title"],
+                    "extras": {"error": str(e)},
+                }
+            )
+    if errors != []:
+        return {"errors": errors, "data": []}
+    try:
+        sparql = triples_to_sparql(triples)
+        response = assets_db.run_update("create_asset", triples=sparql)
+        return {"errors": [], "data": assets}
+    except Exception as e:
+        return {
+            "errors": [
+                {
+                    "message": "Failed to save data to database",
+                    "scope": errorScope.batch,
+                    "location": "unknown",
+                    "extras": {"internal_error": str(e)},
+                }
+            ],
+            "data": [],
+        }

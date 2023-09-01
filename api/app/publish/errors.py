@@ -7,6 +7,7 @@ class errorScope(str, Enum):
     file = "FILE"
     asset = "ASSET"
     field = "FIELD"
+    batch = "BATCH"
 
 
 class ErrorInfo(BaseModel):
