@@ -2,9 +2,10 @@
 @prefix dct: <http://purl.org/dc/terms/> .
 @prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
 @prefix skos: <http://www.w3.org/2004/02/skos/core#> .
+@prefix cddo_distribution: <http://marketplace.cddo.gov.uk/distribution/> .
 
-<https://www.data.gov.uk/distribution/os-postcodes-data/csv-distribution-id/> a dcat:Distribution;
-    dct:identifier "515ef6b0-a842-4b89-b58a-56693cbee705" ;
+cddo_distribution:ac7ac094-0098-4849-97b4-f9f65b537651 a dcat:Distribution ;
+    dct:identifier "ac7ac094-0098-4849-97b4-f9f65b537651" ;
     skos:notation "csv-distribution-id" ;
     dct:accessRights "OPEN" ;
     dct:description "Free and open postcode location data. Can be used for geographical analysis simple route planning asset management and much more." ;
