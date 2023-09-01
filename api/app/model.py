@@ -26,13 +26,6 @@ class Organisation(BaseModel):
     web_url: AnyUrl
 
 
-class organisationID(str, Enum):
-    dwp = "department-for-work-pensions"
-    fsa = "food-standards-agency"
-    nhsd = "nhs-digital"
-    os = "ordnance-survey"
-
-
 class securityClass(str, Enum):
     official = "OFFICIAL"
     secret = "SECRET"
@@ -287,8 +280,8 @@ class AssetDetailResponse(BaseModel):
 
 
 class CreateAssetBody(BaseAsset):
-    organisationID: organisationID
-    creatorID: organisationID
+    organisationID: str
+    creatorID: str
 
 
 class JWT(BaseModel):

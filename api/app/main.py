@@ -29,7 +29,7 @@ async def list_organisations() -> List[m.Organisation]:
 def search_catalogue(
     query: str = "",
     topic: Annotated[List[str], Query()] = [],
-    organisation: Annotated[List[m.organisationID], Query()] = [],
+    organisation: Annotated[List[str], Query()] = [],
     assetType: Annotated[List[m.assetType], Query()] = [],
     limit: int = 100,
     offset: int = 0,

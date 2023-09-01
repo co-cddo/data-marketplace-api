@@ -82,7 +82,7 @@ def initialise_organisations():
 orgs = initialise_organisations()
 
 
-def lookup_organisation(org_id: m.organisationID) -> m.Organisation:
+def lookup_organisation(org_id: str) -> m.Organisation:
     try:
         org_data = orgs[org_id]
     except:
