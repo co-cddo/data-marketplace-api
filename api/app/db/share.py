@@ -12,12 +12,13 @@ def get_request_forms(user_id: str):
 
 def upsert_sharedata(user_id: str, sharedata: m.ShareData):
     shares_db.run_update("delete_share_request_data", id=sharedata.requestId)
+    sharedata_string = json.dumps(sharedata.model_dump_json())
     query_results = shares_db.run_update(
         "create_share_request_data",
         id=sharedata.requestId,
         user_id=user_id,
         asset_id=sharedata.dataAsset,
-        sharedata=sharedata.model_dump_json(),
+        sharedata=sharedata_string,
         current_time=datetime.now().isoformat(),
         status=sharedata.status,
     )

@@ -10,7 +10,7 @@ INSERT DATA {
             cddo_share:$id dct:identifier "$id";
                            cddo:user "$user_id";
                            cddo:asset "$asset_id";
-                           cddo:sharedata '$sharedata';
+                           cddo:sharedata $sharedata;
                            dct:modified "$current_time";
                            adms:status "$status" .
       }
