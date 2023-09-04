@@ -1,7 +1,7 @@
 import uuid
 from datetime import datetime
 from enum import Enum
-from pydantic import BaseModel, Field, EmailStr, field_validator
+from pydantic import BaseModel, Field, EmailStr, field_validator, PositiveInt
 from typing import List, Literal, Any, Optional
 from pydantic.networks import AnyUrl
 import re
@@ -94,7 +94,7 @@ class DistributionSummary(BaseModel):
     licence: AnyUrl | None = (
         "https://www.nationalarchives.gov.uk/doc/open-government-licence/version/3/"
     )
-    byteSize: int | None = None
+    byteSize: PositiveInt | None = None
 
 
 class DistributionResponse(DistributionSummary):
