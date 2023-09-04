@@ -86,7 +86,7 @@ class ContactPoint(BaseModel):
 
 
 def check_date_past(v: datetime) -> datetime:
-    assert v <= datetime.now(), "date must be in the past"
+    assert v <= datetime.now(v.tzinfo), "date must be in the past"
     return v
 
 
