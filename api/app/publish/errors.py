@@ -13,7 +13,7 @@ class errorScope(str, Enum):
 class ErrorInfo(BaseModel):
     message: str
     location: str = Field(description="The file, asset, or field that caused the error")
-    extras: Dict | None = Field(description="Extra info about the error")
+    extras: Dict | None = Field(default=None, description="Extra info about the error")
     scope: errorScope
 
 
