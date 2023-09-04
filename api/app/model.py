@@ -1,4 +1,3 @@
-import uuid
 from datetime import datetime
 from enum import Enum
 from pydantic import (
@@ -9,9 +8,11 @@ from pydantic import (
     field_validator,
     model_validator,
 )
-from typing import List, Literal, Any, Optional
+from pydantic.functional_validators import AfterValidator
 from pydantic.networks import AnyUrl
 import re
+from typing import List, Literal, Any, Optional, Annotated
+import uuid
 
 
 class rightsStatement(str, Enum):
@@ -91,13 +92,21 @@ class ContactPoint(BaseModel):
             raise ValueError("must be a .gov.uk domain")
 
 
+def check_date_past(v: datetime) -> datetime:
+    assert v <= datetime.now(), "date must be in the past"
+    return v
+
+
+PastDate = Annotated[datetime, AfterValidator(check_date_past)]
+
+
 class DistributionSummary(BaseModel):
     title: str
-    modified: datetime
+    modified: PastDate
     mediaType: str
     accessService: str | None = None
     externalIdentifier: str | None = None
-    issued: datetime | None = None
+    issued: PastDate | None = None
     licence: AnyUrl | None = (
         "https://www.nationalarchives.gov.uk/doc/open-government-licence/version/3/"
     )
@@ -110,9 +119,9 @@ class DistributionResponse(DistributionSummary):
 
 
 class BaseAssetSummary(BaseModel):
-    created: datetime | None = None
+    created: PastDate | None = None
     summary: str
-    modified: datetime | None = None
+    modified: PastDate | None = None
     title: str
     type: assetType  # TODO I reckon this should be a uri - dcat:DataService, dcat:DataSet
     theme: List[str] | None = []
@@ -130,7 +139,7 @@ class BaseAsset(BaseAssetSummary):
     alternativeTitle: List[str] | None = []
     contactPoint: ContactPoint
     description: str
-    issued: datetime | None = None
+    issued: PastDate | None = None
     keyword: List[str] | None = []
     licence: AnyUrl | None = (
         "https://www.nationalarchives.gov.uk/doc/open-government-licence/version/3/"
@@ -147,8 +156,8 @@ class BaseAsset(BaseAssetSummary):
 
 # Common class for assets returned from the server
 class OutputAssetInfo(BaseModel):
-    catalogueCreated: datetime
-    catalogueModified: datetime
+    catalogueCreated: PastDate
+    catalogueModified: PastDate
     creator: Organisation
     identifier: uuid.UUID
     organisation: Organisation
