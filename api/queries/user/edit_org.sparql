@@ -1,0 +1,14 @@
+PREFIX schema: <http://schema.org/>
+PREFIX cddo_user: <http://marketplace.cddo.gov.uk/user/>
+PREFIX cddo_graph: <http://marketplace.cddo.gov.uk/graph/>
+
+WITH cddo_graph:users
+DELETE {
+	cddo_user:$user_id schema:memberOf ?org 
+}
+INSERT {
+  cddo_user:$user_id schema:memberOf "$org"
+}
+WHERE {
+  OPTIONAL{cddo_user:$user_id schema:memberOf ?org}
+}

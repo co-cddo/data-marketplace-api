@@ -320,7 +320,6 @@ class UpsertUserResponse(BaseModel):
 
 
 class UpsertShareDataRequest(BaseModel):
-    jwt: str
     sharedata: ShareData
 
 
@@ -330,3 +329,7 @@ class CreateDatasetBody(CreateAssetBody, Dataset):
 
 class CreateDataServiceBody(CreateAssetBody, DataService):
     pass
+
+
+class EditUserOrgRequest(BaseModel):
+    org: str
