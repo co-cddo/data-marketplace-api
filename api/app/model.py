@@ -1,7 +1,14 @@
 import uuid
 from datetime import datetime
 from enum import Enum
-from pydantic import BaseModel, Field, EmailStr, field_validator, PositiveInt
+from pydantic import (
+    BaseModel,
+    Field,
+    EmailStr,
+    PositiveInt,
+    field_validator,
+    model_validator,
+)
 from typing import List, Literal, Any, Optional
 from pydantic.networks import AnyUrl
 import re
@@ -109,6 +116,13 @@ class BaseAssetSummary(BaseModel):
     title: str
     type: assetType  # TODO I reckon this should be a uri - dcat:DataService, dcat:DataSet
     theme: List[str] | None = []
+
+    @model_validator(mode="after")
+    def check_created_before_modified(self):
+        if self.created and self.modified:
+            if self.created > self.modified:
+                raise ValueError("created date must be before modified date")
+        return self
 
 
 class BaseAsset(BaseAssetSummary):
