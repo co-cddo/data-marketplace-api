@@ -89,6 +89,7 @@ class DistributionSummary(BaseModel):
 
 class DistributionResponse(DistributionSummary):
     identifier: uuid.UUID
+    distribution: AnyUrl = Field(serialization_alias="@id")
 
 
 class BaseAssetSummary(BaseModel):
@@ -127,6 +128,7 @@ class OutputAssetInfo(BaseModel):
     creator: Organisation
     identifier: uuid.UUID
     organisation: Organisation
+    resourceUri: AnyUrl = Field(serialization_alias="@id")
 
 
 class Dataset(BaseAsset):

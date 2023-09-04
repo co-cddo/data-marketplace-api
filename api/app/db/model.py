@@ -139,7 +139,7 @@ predicates_map = {
                 "byteSize": SimpleAttribute(DCAT.byteSize),
                 "externalIdentifier": SimpleAttribute(SKOS.notation),
             },
-            object_id_fn=distribution_uri,
+            object_id_fn=lambda d: d["distribution"],
             object_type_uri=DCAT.Distribution,
         )
     ),
@@ -177,7 +177,7 @@ def format_term(rdf_term):
 
 
 def asset_to_triples(asset):
-    asset_uri = subject_uri(asset)
+    asset_uri = asset["resourceUri"]
     triples = []
     for k, v in asset.items():
         if k in predicates_map and v is not None:  # TODO should always be!

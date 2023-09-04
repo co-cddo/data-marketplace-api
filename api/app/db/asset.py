@@ -20,7 +20,7 @@ def search(q: str = ""):
     for r in query_results:
         _resolve_media_type_label(r)
     result_dicts = dbutils.aggregate_query_results_by_key(
-        query_results, group_key="identifier"
+        query_results, group_key="resourceUri"
     )
     result_dicts = [dbutils.enrich_query_result_dict(r) for r in result_dicts]
     result_dicts = [dbutils.munge_asset_summary_response(r) for r in result_dicts]
@@ -57,10 +57,7 @@ def detail(asset_id: str):
     asset["contactPoint"] = m.ContactPoint.model_validate(contactPoint)
 
     if asset["type"] == m.assetType.dataset:
-        distributions = [
-            utils.remove_keys(r, ["distribution"])
-            for r in _fetch_distribution_details(asset["distribution"])
-        ]
+        distributions = _fetch_distribution_details(asset["distribution"])
         asset["distributions"] = [
             m.DistributionResponse.model_validate(d) for d in distributions
         ]

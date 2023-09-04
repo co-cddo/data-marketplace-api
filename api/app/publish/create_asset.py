@@ -1,5 +1,10 @@
 from app import model as m
-from app.db.model import asset_to_triples, triples_to_sparql
+from app.db.model import (
+    asset_to_triples,
+    triples_to_sparql,
+    subject_uri,
+    distribution_uri,
+)
 from app.db.sparql import assets_db
 from typing import List
 from app import utils
@@ -26,8 +31,11 @@ def _create_asset(asset):
     asset["catalogueCreated"] = datetime.now()
     asset["catalogueModified"] = datetime.now()
     asset["identifier"] = uuid.uuid4()
+    asset["resourceUri"] = subject_uri(asset)
     if asset["type"] == m.assetType.dataset:
         asset["distributions"] = [_add_uuid(d) for d in asset["distributions"]]
+        for d in asset["distributions"]:
+            d["distribution"] = distribution_uri(d)
     return asset
 
 
