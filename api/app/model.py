@@ -35,13 +35,6 @@ class Organisation(BaseModel):
     web_url: AnyUrl
 
 
-class securityClass(str, Enum):
-    official = "OFFICIAL"
-    secret = "SECRET"
-    top_secret = "TOP_SECRET"
-    na = "NOT_APPLICABLE"
-
-
 class ServiceStatus(str, Enum):
     discovery = "DISCOVERY"
     alpha = "ALPHA"
@@ -105,11 +98,9 @@ class DistributionSummary(BaseModel):
     modified: PastDate
     mediaType: str
     accessService: str | None = None
-    externalIdentifier: str | None = None
+    externalIdentifier: str
     issued: PastDate | None = None
-    licence: AnyUrl | None = (
-        "https://www.nationalarchives.gov.uk/doc/open-government-licence/version/3/"
-    )
+    licence: AnyUrl
     byteSize: PositiveInt | None = None
 
 
@@ -141,14 +132,12 @@ class BaseAsset(BaseAssetSummary):
     description: str
     issued: PastDate | None = None
     keyword: List[str] | None = []
-    licence: AnyUrl | None = (
-        "https://www.nationalarchives.gov.uk/doc/open-government-licence/version/3/"
-    )
+    licence: AnyUrl
     relatedAssets: List[AnyUrl] | None = []
-    securityClassification: securityClass | None = securityClass.official
+    securityClassification: Literal["OFFICIAL"]
     summary: str | None = None
     version: str | None = "1.0"
-    externalIdentifier: str | None = None
+    externalIdentifier: str
 
     class Config:
         use_enum_values = True
@@ -232,7 +221,7 @@ class DatasetResponse(Dataset, OutputAssetInfo):
 
 
 class DataService(BaseAsset):
-    endpointDescription: str
+    endpointDescription: AnyUrl
     endpointURL: str | None = None
     servesData: list[AnyUrl]
     serviceStatus: ServiceStatus
