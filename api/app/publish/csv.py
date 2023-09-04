@@ -92,7 +92,14 @@ keys_to_rename = {
 }
 date_fields = ["issued", "modified", "created"]
 
-list_fields = ["alternativeTitle", "theme", "keyword", "relatedAssets", "servesData"]
+list_fields = [
+    "alternativeTitle",
+    "theme",
+    "keyword",
+    "relatedAssets",
+    "servesData",
+    "creatorID",
+]
 
 
 def _to_row_dicts(csv_file: SpooledTemporaryFile, asset_type: m.assetType):

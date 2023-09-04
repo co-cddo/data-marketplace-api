@@ -147,7 +147,7 @@ class BaseAsset(BaseAssetSummary):
 class OutputAssetInfo(BaseModel):
     catalogueCreated: PastDate
     catalogueModified: PastDate
-    creator: Organisation
+    creator: List[Organisation]
     identifier: uuid.UUID
     organisation: Organisation
     resourceUri: AnyUrl = Field(serialization_alias="@id")
@@ -305,7 +305,7 @@ class AssetDetailResponse(BaseModel):
 
 class CreateAssetBody(BaseAsset):
     organisationID: str
-    creatorID: str
+    creatorID: List[str]
 
 
 class JWT(BaseModel):

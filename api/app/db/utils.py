@@ -40,6 +40,7 @@ def _convert_multival_fields_to_lists(asset_result_dict):
         "servesData",
         "distribution",
         "mediaType",
+        "creator",
     ]:
         current_val = asset_result_dict.get(k)
         if current_val is None:
@@ -56,7 +57,7 @@ def enrich_query_result_dict(asset_result_dict):
     if "organisation" in enriched:
         enriched["organisation"] = lookup_organisation(enriched["organisation"])
     if "creator" in enriched:
-        enriched["creator"] = lookup_organisation(enriched["creator"])
+        enriched["creator"] = [lookup_organisation(o) for o in enriched["creator"]]
     return enriched
 
 
