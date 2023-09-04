@@ -1,9 +1,10 @@
 import uuid
 from datetime import datetime
 from enum import Enum
-from pydantic import BaseModel, Field, EmailStr
+from pydantic import BaseModel, Field, EmailStr, field_validator
 from typing import List, Literal, Any, Optional
 from pydantic.networks import AnyUrl
+import re
 
 
 class rightsStatement(str, Enum):
@@ -72,6 +73,15 @@ class ContactPoint(BaseModel):
     email: EmailStr
     telephone: str | None = None
     address: str | None = None
+
+    @field_validator("email")
+    @classmethod
+    def email_must_be_gov_uk(cls, v: EmailStr) -> EmailStr:
+        pattern = re.compile(r".+@.*.gov.uk")
+        if re.fullmatch(pattern, v):
+            return v
+        else:
+            raise ValueError("must be a .gov.uk domain")
 
 
 class DistributionSummary(BaseModel):
