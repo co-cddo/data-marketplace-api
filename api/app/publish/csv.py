@@ -8,10 +8,12 @@ from datetime import datetime
 from pydantic import ValidationError
 from app.publish.errors import (
     validation_error_info,
+    db_validation_error_info,
     ErrorContainer,
     errorScope,
     dicts_diff,
 )
+from app.db.reference_data import reference_data_validator
 
 
 expected_headers = {
@@ -187,6 +189,49 @@ def _aggregate_distributions(row_dicts):
     return data, errors
 
 
+def _lookup_ok(lookup_fn, value):
+    "Return true if the lookup function returned something for the value"
+    if value is None:
+        return True
+    try:
+        return bool(lookup_fn(value))
+    except ValueError:
+        return False
+
+
+def _validate_db_fields(asset):
+    """Check that all fields referencing other entities in the database refer to one that exists,
+    and return a list of errors for those that dont"""
+    errors = []
+    if not _lookup_ok(utils.lookup_organisation, asset["organisationID"]):
+        errors.append(
+            db_validation_error_info("organisationID", asset["organisationID"])
+        )
+    for c in asset["creatorID"]:
+        if not _lookup_ok(utils.lookup_organisation, c):
+            errors.append(db_validation_error_info("creatorID", c))
+    if asset["type"] == m.assetType.dataset:
+        for dist in asset["distributions"]:
+            if not _lookup_ok(
+                reference_data_validator.media_type_uri, dist["mediaType"]
+            ):
+                errors.append(
+                    db_validation_error_info(
+                        "distribution.mediaType", dist["mediaType"]
+                    )
+                )
+        if not _lookup_ok(
+            reference_data_validator.update_freq_url, asset["updateFrequency"]
+        ):
+            errors.append(
+                db_validation_error_info("updateFrequency", asset["updateFrequency"])
+            )
+    for t in asset["theme"]:
+        if not _lookup_ok(reference_data_validator.theme_uri, t):
+            errors.append(db_validation_error_info("theme", t))
+    return errors
+
+
 def parse_input_file(
     error_ctx: ErrorContainer, csv_file: SpooledTemporaryFile, asset_type: m.assetType
 ):
@@ -206,9 +251,14 @@ def parse_input_file(
     )
     validated_data = []
     for d in data:
+        validation_errors = _validate_db_fields(d)
         try:
-            validated_data.append(model.model_validate(d))
+            validated = model.model_validate(d)
         except ValidationError as e:
+            validation_errors = validation_errors + validation_error_info(e)
+        if validation_errors == []:
+            validated_data.append(validated)
+        else:
             error_ctx.add(
                 {
                     "message": "Validation error for asset",
@@ -216,7 +266,7 @@ def parse_input_file(
                     if d["externalIdentifier"] is not None
                     else d["title"],
                     "scope": errorScope.asset,
-                    "sub_errors": validation_error_info(e),
+                    "sub_errors": validation_errors,
                 }
             )
     return validated_data
