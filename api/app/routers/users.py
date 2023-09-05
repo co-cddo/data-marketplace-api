@@ -29,6 +29,10 @@ async def show_user(
     is_ops: Annotated[bool, Depends(ops_user)],
     jwt: Annotated[JWTBearer(auto_error=False), Depends()] = None,
 ):
+    # If an email address has been provided, turn it into an ID
+    if "@" in user_id:
+        user_id = utils.user_id_from_email(user_id)
+
     # If you've passed the OPS_KEY, return the user
     if is_ops:
         return m.User.model_validate(user_db.get_by_id(user_id))
@@ -49,6 +53,7 @@ async def edit_user_org(
     if not is_ops:
         raise HTTPException(status_code=401, detail="Unauthorised")
 
+    # If an email address has been provided, turn it into an ID
     if "@" in user_id:
         user_id = utils.user_id_from_email(user_id)
 
