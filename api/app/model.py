@@ -319,14 +319,87 @@ class DataServiceResponse(DataService, OutputAssetInfo):
 # For the list endpoint, which returns only a summary of each asset
 class DatasetSummary(BaseAssetSummary, OutputAssetInfo):
     type: Literal[assetType.dataset]
-    mediaType: List[str] = Field(examples=[["CSV", "text/csv"]])
-    title: str = Field(examples=["Dataset title"])
+    mediaType: List[str]
+    title: str
+    model_config = {
+        "json_schema_extra": {
+            "examples": [
+                {
+                    "catalogueCreated": "2023-07-28T00:00:00",
+                    "catalogueModified": "2023-08-01T00:00:00",
+                    "creator": [
+                        {
+                            "id": "https://www.gov.uk/api/organisations/ordnance-survey",
+                            "title": "Ordnance Survey",
+                            "abbreviation": "OS",
+                            "slug": "ordnance-survey",
+                            "format": "Public corporation",
+                            "web_url": "https://www.gov.uk/government/organisations/ordnance-survey",
+                        }
+                    ],
+                    "identifier": "b3ae48af-c130-44ac-8341-5dead13c5427",
+                    "organisation": {
+                        "id": "https://www.gov.uk/api/organisations/department-for-work-pensions",
+                        "title": "Department for Work and Pensions",
+                        "abbreviation": "DWP",
+                        "slug": "department-for-work-pensions",
+                        "format": "Ministerial department",
+                        "web_url": "https://www.gov.uk/government/organisations/department-for-work-pensions",
+                    },
+                    "@id": "http://marketplace.cddo.gov.uk/asset/b3ae48af-c130-44ac-8341-5dead13c5427",
+                    "summary": "Free and open postcode location data. Can be used for geographical analysis simple route planning asset management and much more.",
+                    "modified": "2023-02-01T10:20:13+05:30",
+                    "title": "OS Postcodes Data",
+                    "type": "Dataset",
+                    "theme": ["Mapping"],
+                    "mediaType": ["CSV", "GeoPackage"],
+                }
+            ]
+        }
+    }
 
 
 class DataServiceSummary(BaseAssetSummary, OutputAssetInfo):
     type: Literal[assetType.service]
     serviceType: ServiceType
-    title: str = Field(examples=["Data service title"])
+    title: str
+
+    model_config = {
+        "json_schema_extra": {
+            "examples": [
+                {
+                    "catalogueCreated": "2023-07-28T00:00:00",
+                    "catalogueModified": "2023-08-01T00:00:00",
+                    "creator": [
+                        {
+                            "id": "https://www.gov.uk/api/organisations/department-for-work-pensions",
+                            "title": "Department for Work and Pensions",
+                            "abbreviation": "DWP",
+                            "slug": "department-for-work-pensions",
+                            "format": "Ministerial department",
+                            "web_url": "https://www.gov.uk/government/organisations/department-for-work-pensions",
+                        }
+                    ],
+                    "identifier": "fcbc4d3f-0c05-4857-b0e3-eeec6bfea3a1",
+                    "organisation": {
+                        "id": "https://www.gov.uk/api/organisations/department-for-work-pensions",
+                        "title": "Department for Work and Pensions",
+                        "abbreviation": "DWP",
+                        "slug": "department-for-work-pensions",
+                        "format": "Ministerial department",
+                        "web_url": "https://www.gov.uk/government/organisations/department-for-work-pensions",
+                    },
+                    "@id": "http://marketplace.cddo.gov.uk/asset/fcbc4d3f-0c05-4857-b0e3-eeec6bfea3a1",
+                    "summary": "DWP single strategic solution for looking up addresses including fuzzy search and UPRN.",
+                    "modified": "2023-01-30T00:00:00",
+                    "title": "Address Lookup",
+                    "type": "DataService",
+                    "theme": ["Mapping"],
+                    "serviceType": "REST",
+                }
+            ]
+        }
+    }
 
 
 class SearchAssetsResponse(BaseModel):
