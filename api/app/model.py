@@ -1,5 +1,5 @@
 import uuid
-from datetime import datetime
+from datetime import datetime, date
 from enum import Enum
 from pydantic import BaseModel, Field, EmailStr
 from typing import List, Literal, Any, Optional
@@ -323,6 +323,24 @@ class UpsertShareDataRequest(BaseModel):
     sharedata: ShareData
 
 
+class ShareRequest(BaseModel):
+    requestId: str
+    assetTitle: str
+    requestingOrg: str
+    status: Literal[
+        "NOT STARTED",
+        "IN PROGRESS",
+        "AWAITING REVIEW",
+        "RETURNED",
+        "IN REVIEW",
+        "ACCEPTED",
+        "REJECTED",
+    ]
+    received: datetime
+    sharedata: ShareData
+    neededBy: date
+
+
 class CreateDatasetBody(CreateAssetBody, Dataset):
     pass
 
@@ -333,3 +351,14 @@ class CreateDataServiceBody(CreateAssetBody, DataService):
 
 class EditUserOrgRequest(BaseModel):
     org: str
+
+
+class User(BaseModel):
+    id: str
+    email: EmailStr
+    org: Optional[str] = None
+
+
+class SPARQLUpdate(BaseModel):
+    statusCode: int
+    message: str

@@ -11,15 +11,19 @@ from fastapi import (
     Depends,
 )
 from fastapi.responses import JSONResponse
+
+from app import utils
 from app import model as m
-from app import config
 from app.db import asset as asset_db, user as user_db, share as share_db
 from app.publish import csv as pubcsv, response as pubres
-from app.auth.auth_bearer import JWTBearer
-from . import utils
+from app.auth.jwt_bearer import JWTBearer
+from app.routers.users import router as users_router
+from app.routers.manage_shares import router as shares_router
 
 app = FastAPI(title="CDDO Data Marketplace API", version="0.1.0")
 
+app.include_router(users_router)
+app.include_router(shares_router)
 
 # TODO: in order to find out what filters are available, we need
 # and endpoint to return all of the available organisations, themes, and types.
@@ -33,49 +37,6 @@ async def list_organisations() -> List[m.Organisation]:
         [m.Organisation.model_validate(utils.orgs[o]) for o in utils.MVP_ORGS],
         key=lambda o: o.title,
     )
-
-
-async def ops_user(x_api_key: str = Header(None)):
-    if not x_api_key:
-        return False
-    return x_api_key == config.OPS_API_KEY
-
-
-@app.get("/users")
-async def list_users(is_ops: Annotated[bool, Depends(ops_user)]):
-    if not is_ops:
-        raise HTTPException(status_code=401, detail="Unauthorised")
-    return user_db.list_users()
-
-
-@app.put("/users/{user_id}/org")
-async def edit_user_org(
-    is_ops: Annotated[bool, Depends(ops_user)], user_id: str, req: m.EditUserOrgRequest
-):
-    if not is_ops:
-        raise HTTPException(status_code=401, detail="Unauthorised")
-
-    if "@" in user_id:
-        user_id = utils.user_id_from_email(user_id)
-
-    user = user_db.get_by_id(user_id)
-    if not user:
-        raise HTTPException(status_code=400, detail=f"Invalid user id: {user_id}")
-
-    if req.org not in utils.orgs.keys():
-        raise HTTPException(status_code=400, detail=f"Invalid organisation: {req.org}")
-
-    return user_db.edit_org(user_id, req.org)
-
-
-@app.get("/managed-shared/received-requests")
-async def received_requests(jwt: Annotated[JWTBearer(), Depends()]):
-    user_email = jwt.get("email", None)
-    user_id = utils.user_id_from_email(user_email)
-    local_user = user_db.get_by_id(user_id)
-    if not local_user:
-        raise HTTPException(400, "Invalid user")
-    return
 
 
 # TODO: add theme query param

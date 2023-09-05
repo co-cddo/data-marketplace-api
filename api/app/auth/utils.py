@@ -2,10 +2,15 @@ import requests
 import jwt
 import json
 
-from fastapi import Request, HTTPException
-from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
+from fastapi import Header
 
 from app import config
+
+
+async def ops_user(x_api_key: str = Header(None)):
+    if not x_api_key:
+        return False
+    return x_api_key == config.OPS_API_KEY
 
 
 def decodeJWT(token: str):
@@ -33,20 +38,3 @@ def decodeJWT(token: str):
     except Exception as err:
         print(err)
         return None
-
-
-class JWTBearer(HTTPBearer):
-    def __init__(self, auto_error: bool = True):
-        super(JWTBearer, self).__init__(auto_error=auto_error)
-
-    async def __call__(self, request: Request):
-        credentials: HTTPAuthorizationCredentials = await super(
-            JWTBearer, self
-        ).__call__(request)
-        if credentials:
-            decoded_jwt = decodeJWT(credentials.credentials)
-            if not decoded_jwt:
-                raise HTTPException(status_code=401, detail="Invalid or expired token.")
-            return decoded_jwt
-        else:
-            raise HTTPException(status_code=401, detail="Unauthorised")
