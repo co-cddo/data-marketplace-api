@@ -11,9 +11,7 @@ def get_request_forms(user_id: str):
 
 
 def upsert_sharedata(user_id: str, sharedata: m.ShareData):
-    # shares_db.run_update("shares/delete_share_request_data", id=sharedata.requestId)
     sharedata_string = json.dumps(sharedata.model_dump_json())
-    print(sharedata.status)
     query_results = shares_db.run_update(
         "shares/upsert",
         id=sharedata.requestId,
