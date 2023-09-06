@@ -6,9 +6,11 @@
 @prefix vcard: <http://www.w3.org/2006/vcard/ns#> .
 @prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
 @prefix cddo_asset: <http://marketplace.cddo.gov.uk/asset/> .
+@prefix skos: <http://www.w3.org/2004/02/skos/core#> .
 
 cddo_asset:fcbc4d3f-0c05-4857-b0e3-eeec6bfea3a1 a dcat:DataService ;
     dct:identifier "fcbc4d3f-0c05-4857-b0e3-eeec6bfea3a1" ;
+    skos:notation "address-lookup-external-id" ;
     dct:accessRights "INTERNAL" ;
     dct:creator "department-for-work-pensions" ;
     dct:description """The location-service provides endpoints to perform a range of address based queries for UK locations. The reference data used is provided by Ordnance Survey and covers Great Britain Northern Ireland and the Channel Islands.

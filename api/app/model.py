@@ -26,13 +26,6 @@ class Organisation(BaseModel):
     web_url: AnyUrl
 
 
-class organisationID(str, Enum):
-    dwp = "department-for-work-pensions"
-    fsa = "food-standards-agency"
-    nhsd = "nhs-digital"
-    os = "ordnance-survey"
-
-
 class securityClass(str, Enum):
     official = "OFFICIAL"
     secret = "SECRET"
@@ -86,12 +79,17 @@ class DistributionSummary(BaseModel):
     modified: datetime
     mediaType: str
     accessService: str | None = None
-    identifier: str
+    externalIdentifier: str | None = None
     issued: datetime | None = None
     licence: AnyUrl | None = (
         "https://www.nationalarchives.gov.uk/doc/open-government-licence/version/3/"
     )
     byteSize: int | None = None
+
+
+class DistributionResponse(DistributionSummary):
+    identifier: uuid.UUID
+    distribution: AnyUrl = Field(serialization_alias="@id")
 
 
 class BaseAssetSummary(BaseModel):
@@ -117,6 +115,7 @@ class BaseAsset(BaseAssetSummary):
     securityClassification: securityClass | None = securityClass.official
     summary: str | None = None
     version: str | None = "1.0"
+    externalIdentifier: str | None = None
 
     class Config:
         use_enum_values = True
@@ -129,6 +128,7 @@ class OutputAssetInfo(BaseModel):
     creator: Organisation
     identifier: uuid.UUID
     organisation: Organisation
+    resourceUri: AnyUrl = Field(serialization_alias="@id")
 
 
 class Dataset(BaseAsset):
@@ -139,6 +139,8 @@ class Dataset(BaseAsset):
 
 # A single dataset returned from asset detail endpoint
 class DatasetResponse(Dataset, OutputAssetInfo):
+    distributions: list[DistributionResponse]
+    # TODO update this
     model_config = {
         "json_schema_extra": {
             "examples": [
@@ -280,8 +282,8 @@ class AssetDetailResponse(BaseModel):
 
 
 class CreateAssetBody(BaseAsset):
-    organisationID: organisationID
-    creatorID: organisationID
+    organisationID: str
+    creatorID: str
 
 
 class JWT(BaseModel):

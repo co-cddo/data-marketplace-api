@@ -1,9 +1,12 @@
 @prefix dcat: <http://www.w3.org/ns/dcat#> .
 @prefix dct: <http://purl.org/dc/terms/> .
 @prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix skos: <http://www.w3.org/2004/02/skos/core#> .
+@prefix cddo_distribution: <http://marketplace.cddo.gov.uk/distribution/> .
 
-<https://www.data.gov.uk/distribution/os-postcodes-data/geopackage-distribution-id/> a dcat:Distribution;
-    dct:identifier "geopackage-distribution-id" ;
+cddo_distribution:0e4773ea-2de6-4b27-98f4-63ff2f4d80a9 a dcat:Distribution;
+    skos:notation "geopackage-distribution-id" ;
+    dct:identifier "bd772965-dd61-4f92-83d8-b6d11fcecb63";
     dct:accessRights "OPEN" ;
     dct:description "Free and open postcode location data. Can be used for geographical analysis, simple route planning, asset management and much more." ;
     dct:issued "2023-02-01"^^xsd:date ;

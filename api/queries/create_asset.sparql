@@ -1,0 +1,8 @@
+PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
+PREFIX cddo_graph: <http://marketplace.cddo.gov.uk/graph/>
+
+INSERT DATA {
+  GRAPH cddo_graph:assets {
+            $triples
+  }
+}
