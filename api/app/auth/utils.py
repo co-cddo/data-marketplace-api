@@ -13,6 +13,20 @@ async def ops_user(x_api_key: str = Header(None)):
     return x_api_key == config.OPS_API_KEY
 
 
+class JWKS:
+    def __init__(self):
+        self.data = None
+        self.url = config.JWKS_URL
+
+    def get(self):
+        if self.data is None:
+            self.data = requests.get(config.JWKS_URL).json()
+        return self.data
+
+
+jwks = JWKS()
+
+
 def decodeJWT(token: str):
     try:
         # Extract the JWT's header and payload
@@ -20,7 +34,7 @@ def decodeJWT(token: str):
 
         # Find the appropriate key from JWKS based on the key ID (kid) in JWT header
         key_id = header["kid"]
-        jwks_data = requests.get(config.JWKS_URL).json()
+        jwks_data = jwks.get()
         keys = jwks_data["keys"]
         matching_keys = [key for key in keys if key["kid"] == key_id]
 
