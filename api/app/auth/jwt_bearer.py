@@ -4,6 +4,7 @@ from fastapi import Request, HTTPException, Depends
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 
 from app import utils
+from app import model as m
 from app.db import user as user_db
 from .utils import decodeJWT
 
@@ -39,4 +40,4 @@ async def authenticated_user(jwt: Annotated[JWTBearer(), Depends()]):
     local_user = user_db.get_by_id(user_id)
     if not local_user:
         raise HTTPException(401, "Invalid JWT")
-    return local_user
+    return m.User.model_validate(local_user)
