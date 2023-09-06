@@ -49,7 +49,7 @@ async def received_request(
     share_request = share_db.received_request(request_id)
     share_request["requestId"] = request_id
 
-    if share_request["assetPublisher"] != user.get("org", None):
+    if share_request["assetPublisher"] != user.org:
         raise HTTPException(403, "You are not authorised to see this request")
 
     return enrich_share_request(share_request)
