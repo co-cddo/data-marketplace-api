@@ -10,7 +10,6 @@ from pydantic import (
 )
 from pydantic.functional_validators import AfterValidator
 from pydantic.networks import AnyUrl
-import re
 from typing import List, Literal, Any, Optional, Annotated
 import uuid
 
@@ -93,8 +92,7 @@ class ContactPoint(BaseModel):
     @field_validator("email")
     @classmethod
     def email_must_be_gov_uk(cls, v: EmailStr) -> EmailStr:
-        pattern = re.compile(r".+@.*.gov.uk")
-        if re.fullmatch(pattern, v):
+        if v.endswith(".gov.uk"):
             return v
         else:
             raise ValueError("must be a .gov.uk domain")
