@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "cddo-dm-api"
-version = "0.1.1"
+version = "0.1.4"
 description = ""
 authors = ["Kiran Joshi <kiran.joshi@tpximpact.com>", "Madeline Kosse <madeline.kosse@tpximpact.com>"]
 readme = "README.md"
