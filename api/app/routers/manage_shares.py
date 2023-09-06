@@ -34,7 +34,7 @@ def enrich_share_request(r) -> m.ShareRequest:
 async def received_requests(
     user: Annotated[m.User, Depends(authenticated_user)]
 ) -> List[m.ShareRequest]:
-    org = user.get("org", None)
+    org = user.org
     if not org:
         return []
 
