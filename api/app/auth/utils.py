@@ -20,7 +20,7 @@ class JWKS:
 
     def get(self):
         if self.data is None:
-            self.data = requests.get(config.JWKS_URL).json()
+            self.data = requests.get(self.url).json()
         return self.data
 
 
