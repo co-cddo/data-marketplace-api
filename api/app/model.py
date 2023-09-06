@@ -7,6 +7,7 @@ from pydantic import (
     PositiveInt,
     field_validator,
     model_validator,
+    conlist,
 )
 from pydantic.functional_validators import AfterValidator
 from pydantic.networks import AnyUrl
@@ -171,18 +172,10 @@ class BaseAsset(BaseAssetSummary):
 class OutputAssetInfo(BaseModel):
     catalogueCreated: PastDate
     catalogueModified: PastDate
-    creator: List[Organisation]
+    creator: conlist(Organisation, min_length=1)
     identifier: uuid.UUID
     organisation: Organisation
     resourceUri: AnyUrl = Field(serialization_alias="@id")
-
-    @field_validator("creator")
-    @classmethod
-    def at_least_one_creator(cls, v: List[Organisation]) -> List[Organisation]:
-        if len(v) > 0:
-            return v
-        else:
-            raise ValueError("must have at least one creator")
 
 
 class Dataset(BaseAsset):
@@ -411,15 +404,7 @@ class AssetDetailResponse(BaseModel):
 
 class CreateAssetBody(BaseAsset):
     organisationID: str
-    creatorID: List[str]
-
-    @field_validator("creatorID")
-    @classmethod
-    def at_least_one_creator(cls, v: List[str]) -> List[str]:
-        if len(v) > 0:
-            return v
-        else:
-            raise ValueError("must have at least one creator")
+    creatorID: conlist(str, min_length=1)
 
 
 class JWT(BaseModel):
