@@ -5,7 +5,7 @@ from datetime import datetime
 
 
 def get_request_forms(user_id: str):
-    query_results = shares_db.run_query("user/get_share_request_forms", user_id=user_id)
+    query_results = shares_db.run_query("shares/get_for_user", user_id=user_id)
     forms = {r["assetId"]: json.loads(r["sharedata"]) for r in query_results}
     return forms
 
