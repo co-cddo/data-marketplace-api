@@ -1,0 +1,9 @@
+PREFIX skos: <http://www.w3.org/2004/02/skos/core#> 
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#> 
+PREFIX cddo_graph: <http://marketplace.cddo.gov.uk/graph/>
+
+SELECT ?label
+FROM cddo_graph:assets
+WHERE {{
+      <$subject> rdfs:label|skos:prefLabel ?label .
+}}

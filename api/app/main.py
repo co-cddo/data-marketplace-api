@@ -15,10 +15,11 @@ from fastapi.responses import JSONResponse
 from app import utils
 from app import model as m
 from app.db import asset as asset_db, user as user_db, share as share_db
-from app.publish import csv as pubcsv, response as pubres
+from app.publish import csv as pubcsv, response as pubres, create_asset as publish
 from app.auth.jwt_bearer import JWTBearer
 from app.routers.users import router as users_router
 from app.routers.manage_shares import router as shares_router
+
 
 app = FastAPI(title="CDDO Data Marketplace API", version="0.1.0")
 
@@ -44,7 +45,7 @@ async def list_organisations() -> List[m.Organisation]:
 def search_catalogue(
     query: str = "",
     topic: Annotated[List[str], Query()] = [],
-    organisation: Annotated[List[m.organisationID], Query()] = [],
+    organisation: Annotated[List[str], Query()] = [],
     assetType: Annotated[List[m.assetType], Query()] = [],
     limit: int = 100,
     offset: int = 0,
@@ -102,7 +103,8 @@ async def upsert_sharedata(
 async def publish_assets(
     body: pubres.CreateAssetsRequestBody,
 ) -> pubres.CreateAssetsResponseBody:
-    return
+    data = body.dict()["data"]
+    return pubres.CreateAssetsResponseBody.model_validate(publish.create_assets(data))
 
 
 # multipart/form-data endpoint
@@ -123,10 +125,4 @@ async def prepare_batch_publish_request(
     parsed = pubcsv.parse_input_files(
         datasets_file=datasets.file, services_file=dataservices.file
     )
-    response = pubres.format_response(parsed)
-    if response.ok:
-        return response
-    # Annoyingly, the API specification for 422 response is hard-coded in openAPI so we can't override it
-    # here with the response specification. Maybe we can return 400 and include a flag for success/error state
-    else:
-        return JSONResponse(status_code=422, content=response)
+    return pubres.format_response(parsed)

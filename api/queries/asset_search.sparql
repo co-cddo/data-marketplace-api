@@ -6,12 +6,12 @@ PREFIX cddo_asset: <http://marketplace.cddo.gov.uk/asset/>
 PREFIX cddo_graph: <http://marketplace.cddo.gov.uk/graph/>
 PREFIX skos: <http://www.w3.org/2004/02/skos/core#> 
 
-SELECT ?identifier ?type ?title ?description ?organisation 
+SELECT ?resourceUri ?identifier ?type ?title ?description ?organisation 
         ?catalogueCreated ?catalogueModified ?created ?issued ?modified 
         ?summary ?serviceType ?creator ?mediaType ?mediaTypeLabel ?theme
 FROM cddo_graph:assets
 WHERE {{
-    ?s text:query "$q" ;
+    ?resourceUri text:query "$q" ;
         dct:identifier ?identifier ;
         a ?typeURI ;
         dct:title ?title ;
@@ -21,16 +21,16 @@ WHERE {{
         cddo_asset:modified ?catalogueModified ;
         .
     ?typeURI rdfs:label ?type .
-    OPTIONAL {{ ?s dcat:distribution ?distribution }
+    OPTIONAL {{ ?resourceUri dcat:distribution ?distribution }
               { ?distribution dcat:mediaType ?mediaTypeUri }
-              { ?mediaTypeUri rdfs:label ?mediaType }} .
-    OPTIONAL {{ ?mediaTypeUri skos:prefLabel ?mediaTypeLabel }} .
-    OPTIONAL {{ ?s dct:creator ?creator }} .
-    OPTIONAL {{ ?s dct:created ?created }} .
-    OPTIONAL {{ ?s dct:issued ?issued }} .
-    OPTIONAL {{ ?s dct:modified ?modified }} .
-    OPTIONAL {{ ?s rdfs:comment ?summary }} .
-    OPTIONAL {{ ?s dct:type ?serviceType }} .
-    OPTIONAL {{ ?s dcat:theme ?themeURI }
+              { ?mediaTypeUri rdfs:label  ?mediaType }
+              OPTIONAL {{ ?mediaTypeUri skos:prefLabel ?mediaTypeLabel }}} .
+    OPTIONAL {{ ?resourceUri dct:creator ?creator }} .
+    OPTIONAL {{ ?resourceUri dct:created ?created }} .
+    OPTIONAL {{ ?resourceUri dct:issued ?issued }} .
+    OPTIONAL {{ ?resourceUri dct:modified ?modified }} .
+    OPTIONAL {{ ?resourceUri rdfs:comment ?summary }} .
+    OPTIONAL {{ ?resourceUri dct:type ?serviceType }} .
+    OPTIONAL {{ ?resourceUri dcat:theme ?themeURI }
               {?themeURI skos:prefLabel ?theme }} .
 }}

@@ -51,7 +51,7 @@ def _convert_multival_fields_to_lists(asset_result_dict):
 
 
 def enrich_query_result_dict(asset_result_dict):
-    enriched = {k: v for k, v in asset_result_dict.items() if k != "resourceUri"}
+    enriched = {k: v for k, v in asset_result_dict.items()}
     _convert_multival_fields_to_lists(enriched)
     if "organisation" in enriched:
         enriched["organisation"] = lookup_organisation(enriched["organisation"])

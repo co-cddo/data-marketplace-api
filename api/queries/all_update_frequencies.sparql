@@ -1,0 +1,8 @@
+PREFIX cddo_graph: <http://marketplace.cddo.gov.uk/graph/>
+PREFIX skos: <http://www.w3.org/2004/02/skos/core#> 
+
+SELECT ?updateFrequency
+FROM cddo_graph:assets
+WHERE {{
+      ?updateFrequency skos:inScheme <http://purl.org/cld/terms/Frequency> .
+}}

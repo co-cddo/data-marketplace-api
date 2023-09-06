@@ -88,6 +88,7 @@ keys_to_rename = {
     "creator": "creatorID",
     "publisher": "organisationID",
     "relatedResource": "relatedAssets",
+    "identifier": "externalIdentifier",
 }
 date_fields = ["issued", "modified", "created"]
 
@@ -204,7 +205,9 @@ def parse_input_file(
             error_ctx.add(
                 {
                     "message": "Validation error for asset",
-                    "location": d["identifier"],
+                    "location": d["externalIdentifier"]
+                    if d["externalIdentifier"] is not None
+                    else d["title"],
                     "scope": errorScope.asset,
                     "sub_errors": validation_error_info(e),
                 }

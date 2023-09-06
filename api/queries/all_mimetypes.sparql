@@ -1,0 +1,11 @@
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+PREFIX cddo_graph: <http://marketplace.cddo.gov.uk/graph/>
+PREFIX skos: <http://www.w3.org/2004/02/skos/core#> 
+PREFIX uriv: <https://w3id.org/uri4uri/vocab#>
+
+SELECT ?mimetypeUri ?mimetypeLabel
+FROM cddo_graph:assets
+WHERE {{
+  ?mimetypeUri rdfs:label|skos:prefLabel ?mimetypeLabel . 
+  ?mimetypeUri a uriv:Mimetype .
+}}
