@@ -1,11 +1,12 @@
 PREFIX schema: <http://schema.org/>
 PREFIX adms: <https://www.w3.org/ns/adms#>
 PREFIX dct: <http://purl.org/dc/terms/>
+PREFIX vcard: <http://www.w3.org/2006/vcard/ns#>
 PREFIX cddo: <http://marketplace.cddo.gov.uk#>
 PREFIX cddo_user: <http://marketplace.cddo.gov.uk/user/>
 PREFIX cddo_graph: <http://marketplace.cddo.gov.uk/graph/>
 
-SELECT ?requestId ?assetTitle ?requestingOrg ?status ?received ?sharedata 
+SELECT ?requestId ?assetTitle ?requesterEmail ?requestingOrg ?status ?received ?sharedata 
 FROM cddo_graph:shares
 FROM cddo_graph:assets
 FROM cddo_graph:users
@@ -22,6 +23,7 @@ WHERE {
 			cddo:user ?userId .
 
 	?user dct:identifier ?userId ;
+		  vcard:hasEmail ?requesterEmail ;
 		  schema:memberOf ?requestingOrg .
 
 	FILTER(?status NOT IN ("NOT STARTED", "IN PROGRESS"))

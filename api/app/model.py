@@ -328,6 +328,7 @@ class UpsertShareDataRequest(BaseModel):
 class ShareRequest(BaseModel):
     requestId: str
     assetTitle: str
+    requesterEmail: EmailStr
     requestingOrg: str
     status: Literal[
         "NOT STARTED",
@@ -340,7 +341,7 @@ class ShareRequest(BaseModel):
     ]
     received: datetime
     sharedata: ShareData
-    neededBy: date
+    neededBy: date | Literal["UNREQUESTED"]
 
 
 class CreateDatasetBody(CreateAssetBody, Dataset):
