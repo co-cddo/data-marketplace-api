@@ -14,7 +14,7 @@ from app.auth.utils import ops_user
 router = APIRouter(prefix="/manage-shares")
 
 
-def enrich_share_request(r) -> m.ShareRequest:
+def enrich_share_request(r: dict) -> m.ShareRequest:
     sharedata = m.ShareData.model_validate_json(r["sharedata"])
     neededBy = sharedata.steps["date"].value
     if not (neededBy["day"] and neededBy["month"] and neededBy["year"]):
@@ -25,6 +25,9 @@ def enrich_share_request(r) -> m.ShareRequest:
             month=int(neededBy["month"]),
             day=int(neededBy["day"]),
         )
+
+    requestingOrg = utils.lookup_organisation(r["requestingOrg"])
+    r["requestingOrg"] = requestingOrg.title
     r["neededBy"] = neededBy
     r["sharedata"] = sharedata
     return m.ShareRequest.model_validate(r)
