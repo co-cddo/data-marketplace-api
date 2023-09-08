@@ -1,0 +1,27 @@
+PREFIX schema: <http://schema.org/>
+PREFIX adms: <https://www.w3.org/ns/adms#>
+PREFIX dct: <http://purl.org/dc/terms/>
+PREFIX cddo: <http://marketplace.cddo.gov.uk#>
+PREFIX cddo_user: <http://marketplace.cddo.gov.uk/user/>
+PREFIX cddo_graph: <http://marketplace.cddo.gov.uk/graph/>
+
+SELECT ?assetTitle ?assetPublisher ?requestingOrg ?status ?received ?sharedata 
+FROM cddo_graph:shares
+FROM cddo_graph:assets
+FROM cddo_graph:users
+WHERE {	
+	?share 	dct:identifier "$requestId" ;
+            cddo:asset ?assetId ;
+			cddo:sharedata ?sharedata ;
+			adms:status ?status ;
+			dct:modified ?received ;
+			cddo:user ?userId .
+
+    ?asset	dct:identifier ?assetId ;
+			dct:publisher ?assetPublisher;
+			dct:title ?assetTitle .	
+
+	?user dct:identifier ?userId ;
+		  schema:memberOf ?requestingOrg .
+
+}

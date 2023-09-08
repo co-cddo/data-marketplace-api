@@ -1,14 +1,30 @@
 from uuid import UUID
-from typing import Annotated, List, Union
-from fastapi import FastAPI, Body, Query, HTTPException, File, UploadFile
+from typing import Annotated, List, Union, Optional
+from fastapi import (
+    FastAPI,
+    Body,
+    Query,
+    HTTPException,
+    File,
+    UploadFile,
+    Header,
+    Depends,
+)
 from fastapi.responses import JSONResponse
+
+from app import utils
 from app import model as m
 from app.db import asset as asset_db, user as user_db, share as share_db
 from app.publish import csv as pubcsv, response as pubres, create_asset as publish
-from . import utils
+from app.auth.jwt_bearer import JWTBearer
+from app.routers.users import router as users_router
+from app.routers.manage_shares import router as shares_router
+
 
 app = FastAPI(title="CDDO Data Marketplace API", version="0.1.0")
 
+app.include_router(users_router)
+app.include_router(shares_router)
 
 # TODO: in order to find out what filters are available, we need
 # and endpoint to return all of the available organisations, themes, and types.
@@ -56,10 +72,9 @@ async def catalogue_entry_detail(asset_id: UUID) -> m.AssetDetailResponse:
     return {"asset": asset}
 
 
-@app.put("/user")
-async def upsert_user(jwt: m.JWT) -> m.UpsertUserResponse:
-    decoded_jwt = utils.decodeJWT(jwt.token)
-    user_email = decoded_jwt.get("email", None)
+@app.get("/login")
+async def login(jwt: Annotated[JWTBearer(), Depends()]):
+    user_email = jwt.get("email", None)
     if not user_email:
         raise HTTPException(status_code=401, detail="Unauthorised")
 
@@ -76,9 +91,10 @@ async def upsert_user(jwt: m.JWT) -> m.UpsertUserResponse:
 
 
 @app.put("/sharedata")
-async def upsert_sharedata(req: m.UpsertShareDataRequest):
-    decoded_jwt = utils.decodeJWT(req.jwt)
-    user_id = utils.user_id_from_email(decoded_jwt.get("email"))
+async def upsert_sharedata(
+    jwt: Annotated[JWTBearer(), Depends()], req: m.UpsertShareDataRequest
+):
+    user_id = utils.user_id_from_email(jwt.get("email"))
     res = share_db.upsert_sharedata(user_id, req.sharedata)
     return res
 

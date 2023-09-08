@@ -5,16 +5,15 @@ from datetime import datetime
 
 
 def get_request_forms(user_id: str):
-    query_results = shares_db.run_query("get_share_request_forms", user_id=user_id)
+    query_results = shares_db.run_query("shares/get_for_user", user_id=user_id)
     forms = {r["assetId"]: json.loads(r["sharedata"]) for r in query_results}
     return forms
 
 
 def upsert_sharedata(user_id: str, sharedata: m.ShareData):
-    shares_db.run_update("delete_share_request_data", id=sharedata.requestId)
     sharedata_string = json.dumps(sharedata.model_dump_json())
     query_results = shares_db.run_update(
-        "create_share_request_data",
+        "shares/upsert",
         id=sharedata.requestId,
         user_id=user_id,
         asset_id=sharedata.dataAsset,
@@ -23,3 +22,14 @@ def upsert_sharedata(user_id: str, sharedata: m.ShareData):
         status=sharedata.status,
     )
     return query_results
+
+
+def received_requests(org: str):
+    results = shares_db.run_query("shares/get_by_org", org=org)
+    return results
+
+
+def received_request(requestId: str):
+    results = shares_db.run_query("shares/get_by_id", requestId=requestId)
+    assert len(results) == 1, "Found multiple share requests with the same ID"
+    return results[0]

@@ -19,6 +19,7 @@ services:
       - DATASET_NAME
       - JWKS_URL
       - JWT_AUD
+      - OPS_API_KEY
     networks:
       - marketplace
 
