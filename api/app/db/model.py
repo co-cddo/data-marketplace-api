@@ -156,7 +156,7 @@ predicates_map = {
     "organisation": SimpleAttribute(
         DCTERMS.publisher, value_converter=extract_organisation_slug
     ),
-    "creator": SimpleAttribute(
+    "creator": ListAttribute(
         DCTERMS.creator, value_converter=extract_organisation_slug
     ),
 }

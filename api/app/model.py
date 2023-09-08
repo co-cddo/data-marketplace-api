@@ -1,9 +1,19 @@
 import uuid
 from datetime import datetime, date
 from enum import Enum
-from pydantic import BaseModel, Field, EmailStr
-from typing import List, Literal, Any, Optional
+from pydantic import (
+    BaseModel,
+    Field,
+    EmailStr,
+    PositiveInt,
+    field_validator,
+    model_validator,
+    conlist,
+)
+from pydantic.functional_validators import AfterValidator
 from pydantic.networks import AnyUrl
+from typing import List, Literal, Any, Optional, Annotated
+import uuid
 
 
 class rightsStatement(str, Enum):
@@ -25,12 +35,20 @@ class Organisation(BaseModel):
     format: str
     web_url: AnyUrl
 
-
-class securityClass(str, Enum):
-    official = "OFFICIAL"
-    secret = "SECRET"
-    top_secret = "TOP_SECRET"
-    na = "NOT_APPLICABLE"
+    model_config = {
+        "json_schema_extra": {
+            "examples": [
+                {
+                    "id": "https://www.gov.uk/api/organisations/department-for-work-pensions",
+                    "title": "Department for Work and Pensions",
+                    "abbreviation": "DWP",
+                    "slug": "department-for-work-pensions",
+                    "format": "Ministerial department",
+                    "web_url": "https://www.gov.uk/government/organisations/department-for-work-pensions",
+                }
+            ]
+        }
+    }
 
 
 class ServiceStatus(str, Enum):
@@ -73,18 +91,43 @@ class ContactPoint(BaseModel):
     telephone: str | None = None
     address: str | None = None
 
+    @field_validator("email")
+    @classmethod
+    def email_must_be_gov_uk(cls, v: EmailStr) -> EmailStr:
+        if v.endswith(".gov.uk"):
+            return v
+        else:
+            raise ValueError("must be a .gov.uk domain")
+
+    model_config = {
+        "json_schema_extra": {
+            "examples": [
+                {
+                    "name": "DWP Integration Team",
+                    "email": "integration.technologyplatforms@dwp.gsi.gov.uk",
+                }
+            ]
+        }
+    }
+
+
+def check_date_past(v: datetime) -> datetime:
+    assert v <= datetime.now(v.tzinfo), "date must be in the past"
+    return v
+
+
+PastDate = Annotated[datetime, AfterValidator(check_date_past)]
+
 
 class DistributionSummary(BaseModel):
     title: str
-    modified: datetime
+    modified: PastDate
     mediaType: str
     accessService: str | None = None
-    externalIdentifier: str | None = None
-    issued: datetime | None = None
-    licence: AnyUrl | None = (
-        "https://www.nationalarchives.gov.uk/doc/open-government-licence/version/3/"
-    )
-    byteSize: int | None = None
+    externalIdentifier: str
+    issued: PastDate | None = None
+    licence: AnyUrl
+    byteSize: PositiveInt | None = None
 
 
 class DistributionResponse(DistributionSummary):
@@ -93,12 +136,19 @@ class DistributionResponse(DistributionSummary):
 
 
 class BaseAssetSummary(BaseModel):
-    created: datetime | None = None
+    created: PastDate | None = None
     summary: str
-    modified: datetime | None = None
+    modified: PastDate | None = None
     title: str
-    type: assetType  # TODO I reckon this should be a uri - dcat:DataService, dcat:DataSet
-    theme: List[str] | None = []
+    type: assetType
+    theme: List[str] | None = None
+
+    @model_validator(mode="after")
+    def check_created_before_modified(self):
+        if self.created and self.modified:
+            if self.created > self.modified:
+                raise ValueError("created date must be before modified date")
+        return self
 
 
 class BaseAsset(BaseAssetSummary):
@@ -106,16 +156,14 @@ class BaseAsset(BaseAssetSummary):
     alternativeTitle: List[str] | None = []
     contactPoint: ContactPoint
     description: str
-    issued: datetime | None = None
+    issued: PastDate | None = None
     keyword: List[str] | None = []
-    licence: AnyUrl | None = (
-        "https://www.nationalarchives.gov.uk/doc/open-government-licence/version/3/"
-    )
+    licence: AnyUrl
     relatedAssets: List[AnyUrl] | None = []
-    securityClassification: securityClass | None = securityClass.official
+    securityClassification: Literal["OFFICIAL"]
     summary: str | None = None
     version: str | None = "1.0"
-    externalIdentifier: str | None = None
+    externalIdentifier: str
 
     class Config:
         use_enum_values = True
@@ -123,9 +171,9 @@ class BaseAsset(BaseAssetSummary):
 
 # Common class for assets returned from the server
 class OutputAssetInfo(BaseModel):
-    catalogueCreated: datetime
-    catalogueModified: datetime
-    creator: Organisation
+    catalogueCreated: PastDate
+    catalogueModified: PastDate
+    creator: conlist(Organisation, min_length=1)
     identifier: uuid.UUID
     organisation: Organisation
     resourceUri: AnyUrl = Field(serialization_alias="@id")
@@ -140,7 +188,6 @@ class Dataset(BaseAsset):
 # A single dataset returned from asset detail endpoint
 class DatasetResponse(Dataset, OutputAssetInfo):
     distributions: list[DistributionResponse]
-    # TODO update this
     model_config = {
         "json_schema_extra": {
             "examples": [
@@ -148,49 +195,54 @@ class DatasetResponse(Dataset, OutputAssetInfo):
                     "accessRights": "INTERNAL",
                     "catalogueCreated": "2023-07-31T11:26:50.383Z",
                     "catalogueModified": "2023-07-31T11:26:50.383Z",
-                    "contactPoint": {
-                        "contactName": "DWP Integration Team",
-                        "email": "integration.technologyplatforms@dwp.gsi.gov.uk",
-                    },
-                    "creator": {
-                        "id": "department-for-work-pensions",
-                        "title": "Department for Work & Pensions",
-                        "acronym": "DWP",
-                        "homepage": "https://www.gov.uk/government/organisations/department-for-work-pensions",
-                    },
-                    "description": "The location-service provides endpoints to perform a range of address based queries for UK locations....",
-                    "distributions": [
-                        {
-                            "title": "document1",
-                            "modified": "2023-08-01",
-                            "mediaType": "CSV",
-                        },
-                        {
-                            "title": "document2",
-                            "modified": "2023-08-01",
-                            "mediaType": "XLS",
-                        },
+                    "contactPoint": ContactPoint.model_config["json_schema_extra"][
+                        "examples"
+                    ][0],
+                    "creator": Organisation.model_config["json_schema_extra"][
+                        "examples"
                     ],
                     "identifier": "fcbc4d3f-0c05-4857-b0e3-eeec6bfea3a1",
-                    "issued": "2022-01-23",
-                    "keyword": ["Address Search", "UPRN"],
+                    "externalIdentifier": "postcode-dataset-id",
+                    "@id": "http://marketplace.cddo.gov.uk/asset/fcbc4d3f-0c05-4857-b0e3-eeec6bfea3a1",
+                    "organisation": Organisation.model_config["json_schema_extra"][
+                        "examples"
+                    ][0],
+                    "distributions": [
+                        {
+                            "@id": "http://marketplace.cddo.gov.uk/asset/distribution/531847ba-441c-4dd9-afa4-213cfd5a55b2",
+                            "identifier": "531847ba-441c-4dd9-afa4-213cfd5a55b2",
+                            "title": "Document 1",
+                            "modified": "2023-02-01T00:00:00",
+                            "mediaType": "text/csv",
+                            "externalIdentifier": "doc-1",
+                            "licence": "https://opensource.org/license/isc-license-txt/",
+                        },
+                        {
+                            "@id": "http://marketplace.cddo.gov.uk/asset/distribution/dcc16430-cd13-4699-b21c-6ea127377346",
+                            "identifier": "dcc16430-cd13-4699-b21c-6ea127377346",
+                            "title": "Document 2",
+                            "modified": "2023-08-01T00:00:00",
+                            "mediaType": "XLS",
+                            "externalIdentifier": "doc-2",
+                            "licence": "https://opensource.org/license/isc-license-txt/",
+                            "issued": "2023-07-01T00:00:00",
+                            "byteSize": 123456,
+                        },
+                    ],
+                    "description": "A description of the dataset",
+                    "issued": "2022-01-23T00:00:00",
+                    "keyword": ["Location"],
                     "licence": "https://opensource.org/license/isc-license-txt/",
-                    "modified": "2023-01-30",
-                    "organisation": {
-                        "id": "department-for-work-pensions",
-                        "title": "Department for Work & Pensions",
-                        "acronym": "DWP",
-                        "homepage": "https://www.gov.uk/government/organisations/department-for-work-pensions",
-                    },
+                    "modified": "2023-01-30T00:00:00",
                     "relatedAssets": [],
                     "securityClassification": "OFFICIAL",
-                    "summary": "DWP single strategic solution for looking up addresses including fuzzy search and UPRN.",
+                    "summary": "Location dataset",
                     "theme": [
                         "https://www.data.gov.uk/search?filters%5Btopic%5D=Mapping"
                     ],
-                    "title": "Address Lookup",
+                    "title": "Postcode dataset",
                     "type": "Dataset",
-                    "updateFrequency": "Monthly",
+                    "updateFrequency": "freq:monthly",
                     "version": "2.0.0",
                 }
             ]
@@ -199,7 +251,7 @@ class DatasetResponse(Dataset, OutputAssetInfo):
 
 
 class DataService(BaseAsset):
-    endpointDescription: str
+    endpointDescription: AnyUrl
     endpointURL: str | None = None
     servesData: list[AnyUrl]
     serviceStatus: ServiceStatus
@@ -215,30 +267,25 @@ class DataServiceResponse(DataService, OutputAssetInfo):
                     "accessRights": "INTERNAL",
                     "catalogueCreated": "2023-07-31T11:26:50.383Z",
                     "catalogueModified": "2023-07-31T11:26:50.383Z",
-                    "contactPoint": {
-                        "contactName": "DWP Integration Team",
-                        "email": "integration.technologyplatforms@dwp.gsi.gov.uk",
-                    },
-                    "creator": {
-                        "id": "department-for-work-pensions",
-                        "title": "Department for Work & Pensions",
-                        "acronym": "DWP",
-                        "homepage": "https://www.gov.uk/government/organisations/department-for-work-pensions",
-                    },
+                    "contactPoint": ContactPoint.model_config["json_schema_extra"][
+                        "examples"
+                    ][0],
+                    "creator": Organisation.model_config["json_schema_extra"][
+                        "examples"
+                    ],
                     "description": "The location-service provides endpoints to perform a range of address based queries for UK locations....",
                     "endpointDescription": "https://engineering.dwp.gov.uk/apis/docs",
                     "endpointURL": "",
                     "identifier": "fcbc4d3f-0c05-4857-b0e3-eeec6bfea3a1",
-                    "issued": "2022-01-23",
+                    "externalIdentifier": "address-lookup-service-id",
+                    "@id": "http://marketplace.cddo.gov.uk/asset/fcbc4d3f-0c05-4857-b0e3-eeec6bfea3a1",
+                    "issued": "2022-01-23T00:00:00",
                     "keyword": ["Address Search", "UPRN"],
                     "licence": "https://opensource.org/license/isc-license-txt/",
-                    "modified": "2023-01-30",
-                    "organisation": {
-                        "id": "department-for-work-pensions",
-                        "title": "Department for Work & Pensions",
-                        "acronym": "DWP",
-                        "homepage": "https://www.gov.uk/government/organisations/department-for-work-pensions",
-                    },
+                    "modified": "2023-01-30T00:00:00",
+                    "organisation": Organisation.model_config["json_schema_extra"][
+                        "examples"
+                    ][0],
                     "relatedAssets": [],
                     "securityClassification": "OFFICIAL",
                     "servesData": [
@@ -265,11 +312,86 @@ class DataServiceResponse(DataService, OutputAssetInfo):
 class DatasetSummary(BaseAssetSummary, OutputAssetInfo):
     type: Literal[assetType.dataset]
     mediaType: List[str]
+    title: str
+    model_config = {
+        "json_schema_extra": {
+            "examples": [
+                {
+                    "catalogueCreated": "2023-07-28T00:00:00",
+                    "catalogueModified": "2023-08-01T00:00:00",
+                    "creator": [
+                        {
+                            "id": "https://www.gov.uk/api/organisations/ordnance-survey",
+                            "title": "Ordnance Survey",
+                            "abbreviation": "OS",
+                            "slug": "ordnance-survey",
+                            "format": "Public corporation",
+                            "web_url": "https://www.gov.uk/government/organisations/ordnance-survey",
+                        }
+                    ],
+                    "identifier": "b3ae48af-c130-44ac-8341-5dead13c5427",
+                    "organisation": {
+                        "id": "https://www.gov.uk/api/organisations/department-for-work-pensions",
+                        "title": "Department for Work and Pensions",
+                        "abbreviation": "DWP",
+                        "slug": "department-for-work-pensions",
+                        "format": "Ministerial department",
+                        "web_url": "https://www.gov.uk/government/organisations/department-for-work-pensions",
+                    },
+                    "@id": "http://marketplace.cddo.gov.uk/asset/b3ae48af-c130-44ac-8341-5dead13c5427",
+                    "summary": "Free and open postcode location data. Can be used for geographical analysis simple route planning asset management and much more.",
+                    "modified": "2023-02-01T10:20:13+05:30",
+                    "title": "OS Postcodes Data",
+                    "type": "Dataset",
+                    "theme": ["Mapping"],
+                    "mediaType": ["CSV", "GeoPackage"],
+                }
+            ]
+        }
+    }
 
 
 class DataServiceSummary(BaseAssetSummary, OutputAssetInfo):
     type: Literal[assetType.service]
     serviceType: ServiceType
+    title: str
+
+    model_config = {
+        "json_schema_extra": {
+            "examples": [
+                {
+                    "catalogueCreated": "2023-07-28T00:00:00",
+                    "catalogueModified": "2023-08-01T00:00:00",
+                    "creator": [
+                        {
+                            "id": "https://www.gov.uk/api/organisations/department-for-work-pensions",
+                            "title": "Department for Work and Pensions",
+                            "abbreviation": "DWP",
+                            "slug": "department-for-work-pensions",
+                            "format": "Ministerial department",
+                            "web_url": "https://www.gov.uk/government/organisations/department-for-work-pensions",
+                        }
+                    ],
+                    "identifier": "fcbc4d3f-0c05-4857-b0e3-eeec6bfea3a1",
+                    "organisation": {
+                        "id": "https://www.gov.uk/api/organisations/department-for-work-pensions",
+                        "title": "Department for Work and Pensions",
+                        "abbreviation": "DWP",
+                        "slug": "department-for-work-pensions",
+                        "format": "Ministerial department",
+                        "web_url": "https://www.gov.uk/government/organisations/department-for-work-pensions",
+                    },
+                    "@id": "http://marketplace.cddo.gov.uk/asset/fcbc4d3f-0c05-4857-b0e3-eeec6bfea3a1",
+                    "summary": "DWP single strategic solution for looking up addresses including fuzzy search and UPRN.",
+                    "modified": "2023-01-30T00:00:00",
+                    "title": "Address Lookup",
+                    "type": "DataService",
+                    "theme": ["Mapping"],
+                    "serviceType": "REST",
+                }
+            ]
+        }
+    }
 
 
 class SearchAssetsResponse(BaseModel):
@@ -283,7 +405,7 @@ class AssetDetailResponse(BaseModel):
 
 class CreateAssetBody(BaseAsset):
     organisationID: str
-    creatorID: str
+    creatorID: conlist(str, min_length=1)
 
 
 class JWT(BaseModel):
