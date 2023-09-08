@@ -22,7 +22,7 @@ WHERE {
 			dct:publisher ?assetPublisher;
 			dct:title ?assetTitle .	
 
-	?user	vcard:hasEmail ?requesterEmail
+	?user	vcard:hasEmail ?requesterEmail ;
 			dct:identifier ?userId ;
 			schema:memberOf ?requestingOrg .
 

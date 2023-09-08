@@ -27,7 +27,7 @@ cddo_asset:b3ae48af-c130-44ac-8341-5dead13c5427 a dcat:Dataset ;
     rdfs:comment "Free and open postcode location data. Can be used for geographical analysis simple route planning asset management and much more." ;
     dcat:contactPoint [ a vcard:Kind ;
             vcard:fn "Ordnance Survey Customer Service Centre" ;
-            vcard:hasEmail "customerservices@os.uk" ] ;
+            vcard:hasEmail "customerservices@os.gov.uk" ] ;
     dcat:distribution cddo_distribution:ac7ac094-0098-4849-97b4-f9f65b537651 ,
                       cddo_distribution:0e4773ea-2de6-4b27-98f4-63ff2f4d80a9 ;
     dcat:keyword "Address", "Postcode" ;
