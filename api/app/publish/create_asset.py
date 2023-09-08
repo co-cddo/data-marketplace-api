@@ -14,10 +14,12 @@ from app.publish.errors import errorScope
 
 
 def _add_organisations(asset):
-    creator = utils.lookup_organisation(asset["creatorID"])
+    creators = [
+        dict(utils.lookup_organisation(creator_id)) for creator_id in asset["creatorID"]
+    ]
     org = utils.lookup_organisation(asset["organisationID"])
     asset = utils.remove_keys(asset, ["creatorID", "organisationID"])
-    asset["creator"] = dict(creator)
+    asset["creator"] = creators
     asset["organisation"] = dict(org)
     return asset
 

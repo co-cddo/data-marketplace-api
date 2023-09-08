@@ -13,7 +13,7 @@ class errorScope(str, Enum):
 class ErrorInfo(BaseModel):
     message: str
     location: str = Field(description="The file, asset, or field that caused the error")
-    extras: Dict | None = Field(description="Extra info about the error")
+    extras: Dict | None = Field(default=None, description="Extra info about the error")
     scope: errorScope
 
 
@@ -66,7 +66,7 @@ class ErrorContainer:
         return [self.__model_validate_error(e) for e in self.__errors]
 
 
-def validation_error_info(e: ValidationError) -> ErrorInfo:
+def validation_error_info(e: ValidationError) -> List[ErrorInfo]:
     output = []
     for err in e.errors():
         field_name = ".".join([str(field) for field in err["loc"]])
@@ -87,6 +87,15 @@ def validation_error_info(e: ValidationError) -> ErrorInfo:
             }
         )
     return output
+
+
+def db_validation_error_info(field_name, value) -> ErrorInfo:
+    return {
+        "scope": errorScope.field,
+        "location": field_name,
+        "value": value,
+        "message": "Invalid option - no matching record found in database",
+    }
 
 
 def dicts_diff(list_of_dicts):
