@@ -4,10 +4,11 @@ PREFIX schema: <http://schema.org/>
 PREFIX cddo_user: <http://marketplace.cddo.gov.uk/user/>
 PREFIX cddo_graph: <http://marketplace.cddo.gov.uk/graph/>
 
-SELECT ?id ?email ?org
+SELECT ?id ?email ?org ?role
 FROM cddo_graph:users
 WHERE {
     ?user dct:identifier ?id;
           vcard:hasEmail ?email .
     OPTIONAL { ?user schema:memberOf ?org } .
+    OPTIONAL { ?user cddo:role ?role } .
 }
