@@ -20,7 +20,25 @@ async def list_users(is_ops: Annotated[bool, Depends(ops_user)]) -> List[m.User]
 
 @router.get("/me")
 async def show_self(user: Annotated[m.User, Depends(authenticated_user)]) -> m.User:
-    return m.User.model_validate(user_db.get_by_id(user.id))
+    return user_db.get_by_id(user.id)
+
+
+@router.put("/complete-profile")
+async def complete_profile(
+    user: Annotated[m.User, Depends(authenticated_user)],
+    profile: m.CompleteProfileRequest,
+) -> m.User:
+    if user.org:
+        raise HTTPException(400, "Organisation already set")
+
+    if profile.org not in utils.orgs.keys():
+        raise HTTPException(
+            status_code=400, detail=f"Invalid organisation: {profile.org}"
+        )
+
+    user_db.complete_profile(user.id, profile.org, profile.role)
+
+    return user_db.get_by_id(user.id)
 
 
 @router.get("/{user_id}")
@@ -35,13 +53,13 @@ async def show_user(
 
     # If you've passed the OPS_KEY, return the user
     if is_ops:
-        return m.User.model_validate(user_db.get_by_id(user_id))
+        return user_db.get_by_id(user_id)
 
     # If you're not OPS, you need to have sent a JWT and can only see yourself
     if jwt is not None:
         authed_user_id = utils.user_id_from_email(jwt.get("email"))
         if authed_user_id == user_id:
-            return m.User.model_validate(user_db.get_by_id(authed_user_id))
+            return user_db.get_by_id(authed_user_id)
 
     raise HTTPException(401, "Unauthorised")
 
