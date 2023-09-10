@@ -476,7 +476,7 @@ class EditUserOrgRequest(BaseModel):
 class User(BaseModel):
     id: str
     email: EmailStr
-    org: Optional[str] = None
+    org: Optional[Organisation] = None
     role: Optional[str] = None
 
 
@@ -486,11 +486,11 @@ class SPARQLUpdate(BaseModel):
 
 
 class LoginResponse(BaseModel):
-    user_id: str
+    user: User
     new_user: bool
     sharedata: dict[str, ShareData]
 
 
 class CompleteProfileRequest(BaseModel):
-    org: str
+    organisation: str
     role: str

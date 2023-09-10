@@ -1,5 +1,9 @@
-from app.db.sparql import users_db
+from typing import List
+
+from .utils import enrich_user_org
 from app import model as m
+from app.db.sparql import users_db
+from app.utils import lookup_organisation
 
 
 def new_user(user_id: str, user_email: str) -> m.User:
@@ -8,9 +12,10 @@ def new_user(user_id: str, user_email: str) -> m.User:
     return user
 
 
-def list_users():
+def list_users() -> List[m.User]:
     query_results = users_db.run_query("user/list")
-    return query_results
+    users = [enrich_user_org(r) for r in query_results]
+    return [m.User.model_validate(u) for u in users]
 
 
 def get_by_id(user_id: str) -> m.User | None:
@@ -20,7 +25,14 @@ def get_by_id(user_id: str) -> m.User | None:
     if not query_results:
         return None
 
-    return m.User.model_validate(query_results[0])
+    user = query_results[0]
+    user = enrich_user_org(user)
+    return m.User.model_validate(user)
+
+
+def delete_by_id(user_id: str) -> m.SPARQLUpdate:
+    res = users_db.run_update("user/delete_by_id", user_id=user_id)
+    return res
 
 
 def edit_org(user_id, org):
