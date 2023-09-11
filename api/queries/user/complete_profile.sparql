@@ -1,5 +1,4 @@
 PREFIX schema: <http://schema.org/>
-PREFIX cddo: <http://marketplace.cddo.gov.uk#>
 PREFIX cddo_user: <http://marketplace.cddo.gov.uk/user/>
 PREFIX cddo_graph: <http://marketplace.cddo.gov.uk/graph/>
 
@@ -7,6 +6,6 @@ INSERT DATA
 { 
       GRAPH cddo_graph:users {
             cddo_user:$user_id  schema:memberOf "$org" ;
-                                cddo:role "$role" .
+                                cddo_user:jobTitle "$jobTitle" .
       }
 }

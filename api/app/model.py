@@ -477,7 +477,7 @@ class User(BaseModel):
     id: str
     email: EmailStr
     org: Optional[Organisation] = None
-    role: Optional[str] = None
+    jobTitle: Optional[str] = None
 
 
 class SPARQLUpdate(BaseModel):
@@ -493,4 +493,4 @@ class LoginResponse(BaseModel):
 
 class CompleteProfileRequest(BaseModel):
     organisation: str
-    role: str
+    jobTitle: str

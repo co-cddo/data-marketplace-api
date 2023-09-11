@@ -40,8 +40,8 @@ def edit_org(user_id, org):
     return res
 
 
-def complete_profile(user_id, org, role):
+def complete_profile(user_id, org, jobTitle):
     res = users_db.run_update(
-        "user/complete_profile", user_id=user_id, org=org, role=role
+        "user/complete_profile", user_id=user_id, org=org, jobTitle=jobTitle
     )
     return res

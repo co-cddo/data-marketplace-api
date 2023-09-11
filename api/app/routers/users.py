@@ -36,7 +36,7 @@ async def complete_profile(
             status_code=400, detail=f"Invalid organisation: {profile.organisation}"
         )
 
-    user_db.complete_profile(user.id, profile.organisation, profile.role)
+    user_db.complete_profile(user.id, profile.organisation, profile.jobTitle)
 
     return user_db.get_by_id(user.id)
 
