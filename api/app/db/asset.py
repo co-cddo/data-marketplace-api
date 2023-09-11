@@ -25,6 +25,10 @@ def _construct_AND_terms(terms: List[str]):
 
 
 def _construct_filter(*filter_groups):
+    """A filter_group is a set of filters to apply to a particular property.
+    It has this shape: ["?theme", ["Mapping", "Defence"]]
+    We need to use an OR for values in the same filter group and
+    an AND between different filter groups."""
     if len(filter_groups) == 0:
         return ""
     if all(len(v) == 0 for _, v in filter_groups):
