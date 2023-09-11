@@ -69,3 +69,11 @@ def munge_asset_summary_response(result_dict):
     del r["description"]
 
     return r
+
+
+def enrich_user_org(user):
+    u = user.copy()
+    org = u.get("org", None)
+    if org:
+        u["org"] = lookup_organisation(org)
+    return u

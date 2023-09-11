@@ -1,4 +1,3 @@
-import json
 import datetime
 
 from typing import Annotated, List
@@ -6,10 +5,8 @@ from fastapi import APIRouter, Depends, HTTPException
 
 from app import utils
 from app import model as m
-from app.db import user as user_db
 from app.db import share as share_db
-from app.auth.jwt_bearer import JWTBearer, authenticated_user
-from app.auth.utils import ops_user
+from app.auth.jwt_bearer import authenticated_user
 
 router = APIRouter(prefix="/manage-shares")
 

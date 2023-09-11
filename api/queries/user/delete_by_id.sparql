@@ -1,0 +1,12 @@
+PREFIX dct: <http://purl.org/dc/terms/>
+PREFIX cddo: <http://marketplace.cddo.gov.uk#>
+PREFIX cddo_graph: <http://marketplace.cddo.gov.uk/graph/>
+
+WITH cddo_graph:users
+DELETE {
+	?user ?p ?o.
+}
+WHERE {
+    ?user dct:identifier "$user_id" ;
+          ?p ?o .
+}

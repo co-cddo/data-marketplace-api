@@ -83,11 +83,15 @@ async def login(jwt: Annotated[JWTBearer(), Depends()]):
     local_user = user_db.get_by_id(user_id)
 
     if not local_user:
-        user_db.new_user(user_id, user_email)
-        return {"user_id": user_id, "sharedata": {}}
+        new_user = user_db.new_user(user_id, user_email)
+        return m.LoginResponse.model_validate(
+            {"user": new_user, "new_user": True, "sharedata": {}}
+        )
 
     share_request_forms = share_db.get_request_forms(user_id)
-    return {"user_id": user_id, "sharedata": share_request_forms}
+    return m.LoginResponse.model_validate(
+        {"user": local_user, "new_user": False, "sharedata": share_request_forms}
+    )
 
 
 @app.put("/sharedata")
