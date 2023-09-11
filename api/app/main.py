@@ -50,7 +50,7 @@ def search_catalogue(
     limit: int = 100,
     offset: int = 0,
 ) -> m.SearchAssetsResponse:
-    assets = asset_db.search(query)
+    assets = asset_db.search(query, organisations=organisation, themes=topic)
     facets = {"topics": [], "organisations": [], "assetTypes": []}
 
     response = {"data": assets, "facets": facets}
