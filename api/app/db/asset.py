@@ -1,3 +1,4 @@
+from typing import List
 from app.db.sparql import assets_db
 from app.db import utils as dbutils
 from app import utils
@@ -10,13 +11,45 @@ def _resolve_media_type_label(db_result_dict):
         db_result_dict.pop("mediaTypeLabel")
 
 
-def search(q: str = ""):
+def _construct_OR_terms(property: str, vals: List[str]):
+    if len(vals) == 0:
+        return None
+    terms = " || ".join([f'STR({property}) = "{v}"' for v in vals])
+    return f"({terms})"
+
+
+def _construct_AND_terms(terms: List[str]):
+    terms = [t for t in terms if t]  # Remove Nones
+    terms = " && ".join(terms)
+    return f"({terms})"
+
+
+def _construct_filter(*filter_groups):
+    """A filter_group is a set of filters to apply to a particular property.
+    It has this shape: ["?theme", ["Mapping", "Defence"]]
+    We need to use an OR for values in the same filter group and
+    an AND between different filter groups."""
+    if len(filter_groups) == 0:
+        return ""
+    if all(len(v) == 0 for _, v in filter_groups):
+        return ""
+    or_terms = [_construct_OR_terms(p, v) for p, v in filter_groups]
+    anded_terms = _construct_AND_terms(or_terms)
+    return f"FILTER ({anded_terms})"
+
+
+def search(q: str = "", organisations: List[str] = [], themes: List[str] = []):
     if q == "":
         q = "*"
+    else:
+        q = f"{q}*"
 
     # TODO What else do we need to do to sanitise the query string?
     q = utils.sanitise_search_query(q)
-    query_results = assets_db.run_query("asset_search", q=q)
+
+    filters = _construct_filter(["?organisation", organisations], ["?theme", themes])
+
+    query_results = assets_db.run_query("asset_search", q=q, filters=filters)
     for r in query_results:
         _resolve_media_type_label(r)
     result_dicts = dbutils.aggregate_query_results_by_key(

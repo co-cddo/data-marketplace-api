@@ -33,4 +33,5 @@ WHERE {{
     OPTIONAL {{ ?resourceUri dct:type ?serviceType }} .
     OPTIONAL {{ ?resourceUri dcat:theme ?themeURI }
               {?themeURI skos:prefLabel ?theme }} .
+    $filters
 }}
