@@ -438,11 +438,6 @@ class ShareData(BaseModel):
     stepHistory: list[str] | None
 
 
-class UpsertUserResponse(BaseModel):
-    user_id: str
-    sharedata: dict[str, ShareData]
-
-
 class UpsertShareDataRequest(BaseModel):
     sharedata: ShareData
 
@@ -481,9 +476,21 @@ class EditUserOrgRequest(BaseModel):
 class User(BaseModel):
     id: str
     email: EmailStr
-    org: Optional[str] = None
+    org: Optional[Organisation] = None
+    jobTitle: Optional[str] = None
 
 
 class SPARQLUpdate(BaseModel):
     statusCode: int
     message: str
+
+
+class LoginResponse(BaseModel):
+    user: User
+    new_user: bool
+    sharedata: dict[str, ShareData]
+
+
+class CompleteProfileRequest(BaseModel):
+    organisation: str
+    jobTitle: str

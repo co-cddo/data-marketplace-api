@@ -14,13 +14,31 @@ router = APIRouter(prefix="/users")
 async def list_users(is_ops: Annotated[bool, Depends(ops_user)]) -> List[m.User]:
     if not is_ops:
         raise HTTPException(status_code=401, detail="Unauthorised")
-    result = user_db.list_users()
-    return [m.User.model_validate(u) for u in result]
+    users = user_db.list_users()
+    return users
 
 
 @router.get("/me")
 async def show_self(user: Annotated[m.User, Depends(authenticated_user)]) -> m.User:
-    return m.User.model_validate(user_db.get_by_id(user.id))
+    return user_db.get_by_id(user.id)
+
+
+@router.put("/complete-profile")
+async def complete_profile(
+    user: Annotated[m.User, Depends(authenticated_user)],
+    profile: m.CompleteProfileRequest,
+) -> m.User:
+    if user.org:
+        raise HTTPException(400, "Organisation already set")
+
+    if profile.organisation not in utils.orgs.keys():
+        raise HTTPException(
+            status_code=400, detail=f"Invalid organisation: {profile.organisation}"
+        )
+
+    user_db.complete_profile(user.id, profile.organisation, profile.jobTitle)
+
+    return user_db.get_by_id(user.id)
 
 
 @router.get("/{user_id}")
@@ -28,22 +46,36 @@ async def show_user(
     user_id: str,
     is_ops: Annotated[bool, Depends(ops_user)],
     jwt: Annotated[JWTBearer(auto_error=False), Depends()] = None,
-):
+) -> m.User:
     # If an email address has been provided, turn it into an ID
     if "@" in user_id:
         user_id = utils.user_id_from_email(user_id)
 
     # If you've passed the OPS_KEY, return the user
     if is_ops:
-        return m.User.model_validate(user_db.get_by_id(user_id))
+        return user_db.get_by_id(user_id)
 
     # If you're not OPS, you need to have sent a JWT and can only see yourself
     if jwt is not None:
         authed_user_id = utils.user_id_from_email(jwt.get("email"))
         if authed_user_id == user_id:
-            return m.User.model_validate(user_db.get_by_id(authed_user_id))
+            return user_db.get_by_id(authed_user_id)
 
     raise HTTPException(401, "Unauthorised")
+
+
+@router.delete("/{user_id}")
+async def delete_user(
+    user_id: str, is_ops: Annotated[bool, Depends(ops_user)]
+) -> m.SPARQLUpdate:
+    if not is_ops:
+        raise HTTPException(401, "Unauthorised")
+
+    # If an email address has been provided, turn it into an ID
+    if "@" in user_id:
+        user_id = utils.user_id_from_email(user_id)
+
+    return user_db.delete_by_id(user_id)
 
 
 @router.put("/{user_id}/org")
