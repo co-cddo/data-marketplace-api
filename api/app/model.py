@@ -502,7 +502,7 @@ class AnyUser(BaseModel):
 
 
 class RegisteredUser(AnyUser):
-    id: str
+    id: str = Field(serialization_alias="@id")
     email: EmailStr
 
 
