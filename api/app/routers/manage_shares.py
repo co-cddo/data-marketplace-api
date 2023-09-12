@@ -34,11 +34,11 @@ def enrich_share_request(r: dict) -> m.ShareRequest:
 async def received_requests(
     user: Annotated[m.User, Depends(authenticated_user)]
 ) -> List[m.ShareRequest]:
-    org = user.org.slug
+    org = user.org
     if not org:
         return []
 
-    result = [enrich_share_request(r) for r in share_db.received_requests(org)]
+    result = [enrich_share_request(r) for r in share_db.received_requests(org.slug)]
     return result
 
 
