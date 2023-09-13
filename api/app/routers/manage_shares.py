@@ -38,7 +38,7 @@ async def received_requests(
     if not org:
         return []
 
-    result = [enrich_share_request(r) for r in share_db.received_requests(org)]
+    result = [enrich_share_request(r) for r in share_db.received_requests(org.slug)]
     return result
 
 
@@ -49,7 +49,7 @@ async def received_request(
     share_request = share_db.received_request(request_id)
     share_request["requestId"] = request_id
 
-    if share_request["assetPublisher"] != user.org:
+    if share_request["assetPublisher"] != user.org.slug:
         raise HTTPException(403, "You are not authorised to see this request")
 
     return enrich_share_request(share_request)
