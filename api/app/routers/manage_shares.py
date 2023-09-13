@@ -32,7 +32,7 @@ def enrich_share_request(r: dict) -> m.ShareRequest:
 
 @router.get("/received-requests")
 async def received_requests(
-    user: Annotated[m.User, Depends(authenticated_user)]
+    user: Annotated[m.RegisteredUser, Depends(authenticated_user)]
 ) -> List[m.ShareRequest]:
     org = user.org
     if not org:
@@ -44,7 +44,7 @@ async def received_requests(
 
 @router.get("/received-requests/{request_id}")
 async def received_request(
-    request_id: str, user: Annotated[m.User, Depends(authenticated_user)]
+    request_id: str, user: Annotated[m.RegisteredUser, Depends(authenticated_user)]
 ) -> m.ShareRequest:
     share_request = share_db.received_request(request_id)
     share_request["requestId"] = request_id

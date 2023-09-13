@@ -2,7 +2,7 @@ from itertools import groupby
 from app.utils import lookup_organisation
 
 
-def _aggregate_results(result_dicts):
+def aggregate_results(result_dicts):
     """Assuming all results relate to a single item, aggregate them to include a list of values for
     any key with multiple values"""
     match len(result_dicts):
@@ -26,7 +26,7 @@ def _aggregate_results(result_dicts):
 def aggregate_query_results_by_key(results, group_key="resourceUri"):
     """Groups the result by given key and aggregates the groups into a single dictionary for each"""
     return [
-        _aggregate_results(list(results_for_resource))
+        aggregate_results(list(results_for_resource))
         for _, results_for_resource in groupby(results, lambda r: r[group_key])
     ]
 

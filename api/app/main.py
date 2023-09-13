@@ -20,7 +20,6 @@ from app.auth.jwt_bearer import JWTBearer
 from app.routers.users import router as users_router
 from app.routers.manage_shares import router as shares_router
 
-
 app = FastAPI(title="CDDO Data Marketplace API", version="0.1.0")
 
 app.include_router(users_router)

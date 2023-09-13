@@ -6,7 +6,7 @@ from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 from app import utils
 from app import model as m
 from app.db import user as user_db
-from .utils import decodeJWT
+from .utils import decodeJWT, ops_user
 
 
 class JWTBearer(HTTPBearer):
@@ -40,4 +40,22 @@ async def authenticated_user(jwt: Annotated[JWTBearer(), Depends()]):
     local_user = user_db.get_by_id(user_id)
     if not local_user:
         raise HTTPException(401, "Invalid JWT")
-    return m.User.model_validate(local_user)
+    return m.RegisteredUser.model_validate(local_user)
+
+
+# Return either a user, general public memer, or ops user
+async def any_type_of_user(
+    is_ops: Annotated[bool, Depends(ops_user)],
+    jwt: Annotated[JWTBearer(auto_error=False), Depends()] = None,
+):
+    if is_ops:
+        return m.AnyUser.model_validate({"role": [m.userRole.ops_admin]})
+    if jwt:
+        user_id = utils.user_id_from_email(jwt.get("email", None))
+        local_user = user_db.get_by_id(user_id)
+        if local_user:
+            return m.RegisteredUser.model_validate(local_user)
+        else:
+            raise HTTPException(401, "Invalid JWT")
+    else:
+        return m.AnyUser.model_validate({"role": []})
