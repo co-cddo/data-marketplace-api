@@ -469,7 +469,7 @@ class CreateDataServiceBody(CreateAssetBody, DataService):
     pass
 
 
-class userRole(str, Enum):
+class userPermission(str, Enum):
     member = "MEMBER"
     publisher = "PUBLISHER"
     org_admin = "ADMINISTRATOR"
@@ -482,8 +482,8 @@ class EditUserOrgRequest(BaseModel):
 
 
 class EditUserPermissionRequest(BaseModel):
-    add: List[userRole] | None = []
-    remove: List[userRole] | None = []
+    add: List[userPermission] | None = []
+    remove: List[userPermission] | None = []
 
     class Config:
         use_enum_values = True
@@ -495,7 +495,7 @@ class AnyUser(BaseModel):
     email: Optional[EmailStr] = None
     org: Optional[Organisation] = None
     jobTitle: Optional[str] = None
-    role: Optional[List[userRole]] = []
+    permission: Optional[List[userPermission]] = []
 
     class Config:
         use_enum_values = True

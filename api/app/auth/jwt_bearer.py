@@ -49,7 +49,7 @@ async def any_type_of_user(
     jwt: Annotated[JWTBearer(auto_error=False), Depends()] = None,
 ):
     if is_ops:
-        return m.AnyUser.model_validate({"role": [m.userRole.ops_admin]})
+        return m.AnyUser.model_validate({"permission": [m.userPermisison.ops_admin]})
     if jwt:
         user_id = utils.user_id_from_email(jwt.get("email", None))
         local_user = user_db.get_by_id(user_id)
@@ -58,4 +58,4 @@ async def any_type_of_user(
         else:
             raise HTTPException(401, "Invalid JWT")
     else:
-        return m.AnyUser.model_validate({"role": []})
+        return m.AnyUser.model_validate({"permission": []})

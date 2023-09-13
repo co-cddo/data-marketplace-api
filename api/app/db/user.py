@@ -13,14 +13,14 @@ def new_user(user_id: str, user_email: str) -> m.RegisteredUser:
 
 
 def _maybe_make_permission_a_list(user_dict):
-    role = user_dict.get("role")
-    if role is None:
+    permission = user_dict.get("permission")
+    if permission is None:
         return user_dict
-    elif isinstance(role, Set):
-        user_dict["role"] = list(role)
+    elif isinstance(permission, Set):
+        user_dict["permission"] = list(permission)
         return user_dict
     else:
-        user_dict["role"] = [role]
+        user_dict["permission"] = [permission]
         return user_dict
 
 

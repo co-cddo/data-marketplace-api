@@ -101,17 +101,17 @@ class OpsAdminAccessRights(UserAccessRights):
 class UserWithAccessRights:
     def __init__(self, user):
         self.access_rights = [UserAccessRights(user)]
-        for perm in user.role:
+        for perm in user.permission:
             match perm:
-                case m.userRole.member:
+                case m.userPermission.member:
                     self.access_rights.append(MemberAccessRights(user))
-                case m.userRole.publisher:
+                case m.userPermission.publisher:
                     self.access_rights.append(PublisherAccessRights(user))
-                case m.userRole.reviewer:
+                case m.userPermission.reviewer:
                     self.access_rights.append(ShareReviewerAccessRights(user))
-                case m.userRole.org_admin:
+                case m.userPermission.org_admin:
                     self.access_rights.append(AdminAccessRights(user))
-                case m.userRole.ops_admin:
+                case m.userPermission.ops_admin:
                     self.access_rights.append(OpsAdminAccessRights(user))
 
     def has_asset_permission(

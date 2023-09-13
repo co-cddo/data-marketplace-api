@@ -3,7 +3,7 @@ PREFIX cddo_graph: <http://marketplace.cddo.gov.uk/graph/>
 
 WITH cddo_graph:users
 INSERT {
-  cddo_user:$user_id cddo_user:role ?toAdd.
+  cddo_user:$user_id cddo_user:permission ?toAdd.
 }
 WHERE {
   VALUES ?toAdd { $to_add }
