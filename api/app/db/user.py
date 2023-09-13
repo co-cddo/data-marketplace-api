@@ -7,19 +7,19 @@ from app.utils import lookup_organisation
 
 
 def new_user(user_id: str, user_email: str) -> m.User:
-    users_db.run_update("user/create", user_id=user_id, user_email=user_email)
+    users_db.run_update("create", user_id=user_id, user_email=user_email)
     user = get_by_id(user_id)
     return user
 
 
 def list_users() -> List[m.User]:
-    query_results = users_db.run_query("user/list")
+    query_results = users_db.run_query("list")
     users = [enrich_user_org(r) for r in query_results]
     return [m.User.model_validate(u) for u in users]
 
 
 def get_by_id(user_id: str) -> m.User | None:
-    query_results = users_db.run_query("user/get_by_id", user_id=user_id)
+    query_results = users_db.run_query("get_by_id", user_id=user_id)
     assert len(query_results) <= 1, "Found multiple users with the same email address."
 
     if not query_results:
@@ -31,17 +31,17 @@ def get_by_id(user_id: str) -> m.User | None:
 
 
 def delete_by_id(user_id: str) -> m.SPARQLUpdate:
-    res = users_db.run_update("user/delete_by_id", user_id=user_id)
+    res = users_db.run_update("delete_by_id", user_id=user_id)
     return res
 
 
 def edit_org(user_id, org):
-    res = users_db.run_update("user/edit_org", user_id=user_id, org=org)
+    res = users_db.run_update("edit_org", user_id=user_id, org=org)
     return res
 
 
 def complete_profile(user_id, org, jobTitle):
     res = users_db.run_update(
-        "user/complete_profile", user_id=user_id, org=org, jobTitle=jobTitle
+        "complete_profile", user_id=user_id, org=org, jobTitle=jobTitle
     )
     return res
