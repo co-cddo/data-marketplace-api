@@ -5,7 +5,7 @@ from datetime import datetime
 
 
 def get_request_forms(user_id: str):
-    query_results = shares_db.run_query("shares/get_for_user", user_id=user_id)
+    query_results = shares_db.run_query("get_for_user", user_id=user_id)
     forms = {r["assetId"]: json.loads(r["sharedata"]) for r in query_results}
     return forms
 
@@ -13,7 +13,7 @@ def get_request_forms(user_id: str):
 def upsert_sharedata(user_id: str, sharedata: m.ShareData):
     sharedata_string = json.dumps(sharedata.model_dump_json())
     query_results = shares_db.run_update(
-        "shares/upsert",
+        "upsert",
         id=sharedata.requestId,
         user_id=user_id,
         asset_id=sharedata.dataAsset,
@@ -25,11 +25,31 @@ def upsert_sharedata(user_id: str, sharedata: m.ShareData):
 
 
 def received_requests(org: str):
-    results = shares_db.run_query("shares/get_by_org", org=org)
+    results = shares_db.run_query("get_by_org", org=org)
     return results
 
 
 def received_request(requestId: str):
-    results = shares_db.run_query("shares/get_by_id", requestId=requestId)
-    assert len(results) == 1, "Found multiple share requests with the same ID"
+    results = shares_db.run_query("get_by_id", requestId=requestId)
+
+    assert len(results) <= 1, "Found multiple share requests with the same ID"
+    if not results:
+        return None
+
     return results[0]
+
+
+def upsert_request_notes(request_id: str, notes: str):
+    results = shares_db.run_update("upsert_notes", request_id=request_id, notes=notes)
+    return results
+
+
+def upsert_decision(request_id: str, status: m.ShareRequestStatus, decisionNotes: str):
+    results = shares_db.run_update(
+        "upsert_decision",
+        request_id=request_id,
+        status=status,
+        decisionNotes=decisionNotes,
+        decisionMade=datetime.now().date(),
+    )
+    return results

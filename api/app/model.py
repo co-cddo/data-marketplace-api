@@ -442,23 +442,33 @@ class UpsertShareDataRequest(BaseModel):
     sharedata: ShareData
 
 
+ShareRequestStatus = Literal[
+    "NOT STARTED",
+    "IN PROGRESS",
+    "AWAITING REVIEW",
+    "RETURNED",
+    "IN REVIEW",
+    "ACCEPTED",
+    "REJECTED",
+]
+
+
 class ShareRequest(BaseModel):
     requestId: str
     assetTitle: str
+    requesterId: str
     requesterEmail: EmailStr
     requestingOrg: str
-    status: Literal[
-        "NOT STARTED",
-        "IN PROGRESS",
-        "AWAITING REVIEW",
-        "RETURNED",
-        "IN REVIEW",
-        "ACCEPTED",
-        "REJECTED",
-    ]
     received: datetime
+    status: ShareRequestStatus
     sharedata: ShareData
     neededBy: date | Literal["UNREQUESTED"]
+
+
+class ShareRequestWithExtras(ShareRequest):
+    reviewNotes: Optional[str] = None
+    decisionNotes: Optional[str] = None
+    decisionMade: Optional[date] = None
 
 
 class CreateDatasetBody(CreateAssetBody, Dataset):
@@ -494,3 +504,12 @@ class LoginResponse(BaseModel):
 class CompleteProfileRequest(BaseModel):
     organisation: str
     jobTitle: str
+
+
+class ReviewRequest(BaseModel):
+    notes: str
+
+
+class DecisionRequest(BaseModel):
+    status: ShareRequestStatus
+    decisionNotes: str
