@@ -1,5 +1,5 @@
 from typing import Annotated, List, Literal
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, Path
 from app import utils
 from app import model as m
 from app.db import user as user_db, asset as asset_db
@@ -7,7 +7,7 @@ from app.auth.jwt_bearer import JWTBearer, authenticated_user, any_type_of_user
 from app.auth.utils import ops_user
 from app.auth import access_control
 
-router = APIRouter(prefix="/users")
+router = APIRouter(prefix="/users", tags=["user"])
 
 
 @router.get("")
@@ -20,19 +20,33 @@ async def list_users(
     return users
 
 
-@router.get("/me")
+@router.get("/me", summary="Show the currently logged-in user")
 async def show_self(
     user: Annotated[m.RegisteredUser, Depends(authenticated_user)]
 ) -> m.RegisteredUser:
     return user_db.get_by_id(user.id)
 
 
-@router.get("/permission/{target_type}/{target_id}/{action}")
+@router.get(
+    "/permission/{target_type}/{target_id}/{action}",
+    summary="Check if the current user has permission to execute a given action on the given entity",
+)
 async def check_permission(
     user: Annotated[m.AnyUser, Depends(any_type_of_user)],
-    target_type: Literal["asset", "organisation"],
-    target_id: str,
-    action: access_control.assetAction | access_control.organisationAction,
+    target_type: Annotated[
+        Literal["asset", "organisation"],
+        Path(title="The type of entity that the permission relates to"),
+    ],
+    target_id: Annotated[
+        str,
+        Path(
+            title="The ID of the asset or organisation that the permission relates to"
+        ),
+    ],
+    action: Annotated[
+        access_control.assetAction | access_control.organisationAction,
+        Path(title="The action that you are looking for permission to do"),
+    ],
 ) -> bool:
     user_perms = access_control.UserWithAccessRights(user)
     match target_type:
@@ -65,7 +79,9 @@ async def check_permission(
             return user_perms.has_org_permission(action, organisation)
 
 
-@router.put("/complete-profile")
+@router.put(
+    "/complete-profile", summary="Add organisation and job title for the current user"
+)
 async def complete_profile(
     user: Annotated[m.RegisteredUser, Depends(authenticated_user)],
     profile: m.CompleteProfileRequest,
@@ -120,7 +136,10 @@ async def delete_user(
     return user_db.delete_by_id(user_id)
 
 
-@router.put("/{user_id}/org")
+@router.put(
+    "/{user_id}/org",
+    summary="Edit a users organisation as ops admin (for development and debug use only)",
+)
 async def edit_user_org(
     is_ops: Annotated[bool, Depends(ops_user)], user_id: str, req: m.EditUserOrgRequest
 ) -> m.SPARQLUpdate:
@@ -141,7 +160,7 @@ async def edit_user_org(
     return m.SPARQLUpdate.model_validate(user_db.edit_org(user_id, req.org))
 
 
-@router.put("/{user_id}/permissions")
+@router.put("/{user_id}/permissions", summary="Add or remove permissions from a user")
 async def edit_user_permissions(
     is_ops: Annotated[bool, Depends(ops_user)],
     user_id: str,

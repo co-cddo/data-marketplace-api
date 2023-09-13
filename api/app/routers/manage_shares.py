@@ -8,7 +8,7 @@ from app import model as m
 from app.db import share as share_db
 from app.auth.jwt_bearer import authenticated_user
 
-router = APIRouter(prefix="/manage-shares")
+router = APIRouter(prefix="/manage-shares", tags=["data share"])
 
 
 def enrich_share_request(r: dict) -> m.ShareRequest:

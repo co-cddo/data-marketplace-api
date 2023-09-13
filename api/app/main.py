@@ -31,7 +31,7 @@ app.include_router(shares_router)
 # May not need it for types seeing as we only have 2
 
 
-@app.get("/organisations")
+@app.get("/organisations", tags=["metadata"])
 async def list_organisations() -> List[m.Organisation]:
     return sorted(
         [m.Organisation.model_validate(utils.orgs[o]) for o in utils.MVP_ORGS],
@@ -40,7 +40,7 @@ async def list_organisations() -> List[m.Organisation]:
 
 
 # TODO: add theme query param
-@app.get("/catalogue")
+@app.get("/catalogue", tags=["data"])
 def search_catalogue(
     query: str = "",
     topic: Annotated[List[str], Query()] = [],
@@ -58,7 +58,7 @@ def search_catalogue(
     return r
 
 
-@app.get("/catalogue/{asset_id}")
+@app.get("/catalogue/{asset_id}", tags=["data"])
 async def catalogue_entry_detail(asset_id: UUID) -> m.AssetDetailResponse:
     asset = asset_db.detail(asset_id)
     if asset["type"] == m.assetType.dataset:
@@ -71,7 +71,7 @@ async def catalogue_entry_detail(asset_id: UUID) -> m.AssetDetailResponse:
     return {"asset": asset}
 
 
-@app.get("/login")
+@app.get("/login", tags=["user"])
 async def login(jwt: Annotated[JWTBearer(), Depends()]):
     user_email = jwt.get("email", None)
     if not user_email:
@@ -93,7 +93,7 @@ async def login(jwt: Annotated[JWTBearer(), Depends()]):
     )
 
 
-@app.put("/sharedata")
+@app.put("/sharedata", tags=["data share"])
 async def upsert_sharedata(
     jwt: Annotated[JWTBearer(), Depends()], req: m.UpsertShareDataRequest
 ):
@@ -102,7 +102,7 @@ async def upsert_sharedata(
     return res
 
 
-@app.post("/publish")
+@app.post("/publish", tags=["data"])
 async def publish_assets(
     body: pubres.CreateAssetsRequestBody,
 ) -> pubres.CreateAssetsResponseBody:
@@ -112,7 +112,7 @@ async def publish_assets(
 
 # multipart/form-data endpoint
 # curl -F "datasets=@dataset.csv" -F "dataservices=@dataservice.csv" localhost:8000/publish/verify
-@app.post("/publish/verify")
+@app.post("/publish/verify", tags=["data"])
 async def prepare_batch_publish_request(
     datasets: Annotated[
         UploadFile,
