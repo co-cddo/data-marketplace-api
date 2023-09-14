@@ -70,7 +70,7 @@ async def received_request(
 async def review_request(
     request_id: str,
     body: m.ReviewRequest,
-    user: Annotated[m.User, Depends(authenticated_user)],
+    user: Annotated[m.RegisteredUser, Depends(authenticated_user)],
 ) -> m.SPARQLUpdate:
     share_request = share_db.received_request(request_id)
     if not share_request:
@@ -90,7 +90,7 @@ async def review_request(
 async def request_decision(
     request_id: str,
     body: m.DecisionRequest,
-    user: Annotated[m.User, Depends(authenticated_user)],
+    user: Annotated[m.RegisteredUser, Depends(authenticated_user)],
 ) -> m.SPARQLUpdate:
     share_request = share_db.received_request(request_id)
     if not share_request:
