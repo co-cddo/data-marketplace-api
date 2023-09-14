@@ -1,11 +1,13 @@
 import json
-from app.db.sparql import shares_db
-from app import model as m
+from typing import List
 from datetime import datetime
 
+from app.db.sparql import shares_db
+from app import model as m
 
-def get_request_forms(user_id: str):
-    query_results = shares_db.run_query("get_for_user", user_id=user_id)
+
+def get_sharedata(user_id: str):
+    query_results = shares_db.run_query("get_sharedata", user_id=user_id)
     forms = {r["assetId"]: json.loads(r["sharedata"]) for r in query_results}
     return forms
 
@@ -22,6 +24,11 @@ def upsert_sharedata(user_id: str, sharedata: m.ShareData):
         status=sharedata.status,
     )
     return query_results
+
+
+def created_requests(user_id: str) -> List[m.ShareRequest]:
+    results = shares_db.run_query("get_user_created", user_id=user_id)
+    return results
 
 
 def received_requests(org: str):

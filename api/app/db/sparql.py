@@ -63,5 +63,5 @@ users_db = Connection(
 shares_db = Connection(
     query_url=config.QUERY_URL,
     update_url=config.UPDATE_URL,
-    query_template_dir="queries/shares/",
+    query_template_dir="queries/shares",
 )

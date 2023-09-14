@@ -6,7 +6,7 @@ PREFIX cddo: <http://marketplace.cddo.gov.uk#>
 PREFIX cddo_user: <http://marketplace.cddo.gov.uk/user/>
 PREFIX cddo_graph: <http://marketplace.cddo.gov.uk/graph/>
 
-SELECT ?requestId ?assetTitle ?assetPublisher ?status ?received ?sharedata 
+SELECT ?requestId ?assetTitle ?assetPublisher ?requesterEmail ?requestingOrg ?status ?received ?sharedata 
 FROM cddo_graph:shares
 FROM cddo_graph:assets
 FROM cddo_graph:users
@@ -16,7 +16,11 @@ WHERE {
 			dct:identifier ?requestId ;
 			adms:status ?status ;
 			dct:modified ?received ;
-			cddo:user "?user_id" .
+			cddo:user "$user_id" .
+
+    ?user	vcard:hasEmail ?requesterEmail ;
+			dct:identifier "$user_id" ;
+			schema:memberOf ?requestingOrg .
 
 	?asset	dct:identifier ?assetId ;
             dct:publisher ?assetPublisher ;
