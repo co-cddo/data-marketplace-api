@@ -479,15 +479,41 @@ class CreateDataServiceBody(CreateAssetBody, DataService):
     pass
 
 
+class userPermission(str, Enum):
+    member = "MEMBER"
+    publisher = "PUBLISHER"
+    org_admin = "ADMINISTRATOR"
+    ops_admin = "OPS"
+    reviewer = "SHARE_REVIEWER"
+
+
 class EditUserOrgRequest(BaseModel):
     org: str
 
 
-class User(BaseModel):
-    id: str
-    email: EmailStr
+class EditUserPermissionRequest(BaseModel):
+    add: List[userPermission] | None = []
+    remove: List[userPermission] | None = []
+
+    class Config:
+        use_enum_values = True
+
+
+# Base class for any user, with or without account
+class AnyUser(BaseModel):
+    id: Optional[str] = Field(serialization_alias="@id", default=None)
+    email: Optional[EmailStr] = None
     org: Optional[Organisation] = None
     jobTitle: Optional[str] = None
+    permission: Optional[List[userPermission]] = []
+
+    class Config:
+        use_enum_values = True
+
+
+class RegisteredUser(AnyUser):
+    id: str = Field(serialization_alias="@id")
+    email: EmailStr
 
 
 class SPARQLUpdate(BaseModel):
@@ -496,7 +522,7 @@ class SPARQLUpdate(BaseModel):
 
 
 class LoginResponse(BaseModel):
-    user: User
+    user: RegisteredUser
     new_user: bool
     sharedata: dict[str, ShareData]
 

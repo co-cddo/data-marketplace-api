@@ -8,7 +8,7 @@ from app import model as m
 from app.db import share as share_db
 from app.auth.jwt_bearer import authenticated_user
 
-router = APIRouter(prefix="/manage-shares")
+router = APIRouter(prefix="/manage-shares", tags=["data share"])
 
 
 def enrich_share_request(r: dict) -> dict:
@@ -32,7 +32,7 @@ def enrich_share_request(r: dict) -> dict:
 
 @router.get("/received-requests")
 async def received_requests(
-    user: Annotated[m.User, Depends(authenticated_user)]
+    user: Annotated[m.RegisteredUser, Depends(authenticated_user)]
 ) -> List[m.ShareRequest]:
     org = user.org
     if not org:
@@ -46,7 +46,7 @@ async def received_requests(
 
 @router.get("/received-requests/{request_id}")
 async def received_request(
-    request_id: str, user: Annotated[m.User, Depends(authenticated_user)]
+    request_id: str, user: Annotated[m.RegisteredUser, Depends(authenticated_user)]
 ) -> m.ShareRequest | m.ShareRequestWithExtras:
     share_request = share_db.received_request(request_id)
     if not share_request:
