@@ -57,7 +57,7 @@ assets_db = Connection(
 users_db = Connection(
     query_url=config.QUERY_URL,
     update_url=config.UPDATE_URL,
-    query_template_dir="queries",
+    query_template_dir="queries/user",
 )
 
 shares_db = Connection(
