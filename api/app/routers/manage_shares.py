@@ -33,6 +33,17 @@ def enrich_share_request(r: dict, org: m.Organisation = None) -> dict:
     return r
 
 
+@router.get("/created-requests")
+async def created_requests(
+    user: Annotated[m.RegisteredUser, Depends(authenticated_user)]
+) -> List[m.ShareRequest]:
+    share_requests = share_db.get_request_forms(user.id)
+    for s in share_requests:
+        s["requesterId"] = user.id
+    share_requests = [enrich_share_request(s) for s in share_requests]
+    return [m.ShareRequest.model_validate(s) for s in share_requests]
+
+
 @router.get("/received-requests")
 async def received_requests(
     user: Annotated[m.RegisteredUser, Depends(authenticated_user)]
@@ -106,8 +117,6 @@ async def request_decision(
 
     if share_request["assetPublisher"].slug != user.org.slug:
         raise HTTPException(403, "You are not authorised to review this request")
-
-    print
 
     result = share_db.upsert_decision(
         request_id, status=body.status, decisionNotes=body.decisionNotes
