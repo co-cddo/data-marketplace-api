@@ -39,6 +39,10 @@ def extract_organisation_slug(organisation):
     return organisation["slug"]
 
 
+def wrap_markdown(markdown_str):
+    return markdown_str.replace("\\", "\\\\").replace('"', '\\"')
+
+
 class SimpleAttribute:
     def __init__(self, predicate, value_converter=lambda v: v):
         self.predicate = predicate
@@ -111,7 +115,7 @@ predicates_map = {
         },
         object_type_uri=VCARD.Kind,
     ),
-    "description": SimpleAttribute(DCTERMS.description),
+    "description": SimpleAttribute(DCTERMS.description, value_converter=wrap_markdown),
     "issued": SimpleAttribute(CDDO_ASSET.issued),
     "keyword": ListAttribute(DCAT.keyword),
     "licence": SimpleAttribute(DCTERMS.license),
