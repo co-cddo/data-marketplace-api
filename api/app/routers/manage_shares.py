@@ -11,7 +11,7 @@ from app.auth.jwt_bearer import authenticated_user
 router = APIRouter(prefix="/manage-shares", tags=["data share"])
 
 
-def enrich_share_request(r: dict) -> dict:
+def enrich_share_request(r: dict, org: m.Organisation = None) -> dict:
     sharedata = m.ShareData.model_validate_json(r["sharedata"])
     neededBy = sharedata.steps["date"].value
     if not (neededBy["day"] and neededBy["month"] and neededBy["year"]):
@@ -22,6 +22,9 @@ def enrich_share_request(r: dict) -> dict:
             month=int(neededBy["month"]),
             day=int(neededBy["day"]),
         )
+    publisherSlug = r.get("assetPublisher", None) or org.slug
+    publisher = utils.lookup_organisation(publisherSlug)
+    r["assetPublisher"] = publisher
 
     requestingOrg = utils.lookup_organisation(r["requestingOrg"])
     r["requestingOrg"] = requestingOrg.title
@@ -39,7 +42,8 @@ async def received_requests(
         return []
     share_requests = share_db.received_requests(org.slug)
     result = [
-        m.ShareRequest.model_validate(enrich_share_request(r)) for r in share_requests
+        m.ShareRequest.model_validate(enrich_share_request(r, org))
+        for r in share_requests
     ]
     return result
 
@@ -60,7 +64,7 @@ async def received_request(
         return m.ShareRequest.model_validate(share_request)
 
     # If user's org is the same as the publisher org, return the share request with the notes field
-    if share_request["assetPublisher"] == user.org.slug:
+    if share_request["assetPublisher"].slug == user.org.slug:
         return m.ShareRequestWithExtras.model_validate(share_request)
 
     raise HTTPException(403, "You are not authorised to see this request")
@@ -77,8 +81,9 @@ async def review_request(
         raise HTTPException(404, f"Request {request_id} not found.")
 
     share_request["requestId"] = request_id
+    share_request = enrich_share_request(share_request)
 
-    if share_request["assetPublisher"] != user.org.slug:
+    if share_request["assetPublisher"].slug != user.org.slug:
         raise HTTPException(403, "You are not authorised to review this request")
 
     result = share_db.upsert_request_notes(request_id, body.notes)
@@ -97,8 +102,9 @@ async def request_decision(
         raise HTTPException(404, f"Request {request_id} not found.")
 
     share_request["requestId"] = request_id
+    share_request = enrich_share_request(share_request)
 
-    if share_request["assetPublisher"] != user.org.slug:
+    if share_request["assetPublisher"].slug != user.org.slug:
         raise HTTPException(403, "You are not authorised to review this request")
 
     print

@@ -459,16 +459,17 @@ class ShareRequest(BaseModel):
     requesterId: str
     requesterEmail: EmailStr
     requestingOrg: str
+    assetPublisher: Organisation
     received: datetime
     status: ShareRequestStatus
     sharedata: ShareData
     neededBy: date | Literal["UNREQUESTED"]
+    decisionNotes: Optional[str] = None
+    decisionDate: Optional[date] = None
 
 
 class ShareRequestWithExtras(ShareRequest):
     reviewNotes: Optional[str] = None
-    decisionNotes: Optional[str] = None
-    decisionDate: Optional[date] = None
 
 
 class CreateDatasetBody(CreateAssetBody, Dataset):
