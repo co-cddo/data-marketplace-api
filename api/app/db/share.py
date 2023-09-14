@@ -50,6 +50,6 @@ def upsert_decision(request_id: str, status: m.ShareRequestStatus, decisionNotes
         request_id=request_id,
         status=status,
         decisionNotes=decisionNotes,
-        decisionMade=datetime.now().date(),
+        decisionDate=datetime.now().date(),
     )
     return results

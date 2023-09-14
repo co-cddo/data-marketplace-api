@@ -7,15 +7,15 @@ WITH cddo_graph:shares
 DELETE {
     cddo_share:$request_id  adms:status ?status ;
                             cddo:decisionNotes ?decisionNotes ;
-                            cddo:decisionMade ?decisionMade .
+                            cddo:decisionDate ?decisionDate .
 }
 INSERT {
     cddo_share:$request_id  adms:status "$status" ;
                             cddo:decisionNotes "$decisionNotes" ;
-                            cddo:decisionMade "$decisionMade" .
+                            cddo:decisionDate "$decisionDate" .
 }
 WHERE {
     OPTIONAL { cddo_share:$request_id adms:status ?status } .
     OPTIONAL { cddo_share:$request_id cddo:decisionNotes ?decisionNotes } .
-    OPTIONAL { cddo_share:$request_id cddo:decisionMade ?decisionMade } .
+    OPTIONAL { cddo_share:$request_id cddo:decisionDate ?decisionDate } .
 }

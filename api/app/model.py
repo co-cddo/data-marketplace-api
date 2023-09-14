@@ -468,7 +468,7 @@ class ShareRequest(BaseModel):
 class ShareRequestWithExtras(ShareRequest):
     reviewNotes: Optional[str] = None
     decisionNotes: Optional[str] = None
-    decisionMade: Optional[date] = None
+    decisionDate: Optional[date] = None
 
 
 class CreateDatasetBody(CreateAssetBody, Dataset):
