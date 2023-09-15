@@ -71,7 +71,7 @@ expected_headers = {
         "serviceStatus",
         "endpointURL",
         "endpointDescription",
-        "servesData",
+        "servesDataset",
     ],
 }
 
@@ -91,6 +91,7 @@ keys_to_rename = {
     "publisher": "organisationID",
     "relatedResource": "relatedAssets",
     "identifier": "externalIdentifier",
+    "servesData": "servesDataset",
 }
 date_fields = ["issued", "modified", "created"]
 
@@ -99,7 +100,7 @@ list_fields = [
     "theme",
     "keyword",
     "relatedAssets",
-    "servesData",
+    "servesDataset",
     "creatorID",
 ]
 
