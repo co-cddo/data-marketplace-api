@@ -151,6 +151,11 @@ class BaseAssetSummary(BaseModel):
         return self
 
 
+class AssetForHref(BaseModel):
+    identifier: str
+    title: str
+
+
 class BaseAsset(BaseAssetSummary):
     accessRights: rightsStatement | None = None
     alternativeTitle: List[str] | None = []
@@ -159,7 +164,7 @@ class BaseAsset(BaseAssetSummary):
     issued: PastDate | None = None
     keyword: List[str] | None = []
     licence: AnyUrl
-    relatedAssets: List[AnyUrl] | None = []
+    relatedAssets: List[AnyUrl | AssetForHref] | None = []
     securityClassification: Literal["OFFICIAL"]
     summary: str | None = None
     version: str | None = "1.0"
@@ -253,7 +258,7 @@ class DatasetResponse(Dataset, OutputAssetInfo):
 class DataService(BaseAsset):
     endpointDescription: AnyUrl
     endpointURL: str | None = None
-    servesDataset: list[AnyUrl]
+    servesDataset: list[AnyUrl | AssetForHref]
     serviceStatus: ServiceStatus
     serviceType: ServiceType
     type: Literal[assetType.service]
