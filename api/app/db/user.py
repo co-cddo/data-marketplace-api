@@ -1,47 +1,80 @@
-from typing import List
+from typing import List, Set
 
-from .utils import enrich_user_org
+from .utils import enrich_user_org, aggregate_results, aggregate_query_results_by_key
 from app import model as m
 from app.db.sparql import users_db
 from app.utils import lookup_organisation
 
 
-def new_user(user_id: str, user_email: str) -> m.User:
-    users_db.run_update("user/create", user_id=user_id, user_email=user_email)
+def new_user(user_id: str, user_email: str) -> m.RegisteredUser:
+    users_db.run_update("create", user_id=user_id, user_email=user_email)
     user = get_by_id(user_id)
     return user
 
 
-def list_users() -> List[m.User]:
-    query_results = users_db.run_query("user/list")
-    users = [enrich_user_org(r) for r in query_results]
-    return [m.User.model_validate(u) for u in users]
+def _maybe_make_permission_a_list(user_dict):
+    permission = user_dict.get("permission")
+    if permission is None:
+        return user_dict
+    elif isinstance(permission, Set):
+        user_dict["permission"] = list(permission)
+        return user_dict
+    else:
+        user_dict["permission"] = [permission]
+        return user_dict
 
 
-def get_by_id(user_id: str) -> m.User | None:
-    query_results = users_db.run_query("user/get_by_id", user_id=user_id)
-    assert len(query_results) <= 1, "Found multiple users with the same email address."
+def _query_result_to_user(aggregated_query_result_for_user):
+    user = _maybe_make_permission_a_list(aggregated_query_result_for_user)
+    user = enrich_user_org(user)
+    return m.RegisteredUser.model_validate(user)
 
+
+def list_users() -> List[m.RegisteredUser]:
+    query_results = users_db.run_query("list")
+    users = aggregate_query_results_by_key(query_results, group_key="id")
+    return [_query_result_to_user(u) for u in users]
+
+
+def get_by_id(user_id: str) -> m.RegisteredUser | None:
+    query_results = users_db.run_query("get_by_id", user_id=user_id)
     if not query_results:
         return None
-
-    user = query_results[0]
-    user = enrich_user_org(user)
-    return m.User.model_validate(user)
+    assert (
+        len({u["id"] for u in query_results}) <= 1
+    ), "Found multiple users with the same email address."
+    user = aggregate_results(query_results)
+    return _query_result_to_user(user)
 
 
 def delete_by_id(user_id: str) -> m.SPARQLUpdate:
-    res = users_db.run_update("user/delete_by_id", user_id=user_id)
+    res = users_db.run_update("delete_by_id", user_id=user_id)
     return res
 
 
 def edit_org(user_id, org):
-    res = users_db.run_update("user/edit_org", user_id=user_id, org=org)
+    res = users_db.run_update("edit_org", user_id=user_id, org=org)
     return res
 
 
 def complete_profile(user_id, org, jobTitle):
     res = users_db.run_update(
-        "user/complete_profile", user_id=user_id, org=org, jobTitle=jobTitle
+        "complete_profile", user_id=user_id, org=org, jobTitle=jobTitle
     )
+    return res
+
+
+def edit_permissions(user_id, permissions_to_add, permissions_to_remove):
+    to_add = [f'"{val}"' for val in permissions_to_add]
+    res = {"status": 200, "message": "no update required"}
+    if permissions_to_remove != []:
+        res = users_db.run_update(
+            "remove_permissions",
+            user_id=user_id,
+            to_remove=[f'"{val}"' for val in permissions_to_remove],
+        )
+        if res["statusCode"] != 200:
+            return res
+    if permissions_to_add != []:
+        res = users_db.run_update("add_permissions", user_id=user_id, to_add=to_add)
     return res

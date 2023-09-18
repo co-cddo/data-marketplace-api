@@ -1,0 +1,10 @@
+PREFIX cddo_user: <http://marketplace.cddo.gov.uk/user/>
+PREFIX cddo_graph: <http://marketplace.cddo.gov.uk/graph/>
+
+WITH cddo_graph:users
+DELETE {
+	cddo_user:$user_id cddo_user:permission ?toRemove .
+}
+WHERE {
+  VALUES ?toRemove { $to_remove }
+}

@@ -1,0 +1,14 @@
+PREFIX cddo: <http://marketplace.cddo.gov.uk#>
+PREFIX cddo_share: <http://marketplace.cddo.gov.uk/share/>
+PREFIX cddo_graph: <http://marketplace.cddo.gov.uk/graph/>
+
+WITH cddo_graph:shares
+DELETE {
+    cddo_share:$request_id  cddo:reviewNotes ?notes .
+}
+INSERT {
+    cddo_share:$request_id  cddo:reviewNotes "$notes" .
+}
+WHERE {
+    OPTIONAL{ cddo_share:$request_id  cddo:reviewNotes ?notes } .
+}

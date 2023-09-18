@@ -12,7 +12,7 @@ from pydantic import (
 )
 from pydantic.functional_validators import AfterValidator
 from pydantic.networks import AnyUrl
-from typing import List, Literal, Any, Optional, Annotated
+from typing import List, Literal, Any, Optional, Annotated, Union
 import uuid
 
 
@@ -151,6 +151,11 @@ class BaseAssetSummary(BaseModel):
         return self
 
 
+class AssetForHref(BaseModel):
+    identifier: str
+    title: str
+
+
 class BaseAsset(BaseAssetSummary):
     accessRights: rightsStatement | None = None
     alternativeTitle: List[str] | None = []
@@ -159,7 +164,7 @@ class BaseAsset(BaseAssetSummary):
     issued: PastDate | None = None
     keyword: List[str] | None = []
     licence: AnyUrl
-    relatedAssets: List[AnyUrl] | None = []
+    relatedAssets: List[AnyUrl | AssetForHref] | None = []
     securityClassification: Literal["OFFICIAL"]
     summary: str | None = None
     version: str | None = "1.0"
@@ -253,7 +258,7 @@ class DatasetResponse(Dataset, OutputAssetInfo):
 class DataService(BaseAsset):
     endpointDescription: AnyUrl
     endpointURL: str | None = None
-    servesData: list[AnyUrl]
+    servesDataset: list[AnyUrl | AssetForHref]
     serviceStatus: ServiceStatus
     serviceType: ServiceType
     type: Literal[assetType.service]
@@ -288,7 +293,7 @@ class DataServiceResponse(DataService, OutputAssetInfo):
                     ][0],
                     "relatedAssets": [],
                     "securityClassification": "OFFICIAL",
-                    "servesData": [
+                    "servesDataset": [
                         "https://www.data.gov.uk/dataset/2dfb82b4-741a-4b93-807e-11abb4bb0875/os-postcodes-data",
                         "https://www.data.gov.uk/dataset/03d48dba-529b-4bd5-93a5-6d41d1b20ff9/national-address-gazetteer",
                         "https://www.data.gov.uk/dataset/92b32629-8ad4-43cb-9952-7d104971fa12/one-scotland-gazetteer",
@@ -442,23 +447,40 @@ class UpsertShareDataRequest(BaseModel):
     sharedata: ShareData
 
 
-class ShareRequest(BaseModel):
-    requestId: str
-    assetTitle: str
-    requesterEmail: EmailStr
-    requestingOrg: str
-    status: Literal[
+ShareRequestDecisionStatus = Literal[
+    "IN REVIEW",
+    "RETURNED",
+    "ACCEPTED",
+    "REJECTED",
+]
+
+ShareRequestStatus = Union[
+    ShareRequestDecisionStatus,
+    Literal[
         "NOT STARTED",
         "IN PROGRESS",
         "AWAITING REVIEW",
-        "RETURNED",
-        "IN REVIEW",
-        "ACCEPTED",
-        "REJECTED",
-    ]
+    ],
+]
+
+
+class ShareRequest(BaseModel):
+    requestId: str
+    assetTitle: str
+    requesterId: str
+    requesterEmail: EmailStr
+    requestingOrg: str
+    assetPublisher: Organisation
     received: datetime
-    sharedata: ShareData
+    status: ShareRequestStatus
+    sharedata: Optional[ShareData] = None
     neededBy: date | Literal["UNREQUESTED"]
+    decisionNotes: Optional[str] = None
+    decisionDate: Optional[date] = None
+
+
+class ShareRequestWithExtras(ShareRequest):
+    reviewNotes: Optional[str] = None
 
 
 class CreateDatasetBody(CreateAssetBody, Dataset):
@@ -469,15 +491,41 @@ class CreateDataServiceBody(CreateAssetBody, DataService):
     pass
 
 
+class userPermission(str, Enum):
+    member = "MEMBER"
+    publisher = "PUBLISHER"
+    org_admin = "ADMINISTRATOR"
+    ops_admin = "OPS"
+    reviewer = "SHARE_REVIEWER"
+
+
 class EditUserOrgRequest(BaseModel):
     org: str
 
 
-class User(BaseModel):
-    id: str
-    email: EmailStr
+class EditUserPermissionRequest(BaseModel):
+    add: List[userPermission] | None = []
+    remove: List[userPermission] | None = []
+
+    class Config:
+        use_enum_values = True
+
+
+# Base class for any user, with or without account
+class AnyUser(BaseModel):
+    id: Optional[str] = Field(serialization_alias="@id", default=None)
+    email: Optional[EmailStr] = None
     org: Optional[Organisation] = None
     jobTitle: Optional[str] = None
+    permission: Optional[List[userPermission]] = []
+
+    class Config:
+        use_enum_values = True
+
+
+class RegisteredUser(AnyUser):
+    id: str = Field(serialization_alias="@id")
+    email: EmailStr
 
 
 class SPARQLUpdate(BaseModel):
@@ -486,7 +534,7 @@ class SPARQLUpdate(BaseModel):
 
 
 class LoginResponse(BaseModel):
-    user: User
+    user: RegisteredUser
     new_user: bool
     sharedata: dict[str, ShareData]
 
@@ -494,3 +542,12 @@ class LoginResponse(BaseModel):
 class CompleteProfileRequest(BaseModel):
     organisation: str
     jobTitle: str
+
+
+class ReviewRequest(BaseModel):
+    notes: str
+
+
+class DecisionRequest(BaseModel):
+    status: ShareRequestDecisionStatus
+    decisionNotes: str

@@ -1,0 +1,21 @@
+PREFIX adms: <https://www.w3.org/ns/adms#>
+PREFIX cddo: <http://marketplace.cddo.gov.uk#>
+PREFIX cddo_share: <http://marketplace.cddo.gov.uk/share/>
+PREFIX cddo_graph: <http://marketplace.cddo.gov.uk/graph/>
+
+WITH cddo_graph:shares
+DELETE {
+    cddo_share:$request_id  adms:status ?status ;
+                            cddo:decisionNotes ?decisionNotes ;
+                            cddo:decisionDate ?decisionDate .
+}
+INSERT {
+    cddo_share:$request_id  adms:status "$status" ;
+                            cddo:decisionNotes "$decisionNotes" ;
+                            cddo:decisionDate "$decisionDate" .
+}
+WHERE {
+    OPTIONAL { cddo_share:$request_id adms:status ?status } .
+    OPTIONAL { cddo_share:$request_id cddo:decisionNotes ?decisionNotes } .
+    OPTIONAL { cddo_share:$request_id cddo:decisionDate ?decisionDate } .
+}

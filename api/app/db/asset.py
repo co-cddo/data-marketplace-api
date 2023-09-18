@@ -61,6 +61,15 @@ def search(q: str = "", organisations: List[str] = [], themes: List[str] = []):
     return result_dicts
 
 
+def _get_asset_id_if_exists(uri) -> str | m.AssetForHref:
+    result = assets_db.run_query("asset_id_title", asset=f"<{uri}>")
+    assert len(result) <= 1
+    if not result:
+        return uri
+    asset = result[0]
+    return {"identifier": asset["id"], "title": asset["title"]}
+
+
 def _fetch_distribution_details(distribution_ids):
     distribution_ids = [f"<{i}>" for i in distribution_ids]
     results = assets_db.run_query("distribution_detail", distribution=distribution_ids)
@@ -100,5 +109,17 @@ def detail(asset_id: str):
         asset["distributions"] = [
             m.DistributionResponse.model_validate(d) for d in distributions
         ]
+    
+
+        relatedAssets = [_get_asset_id_if_exists(r) for r in asset["relatedAssets"]]
+        asset["relatedAssets"] = relatedAssets
+
+    if asset["type"] == m.assetType.service:
+        relatedAssets = [_get_asset_id_if_exists(r) for r in asset["relatedAssets"]]
+        asset["relatedAssets"] = relatedAssets
+
+        servesDataset = [_get_asset_id_if_exists(r) for r in asset["servesDataset"]]
+        asset["servesDataset"] = servesDataset
+
     asset["description"] = _unwrap_markdown(asset["description"])
     return asset

@@ -4,7 +4,7 @@ PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
 PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
 PREFIX cddo_graph: <http://marketplace.cddo.gov.uk/graph/> 
 
-SELECT ?distribution ?title ?modified ?mediaType ?identifier ?licence ?issued ?byteSize ?mediaTypeLabel ?externalIdentifier
+SELECT ?distribution ?title ?modified ?mediaType ?identifier ?licence ?issued ?byteSize ?mediaTypeLabel ?externalIdentifier ?accessService
 FROM cddo_graph:assets
 WHERE {{
     VALUES ?distribution { $distribution }
@@ -18,4 +18,5 @@ WHERE {{
     OPTIONAL {{ ?distribution dct:issued ?issued }}
     OPTIONAL {{ ?distribution dcat:byteSize ?byteSize }}
     OPTIONAL {{ ?distribution skos:notation ?externalIdentifier}}
+    OPTIONAL {{ ?distribution dcat:accessService ?accessService}}
 }}
