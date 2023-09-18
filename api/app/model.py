@@ -468,7 +468,7 @@ class ShareRequest(BaseModel):
     assetPublisher: Organisation
     received: datetime
     status: ShareRequestStatus
-    sharedata: ShareData
+    sharedata: Optional[ShareData] = None
     neededBy: date | Literal["UNREQUESTED"]
     decisionNotes: Optional[str] = None
     decisionDate: Optional[date] = None

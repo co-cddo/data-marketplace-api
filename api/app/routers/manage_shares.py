@@ -13,6 +13,8 @@ router = APIRouter(prefix="/manage-shares", tags=["data share"])
 
 def enrich_share_request(r: dict, org: m.Organisation = None) -> dict:
     sharedata = m.ShareData.model_validate_json(r["sharedata"])
+    sharedata.status = r["status"]
+
     neededBy = sharedata.steps["date"].value
     if not (neededBy["day"] and neededBy["month"] and neededBy["year"]):
         neededBy = "UNREQUESTED"
@@ -31,6 +33,17 @@ def enrich_share_request(r: dict, org: m.Organisation = None) -> dict:
     r["neededBy"] = neededBy
     r["sharedata"] = sharedata
     return r
+
+
+@router.get("/created-requests")
+async def created_requests(
+    user: Annotated[m.RegisteredUser, Depends(authenticated_user)]
+) -> List[m.ShareRequest]:
+    share_requests = share_db.created_requests(user.id)
+    for s in share_requests:
+        s["requesterId"] = user.id
+    share_requests = [enrich_share_request(s) for s in share_requests]
+    return [m.ShareRequest.model_validate(s) for s in share_requests]
 
 
 @router.get("/received-requests")
