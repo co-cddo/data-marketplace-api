@@ -71,7 +71,7 @@ expected_headers = {
         "serviceStatus",
         "endpointURL",
         "endpointDescription",
-        "servesDataset",
+        "servesData",
     ],
 }
 
