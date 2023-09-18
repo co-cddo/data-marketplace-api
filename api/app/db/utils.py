@@ -35,9 +35,9 @@ def _convert_multival_fields_to_lists(asset_result_dict):
     for k in [
         "keyword",
         "alternativeTitle",
-        "relatedResource",
+        "relatedAssets",
         "theme",
-        "servesData",
+        "servesDataset",
         "distribution",
         "mediaType",
         "creator",

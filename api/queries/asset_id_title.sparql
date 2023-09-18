@@ -1,0 +1,10 @@
+PREFIX dct: <http://purl.org/dc/terms/>
+PREFIX cddo_asset: <http://marketplace.cddo.gov.uk/asset/>
+PREFIX cddo_graph: <http://marketplace.cddo.gov.uk/graph/>
+
+SELECT ?id ?title
+FROM cddo_graph:assets
+WHERE {
+    $asset dct:identifier ?id ;
+           dct:title ?title .
+}

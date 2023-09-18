@@ -13,7 +13,7 @@ cddo_distribution:ac7ac094-0098-4849-97b4-f9f65b537651 a dcat:Distribution ;
     dct:license "http://www.nationalarchives.gov.uk/doc/open-government-licence/version/3/" ;
     dct:modified "2023-02-01"^^xsd:date ;
     dct:title "Code-Point Open - CSV GB" ;
-    dcat:accessService "retirement-bereavement-care-address-lookup-location-service-v2.0.0"^^xsd:anyURI ;
+    dcat:accessService cddo_asset:fcbc4d3f-0c05-4857-b0e3-eeec6bfea3a1;
     dcat:byteSize 14330000 ;
     dcat:downloadURL "https://api.os.uk/downloads/v1/products/CodePointOpen/downloads?area=GB&format=CSV&redirect"^^xsd:anyURI ;
     dcat:mediaType <https://w3id.org/uri4uri/mime/text/csv> .

@@ -10,7 +10,7 @@ PREFIX cddo_graph: <http://marketplace.cddo.gov.uk/graph/>
 
 SELECT ?resourceUri ?updateFrequency ?endpointDescription ?endpointURL ?serviceStatus ?serviceType ?accessRights
 ?contactName ?contactEmail ?contactAddress ?contactTelephone ?created ?description ?issued
-?licence ?modified ?organisation ?securityClassification ?summary ?title ?type ?catalogueCreated ?catalogueModified ?creator ?keyword ?alternativeTitle ?relatedResource ?theme ?servesData ?distribution ?externalIdentifier
+?licence ?modified ?organisation ?securityClassification ?summary ?title ?type ?catalogueCreated ?catalogueModified ?creator ?keyword ?alternativeTitle ?relatedAssets ?theme ?servesDataset ?distribution ?externalIdentifier
 FROM cddo_graph:assets
 WHERE {{
 ?resourceUri dct:identifier "$asset_id" ;
@@ -30,7 +30,7 @@ WHERE {{
   OPTIONAL {{ ?resourceUri dcat:distribution ?distribution }}.
   OPTIONAL {{ ?resourceUri dcat:endpointDescription ?endpointDescription }}.
   OPTIONAL {{ ?resourceUri dcat:endpointURL ?endpointURL }}.
-  OPTIONAL {{ ?resourceUri dcat:servesData ?servesData }} .
+  OPTIONAL {{ ?resourceUri dcat:servesDataset ?servesDataset }} .
   OPTIONAL {{ ?resourceUri adms:status ?serviceStatus }} .
   OPTIONAL {{ ?resourceUri dct:type ?serviceType }} .
   OPTIONAL {{ ?resourceUri dct:accessRights ?accessRights }} .
@@ -41,7 +41,7 @@ WHERE {{
   OPTIONAL {{ ?resourceUri dct:creator ?creator }} .
   OPTIONAL {{ ?resourceUri dcat:keyword ?keyword }} .
   OPTIONAL {{ ?resourceUri dct:alternative ?alternativeTitle }} .
-  OPTIONAL {{ ?resourceUri dct:relation ?relatedResource }} .
+  OPTIONAL {{ ?resourceUri dct:relation ?relatedAssets }} .
   OPTIONAL {{ ?resourceUri dcat:theme ?themeURI }
             { ?themeURI skos:prefLabel ?theme }} .
   OPTIONAL {{ ?resourceUri skos:notation ?externalIdentifier}}

@@ -151,6 +151,11 @@ class BaseAssetSummary(BaseModel):
         return self
 
 
+class AssetForHref(BaseModel):
+    identifier: str
+    title: str
+
+
 class BaseAsset(BaseAssetSummary):
     accessRights: rightsStatement | None = None
     alternativeTitle: List[str] | None = []
@@ -159,7 +164,7 @@ class BaseAsset(BaseAssetSummary):
     issued: PastDate | None = None
     keyword: List[str] | None = []
     licence: AnyUrl
-    relatedAssets: List[AnyUrl] | None = []
+    relatedAssets: List[AnyUrl | AssetForHref] | None = []
     securityClassification: Literal["OFFICIAL"]
     summary: str | None = None
     version: str | None = "1.0"
@@ -253,7 +258,7 @@ class DatasetResponse(Dataset, OutputAssetInfo):
 class DataService(BaseAsset):
     endpointDescription: AnyUrl
     endpointURL: str | None = None
-    servesData: list[AnyUrl]
+    servesDataset: list[AnyUrl | AssetForHref]
     serviceStatus: ServiceStatus
     serviceType: ServiceType
     type: Literal[assetType.service]
@@ -288,7 +293,7 @@ class DataServiceResponse(DataService, OutputAssetInfo):
                     ][0],
                     "relatedAssets": [],
                     "securityClassification": "OFFICIAL",
-                    "servesData": [
+                    "servesDataset": [
                         "https://www.data.gov.uk/dataset/2dfb82b4-741a-4b93-807e-11abb4bb0875/os-postcodes-data",
                         "https://www.data.gov.uk/dataset/03d48dba-529b-4bd5-93a5-6d41d1b20ff9/national-address-gazetteer",
                         "https://www.data.gov.uk/dataset/92b32629-8ad4-43cb-9952-7d104971fa12/one-scotland-gazetteer",
