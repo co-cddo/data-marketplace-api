@@ -12,7 +12,7 @@ from pydantic import (
 )
 from pydantic.functional_validators import AfterValidator
 from pydantic.networks import AnyUrl
-from typing import List, Literal, Any, Optional, Annotated
+from typing import List, Literal, Any, Optional, Annotated, Union
 import uuid
 
 
@@ -442,14 +442,20 @@ class UpsertShareDataRequest(BaseModel):
     sharedata: ShareData
 
 
-ShareRequestStatus = Literal[
-    "NOT STARTED",
-    "IN PROGRESS",
-    "AWAITING REVIEW",
-    "RETURNED",
+ShareRequestDecisionStatus = Literal[
     "IN REVIEW",
+    "RETURNED",
     "ACCEPTED",
     "REJECTED",
+]
+
+ShareRequestStatus = Union[
+    ShareRequestDecisionStatus,
+    Literal[
+        "NOT STARTED",
+        "IN PROGRESS",
+        "AWAITING REVIEW",
+    ],
 ]
 
 
@@ -538,5 +544,5 @@ class ReviewRequest(BaseModel):
 
 
 class DecisionRequest(BaseModel):
-    status: ShareRequestStatus
+    status: ShareRequestDecisionStatus
     decisionNotes: str
