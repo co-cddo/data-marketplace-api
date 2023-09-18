@@ -12,7 +12,7 @@ from pydantic import (
 )
 from pydantic.functional_validators import AfterValidator
 from pydantic.networks import AnyUrl
-from typing import List, Literal, Any, Optional, Annotated
+from typing import List, Literal, Any, Optional, Annotated, Union
 import uuid
 
 
@@ -442,23 +442,40 @@ class UpsertShareDataRequest(BaseModel):
     sharedata: ShareData
 
 
-class ShareRequest(BaseModel):
-    requestId: str
-    assetTitle: str
-    requesterEmail: EmailStr
-    requestingOrg: str
-    status: Literal[
+ShareRequestDecisionStatus = Literal[
+    "IN REVIEW",
+    "RETURNED",
+    "ACCEPTED",
+    "REJECTED",
+]
+
+ShareRequestStatus = Union[
+    ShareRequestDecisionStatus,
+    Literal[
         "NOT STARTED",
         "IN PROGRESS",
         "AWAITING REVIEW",
-        "RETURNED",
-        "IN REVIEW",
-        "ACCEPTED",
-        "REJECTED",
-    ]
+    ],
+]
+
+
+class ShareRequest(BaseModel):
+    requestId: str
+    assetTitle: str
+    requesterId: str
+    requesterEmail: EmailStr
+    requestingOrg: str
+    assetPublisher: Organisation
     received: datetime
-    sharedata: ShareData
+    status: ShareRequestStatus
+    sharedata: Optional[ShareData] = None
     neededBy: date | Literal["UNREQUESTED"]
+    decisionNotes: Optional[str] = None
+    decisionDate: Optional[date] = None
+
+
+class ShareRequestWithExtras(ShareRequest):
+    reviewNotes: Optional[str] = None
 
 
 class CreateDatasetBody(CreateAssetBody, Dataset):
@@ -520,3 +537,12 @@ class LoginResponse(BaseModel):
 class CompleteProfileRequest(BaseModel):
     organisation: str
     jobTitle: str
+
+
+class ReviewRequest(BaseModel):
+    notes: str
+
+
+class DecisionRequest(BaseModel):
+    status: ShareRequestDecisionStatus
+    decisionNotes: str
