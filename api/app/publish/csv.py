@@ -173,7 +173,11 @@ def _aggregate_distributions(row_dicts):
     data = []
     errors = []
     for assetID, rows in groupby(row_dicts, lambda r: r["identifier"]):
-        ds_rows = [utils.remove_keys(r, distribution_headers) for r in rows]
+        ds_rows = []
+        distributions = []
+        for row in rows:
+            ds_rows.append(utils.remove_keys(row, distribution_headers))
+            distributions.append(_distribution(row))
         if not all(r == ds_rows[0] for r in ds_rows):
             errors.append(
                 {
@@ -184,9 +188,7 @@ def _aggregate_distributions(row_dicts):
                 }
             )
         else:
-            data.append(
-                {**ds_rows[0], "distributions": [_distribution(r) for r in row_dicts]}
-            )
+            data.append({**ds_rows[0], "distributions": distributions})
     return data, errors
 
 
