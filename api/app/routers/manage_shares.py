@@ -123,7 +123,10 @@ async def request_decision(
     if share_request["assetPublisher"].slug != user.org.slug:
         raise HTTPException(403, "You are not authorised to review this request")
 
+    decisionNotes = body.decisionNotes.replace("\\", "\\\\").replace('"', '\\"')
+    decisionNotes = "\\n".join(l for l in decisionNotes.splitlines())
+
     result = share_db.upsert_decision(
-        request_id, status=body.status, decisionNotes=body.decisionNotes
+        request_id, status=body.status, decisionNotes=decisionNotes
     )
     return m.SPARQLUpdate.model_validate(result)
