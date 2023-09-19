@@ -9,13 +9,13 @@ FROM cddo_graph:assets
 WHERE {{
     VALUES ?distribution { $distribution }
     ?distribution dct:title ?title ;
-                  dct:modified ?modified ;
                   dcat:mediaType ?mediaTypeUri ;
                   dct:identifier ?identifier ;
                   dct:license ?licence.
     ?mediaTypeUri rdfs:label ?mediaType .
     OPTIONAL {{ ?mediaTypeUri skos:prefLabel ?mediaTypeLabel }}
     OPTIONAL {{ ?distribution dct:issued ?issued }}
+    OPTIONAL {{ ?distribution dct:modified ?modified }}
     OPTIONAL {{ ?distribution dcat:byteSize ?byteSize }}
     OPTIONAL {{ ?distribution skos:notation ?externalIdentifier}}
     OPTIONAL {{ ?distribution dcat:accessService ?accessService}}

@@ -105,20 +105,25 @@ def detail(asset_id: str):
     asset["contactPoint"] = m.ContactPoint.model_validate(contactPoint)
 
     if asset["type"] == m.assetType.dataset:
-        distributions = _fetch_distribution_details(asset["distribution"])
+        distributions = _fetch_distribution_details(asset.get("distribution", []))
         asset["distributions"] = [
             m.DistributionResponse.model_validate(d) for d in distributions
         ]
-    
 
-        relatedAssets = [_get_asset_id_if_exists(r) for r in asset["relatedAssets"]]
+        relatedAssets = [
+            _get_asset_id_if_exists(r) for r in asset.get("relatedAssets", [])
+        ]
         asset["relatedAssets"] = relatedAssets
 
     if asset["type"] == m.assetType.service:
-        relatedAssets = [_get_asset_id_if_exists(r) for r in asset["relatedAssets"]]
+        relatedAssets = [
+            _get_asset_id_if_exists(r) for r in asset.get("relatedAssets", [])
+        ]
         asset["relatedAssets"] = relatedAssets
 
-        servesDataset = [_get_asset_id_if_exists(r) for r in asset["servesDataset"]]
+        servesDataset = [
+            _get_asset_id_if_exists(r) for r in asset.get("servesDataset", [])
+        ]
         asset["servesDataset"] = servesDataset
 
     asset["description"] = _unwrap_markdown(asset["description"])

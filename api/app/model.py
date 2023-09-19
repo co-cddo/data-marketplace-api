@@ -121,12 +121,12 @@ PastDate = Annotated[datetime, AfterValidator(check_date_past)]
 
 class DistributionSummary(BaseModel):
     title: str
-    modified: PastDate
     mediaType: str
+    licence: AnyUrl | None = "http://marketplace.cddo.gov.uk/licence/internal"
+    modified: PastDate | None = None
     accessService: str | None = None
-    externalIdentifier: str
+    externalIdentifier: str | None = None
     issued: PastDate | None = None
-    licence: AnyUrl
     byteSize: PositiveInt | None = None
 
 
@@ -163,7 +163,7 @@ class BaseAsset(BaseAssetSummary):
     description: str
     issued: PastDate | None = None
     keyword: List[str] | None = []
-    licence: AnyUrl
+    licence: AnyUrl | None = "http://marketplace.cddo.gov.uk/licence/internal"
     relatedAssets: List[AnyUrl | AssetForHref] | None = []
     securityClassification: Literal["OFFICIAL"]
     summary: str | None = None
@@ -258,7 +258,7 @@ class DatasetResponse(Dataset, OutputAssetInfo):
 class DataService(BaseAsset):
     endpointDescription: AnyUrl
     endpointURL: str | None = None
-    servesDataset: list[AnyUrl | AssetForHref]
+    servesDataset: list[AnyUrl | AssetForHref] | None = []
     serviceStatus: ServiceStatus
     serviceType: ServiceType
     type: Literal[assetType.service]

@@ -153,7 +153,11 @@ def _distribution(row_dict):
     dist_detail_dict = {
         k.split("distribution_")[1]: row_dict[k] for k in distribution_headers
     }
-    return _cleanup_csv_row_dict(dist_detail_dict)
+    cleaned = _cleanup_csv_row_dict(dist_detail_dict)
+    if "licence" not in cleaned:
+        if row_dict.get("licence"):
+            cleaned["licence"] = row_dict["licence"]
+    return cleaned
 
 
 def _add_contact_point(row_dict):
@@ -211,7 +215,7 @@ def _validate_db_fields(asset):
         errors.append(
             db_validation_error_info("organisationID", asset["organisationID"])
         )
-    for c in asset["creatorID"]:
+    for c in asset.get("creatorID", []):
         if not _lookup_ok(utils.lookup_organisation, c):
             errors.append(db_validation_error_info("creatorID", c))
     if asset["type"] == m.assetType.dataset:
@@ -230,7 +234,7 @@ def _validate_db_fields(asset):
             errors.append(
                 db_validation_error_info("updateFrequency", asset["updateFrequency"])
             )
-    for t in asset["theme"]:
+    for t in asset.get("theme", []):
         if not _lookup_ok(reference_data_validator.theme_uri, t):
             errors.append(db_validation_error_info("theme", t))
     return errors
