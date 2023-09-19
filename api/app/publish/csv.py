@@ -38,6 +38,7 @@ expected_headers = {
         "securityClassification",
         "identifier",
         "relatedResource",
+        "",
         "distribution_title",
         "distribution_accessService",
         "distribution_identifier",
@@ -126,7 +127,7 @@ def _to_row_dicts(csv_file: SpooledTemporaryFile, asset_type: m.assetType):
             },
         }
     rows = [r for r in reader]
-    rowdicts = [{h: r[idx] for idx, h in enumerate(headers)} for r in rows]
+    rowdicts = [{h: r[idx] for idx, h in enumerate(headers) if h != ""} for r in rows]
     return rowdicts, None
 
 
