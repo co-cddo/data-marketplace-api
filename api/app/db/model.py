@@ -40,7 +40,8 @@ def extract_organisation_slug(organisation):
 
 
 def wrap_markdown(markdown_str):
-    return markdown_str.replace("\\", "\\\\").replace('"', '\\"')
+    content = markdown_str.replace("\\", "\\\\").replace('"', '\\"')
+    return "\\n".join(l for l in content.splitlines() if l)
 
 
 class SimpleAttribute:
