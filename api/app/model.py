@@ -471,6 +471,8 @@ class ShareRequest(BaseModel):
     requesterEmail: EmailStr
     requestingOrg: str
     assetPublisher: Organisation
+    publisherContactName: str
+    publisherContactEmail: EmailStr
     received: datetime
     status: ShareRequestStatus
     sharedata: Optional[ShareData] = None
