@@ -99,7 +99,10 @@ async def review_request(
     if share_request["assetPublisher"].slug != user.org.slug:
         raise HTTPException(403, "You are not authorised to review this request")
 
-    result = share_db.upsert_request_notes(request_id, body.notes)
+    reviewNotes = body.notes.replace("\\", "\\\\").replace('"', '\\"')
+    reviewNotes = "\\n".join(l for l in reviewNotes.splitlines())
+
+    result = share_db.upsert_request_notes(request_id, reviewNotes)
 
     return m.SPARQLUpdate.model_validate(result)
 
@@ -120,7 +123,10 @@ async def request_decision(
     if share_request["assetPublisher"].slug != user.org.slug:
         raise HTTPException(403, "You are not authorised to review this request")
 
+    decisionNotes = body.decisionNotes.replace("\\", "\\\\").replace('"', '\\"')
+    decisionNotes = "\\n".join(l for l in decisionNotes.splitlines())
+
     result = share_db.upsert_decision(
-        request_id, status=body.status, decisionNotes=body.decisionNotes
+        request_id, status=body.status, decisionNotes=decisionNotes
     )
     return m.SPARQLUpdate.model_validate(result)
