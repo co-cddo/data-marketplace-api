@@ -77,3 +77,14 @@ def enrich_user_org(user):
     if org:
         u["org"] = lookup_organisation(org)
     return u
+
+
+def wrap_markdown(markdown_str):
+    content = markdown_str.replace("\\", "\\\\").replace('"', '\\"')
+    return "\\n".join(l for l in content.splitlines() if l)
+
+
+def unwrap_markdown(description):
+    if isinstance(description, str):
+        return description.replace('\\"', '"').replace("\\\\", "\\")
+    return description

@@ -78,12 +78,6 @@ def _fetch_distribution_details(distribution_ids):
     return dbutils.aggregate_query_results_by_key(results, group_key="distribution")
 
 
-def _unwrap_markdown(description):
-    if isinstance(description, str):
-        return description.replace('\\"', '"').replace("\\\\", "\\")
-    return description
-
-
 def detail(asset_id: str):
     query_results = assets_db.run_query("asset_detail", asset_id=asset_id)
     asset_result_dicts = dbutils.aggregate_query_results_by_key(
@@ -126,5 +120,5 @@ def detail(asset_id: str):
         ]
         asset["servesDataset"] = servesDataset
 
-    asset["description"] = _unwrap_markdown(asset["description"])
+    asset["description"] = dbutils.unwrap_markdown(asset["description"])
     return asset
