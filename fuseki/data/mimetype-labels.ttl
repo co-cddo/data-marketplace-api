@@ -16,3 +16,7 @@ application:vnd.ms-powerpoint.slideshow.macroenabled.12 skos:prefLabel "PPT" .
 application:vnd.ms-powerpoint.template.macroenabled.12 skos:prefLabel "PPT" .
 text:csv skos:prefLabel "CSV" .
 <https://w3id.org/uri4uri/mime/application/geopackage+sqlite3> skos:prefLabel "GeoPackage" .
+<https://w3id.org/uri4uri/mime/application/gml+xml> skos:prefLabel "GML" .
+<https://w3id.org/uri4uri/mime/application/vnd.google-earth.kml+xml> skos:prefLabel "KML" .
+<https://w3id.org/uri4uri/mime/application/vnd.shp> skos:prefLabel "SHP" .
+<https://w3id.org/uri4uri/mime/application/vnd.oasis.opendocument.spreadsheet> skos:prefLabel "OASIS" .
