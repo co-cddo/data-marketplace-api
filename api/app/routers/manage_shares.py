@@ -7,6 +7,7 @@ from app import utils
 from app import model as m
 from app.db import share as share_db
 from app.auth.jwt_bearer import authenticated_user
+from app.db.utils import wrap_markdown
 
 router = APIRouter(prefix="/manage-shares", tags=["data share"])
 
@@ -99,8 +100,7 @@ async def review_request(
     if share_request["assetPublisher"].slug != user.org.slug:
         raise HTTPException(403, "You are not authorised to review this request")
 
-    reviewNotes = body.notes.replace("\\", "\\\\").replace('"', '\\"')
-    reviewNotes = "\\n".join(l for l in reviewNotes.splitlines())
+    reviewNotes = wrap_markdown(body.notes)
 
     result = share_db.upsert_request_notes(request_id, reviewNotes)
 
@@ -123,8 +123,7 @@ async def request_decision(
     if share_request["assetPublisher"].slug != user.org.slug:
         raise HTTPException(403, "You are not authorised to review this request")
 
-    decisionNotes = body.decisionNotes.replace("\\", "\\\\").replace('"', '\\"')
-    decisionNotes = "\\n".join(l for l in decisionNotes.splitlines())
+    decisionNotes = wrap_markdown(body.decisionNotes)
 
     result = share_db.upsert_decision(
         request_id, status=body.status, decisionNotes=decisionNotes

@@ -6,6 +6,7 @@ from pydantic.networks import AnyUrl
 from datetime import datetime
 from uuid import UUID, uuid4
 from app.db.reference_data import reference_data_validator
+from app.db.utils import wrap_markdown
 
 
 CDDO_ASSET = Namespace("http://marketplace.cddo.gov.uk/asset/")
@@ -37,10 +38,6 @@ def type_uri(type_str):
 
 def extract_organisation_slug(organisation):
     return organisation["slug"]
-
-
-def wrap_markdown(markdown_str):
-    return markdown_str.replace("\\", "\\\\").replace('"', '\\"')
 
 
 class SimpleAttribute:

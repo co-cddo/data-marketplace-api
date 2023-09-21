@@ -38,6 +38,7 @@ expected_headers = {
         "securityClassification",
         "identifier",
         "relatedResource",
+        "",
         "distribution_title",
         "distribution_accessService",
         "distribution_identifier",
@@ -126,7 +127,7 @@ def _to_row_dicts(csv_file: SpooledTemporaryFile, asset_type: m.assetType):
             },
         }
     rows = [r for r in reader]
-    rowdicts = [{h: r[idx] for idx, h in enumerate(headers)} for r in rows]
+    rowdicts = [{h: r[idx] for idx, h in enumerate(headers) if h != ""} for r in rows]
     return rowdicts, None
 
 
@@ -152,7 +153,11 @@ def _distribution(row_dict):
     dist_detail_dict = {
         k.split("distribution_")[1]: row_dict[k] for k in distribution_headers
     }
-    return _cleanup_csv_row_dict(dist_detail_dict)
+    cleaned = _cleanup_csv_row_dict(dist_detail_dict)
+    if "licence" not in cleaned:
+        if row_dict.get("licence"):
+            cleaned["licence"] = row_dict["licence"]
+    return cleaned
 
 
 def _add_contact_point(row_dict):
@@ -173,7 +178,11 @@ def _aggregate_distributions(row_dicts):
     data = []
     errors = []
     for assetID, rows in groupby(row_dicts, lambda r: r["identifier"]):
-        ds_rows = [utils.remove_keys(r, distribution_headers) for r in rows]
+        ds_rows = []
+        distributions = []
+        for row in rows:
+            ds_rows.append(utils.remove_keys(row, distribution_headers))
+            distributions.append(_distribution(row))
         if not all(r == ds_rows[0] for r in ds_rows):
             errors.append(
                 {
@@ -184,9 +193,7 @@ def _aggregate_distributions(row_dicts):
                 }
             )
         else:
-            data.append(
-                {**ds_rows[0], "distributions": [_distribution(r) for r in row_dicts]}
-            )
+            data.append({**ds_rows[0], "distributions": distributions})
     return data, errors
 
 
@@ -208,7 +215,7 @@ def _validate_db_fields(asset):
         errors.append(
             db_validation_error_info("organisationID", asset["organisationID"])
         )
-    for c in asset["creatorID"]:
+    for c in asset.get("creatorID", []):
         if not _lookup_ok(utils.lookup_organisation, c):
             errors.append(db_validation_error_info("creatorID", c))
     if asset["type"] == m.assetType.dataset:
@@ -227,7 +234,7 @@ def _validate_db_fields(asset):
             errors.append(
                 db_validation_error_info("updateFrequency", asset["updateFrequency"])
             )
-    for t in asset["theme"]:
+    for t in asset.get("theme", []):
         if not _lookup_ok(reference_data_validator.theme_uri, t):
             errors.append(db_validation_error_info("theme", t))
     return errors
