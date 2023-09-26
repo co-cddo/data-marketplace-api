@@ -19,4 +19,4 @@ text:csv skos:prefLabel "CSV" .
 <https://w3id.org/uri4uri/mime/application/gml+xml> skos:prefLabel "GML" .
 <https://w3id.org/uri4uri/mime/application/vnd.google-earth.kml+xml> skos:prefLabel "KML" .
 <https://w3id.org/uri4uri/mime/application/vnd.shp> skos:prefLabel "SHP" .
-<https://w3id.org/uri4uri/mime/application/vnd.oasis.opendocument.spreadsheet> skos:prefLabel "OASIS" .
+<https://w3id.org/uri4uri/mime/application/vnd.oasis.opendocument.spreadsheet> skos:prefLabel "ODS" .
