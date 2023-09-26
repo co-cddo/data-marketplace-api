@@ -438,9 +438,9 @@ class ShareData(BaseModel):
     ownedBy: str
     completedSections: int
     status: str
+    contactPoint: ContactPoint | None = None
     overviewSections: dict[str, ShareDataSection]
     steps: dict[str, ShareDataStep]
-    stepHistory: list[str] | None
 
 
 class UpsertShareDataRequest(BaseModel):
