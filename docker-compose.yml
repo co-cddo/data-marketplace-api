@@ -27,6 +27,8 @@ services:
     build:
       context: fuseki
       dockerfile: Dockerfile
+    environment:
+      - ADMIN_PASSWORD
     # volumes:
       # - fuseki_storage:/fuseki-base/databases
     ports:

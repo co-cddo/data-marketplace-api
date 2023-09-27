@@ -1,5 +1,9 @@
 FROM secoresearch/fuseki
 
+USER root
+RUN apt-get install -qq curl
+USER 9008
+
 COPY --chown=9008 data /tmp/data
 COPY assembler.ttl /fuseki-base/configuration/assembler.ttl
 
