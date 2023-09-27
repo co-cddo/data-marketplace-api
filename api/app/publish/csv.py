@@ -275,6 +275,7 @@ def parse_input_file(
                     else d["title"],
                     "scope": errorScope.asset,
                     "sub_errors": validation_errors,
+                    "extras": {"input_data": d},
                 }
             )
     return validated_data

@@ -82,7 +82,7 @@ def validation_error_info(e: ValidationError) -> List[ErrorInfo]:
             {
                 "scope": errorScope.field,
                 "location": field_name,
-                "value": err["input"],
+                "value": "" if err["type"] == "missing" else err["input"],
                 **info,
             }
         )
