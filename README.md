@@ -15,6 +15,7 @@ This repository contains everything you need to build the API used for the MVP o
     - [`/publish/verify`](#publishverify)
 - [Build and run](#build-and-run)
   - [Prerequisites](#prerequisites)
+    - [Python version](#python-version)
     - [just (required)](#just-required)
     - [Poetry (required)](#poetry-required)
     - [docker (required)](#docker-required)
@@ -107,6 +108,12 @@ There was a requirement to publish multiple data assets from a pair of CSV files
 
 ### Prerequisites
 
+<!-- TOC --><a name="python-version"></a>
+
+#### Python version
+
+The Python version needs to match that specified in [api/pyproject.toml](api/pyproject.toml) before the other prerequisites such as Poetry are installed.
+
 <!-- TOC --><a name="just-required"></a>
 
 #### just (required)
@@ -157,7 +164,7 @@ Installation instructions are [here](https://github.com/mikefarah/yq/#install) (
 
 ##### Environment variables
 
-You'll need to set up a `.env` file by copying `.env.example` and adding the following variables:
+You'll need to set up a `.env` file by copying `.env.template` and adding the following variables:
 
 - `OPS_API_KEY` is the key that you need to pass to endpoints that require super-admin permissions, such as those that manage users. Generate one with `openssl rand -hex 32`.
 - `JWT_AUD` is the audience claim for the gov.uk single sign on, which is needed to decode user JWT tokens. If you've logged in to the front end via SSO, you can find this keyed under `aud` within the response.
