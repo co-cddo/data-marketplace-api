@@ -93,9 +93,10 @@ class AdminAccessRights(MemberAccessRights):
         return self.org_id == org_slug
 
 
-# Ops admin can do nothing so far, but we'll add user stuff here
 class OpsAdminAccessRights(UserAccessRights):
-    pass
+    # OPS Admin can publish to any organisation
+    def can_add_asset(self, org_slug):
+        return True
 
 
 class UserWithAccessRights:
