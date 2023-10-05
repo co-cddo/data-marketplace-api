@@ -66,7 +66,7 @@ def complete_profile(user_id, org, jobTitle):
 
 def edit_permissions(user_id, permissions_to_add, permissions_to_remove):
     to_add = [f'"{val}"' for val in permissions_to_add]
-    res = {"status": 200, "message": "no update required"}
+    res = {"statusCode": 200, "message": "no update required"}
     if permissions_to_remove != []:
         res = users_db.run_update(
             "remove_permissions",
