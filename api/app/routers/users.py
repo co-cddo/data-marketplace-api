@@ -166,6 +166,9 @@ async def edit_user_permissions(
     user_id: str,
     req: m.EditUserPermissionRequest,
 ):
+    if not is_ops:
+        raise HTTPException(status_code=401, detail="Unauthorised")
+
     # If an email address has been provided, turn it into an ID
     if "@" in user_id:
         user_id = utils.user_id_from_email(user_id)
