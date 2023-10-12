@@ -91,14 +91,6 @@ class ContactPoint(BaseModel):
     telephone: str | None = None
     address: str | None = None
 
-    @field_validator("email")
-    @classmethod
-    def email_must_be_gov_uk(cls, v: EmailStr) -> EmailStr:
-        if v.endswith(".gov.uk"):
-            return v
-        else:
-            raise ValueError("must be a .gov.uk domain")
-
     model_config = {
         "json_schema_extra": {
             "examples": [
