@@ -17,3 +17,6 @@ setup-hooks:
 
 generate-spec-file:
   curl localhost:8000/openapi.json | yq eval -P > openapi.yaml
+
+test:
+  cd api/test && hurl --test --variables-file=.env admin_routes.hurl
