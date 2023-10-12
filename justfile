@@ -3,7 +3,10 @@ run:
   docker compose up --build
 
 shell-fuseki:
-  docker compose exec fuseki /bin/sh
+  docker compose exec fuseki /bin/bash
+  
+copy-backups:
+  docker compose cp fuseki:/fuseki-base/backups .
 
 shell-api:
   docker compose exec api /bin/sh
