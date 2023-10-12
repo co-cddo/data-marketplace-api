@@ -85,7 +85,7 @@ def lookup_organisation(org_id: str) -> m.Organisation:
     try:
         org_data = orgs[org_id]
     except:
-        raise ValueError("Organisation does not exist")
+        raise ValueError(f'Organisation "{org_id}" does not exist')
     return m.Organisation.model_validate(org_data)
 
 

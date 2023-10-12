@@ -22,6 +22,13 @@ class rightsStatement(str, Enum):
     commercial = "COMMERCIAL"
 
 
+class securityClassification(str, Enum):
+    official = "OFFICIAL"
+    secret = "SECRET"
+    top_secret = "TOP_SECRET"
+    not_applicable = "NOT_APPLICABLE"
+
+
 class assetType(str, Enum):
     service = "DataService"
     dataset = "Dataset"
@@ -117,7 +124,7 @@ class DistributionSummary(BaseModel):
     licence: AnyUrl | None = "http://marketplace.cddo.gov.uk/licence/internal"
     modified: PastDate | None = None
     accessService: str | None = None
-    externalIdentifier: str | None = None
+    externalIdentifier: str
     issued: PastDate | None = None
     byteSize: PositiveInt | None = None
 
@@ -130,7 +137,7 @@ class DistributionResponse(DistributionSummary):
 class BaseAssetSummary(BaseModel):
     created: PastDate | None = None
     summary: str
-    modified: PastDate | None = None
+    modified: PastDate
     title: str
     type: assetType
     theme: List[str] | None = None
@@ -149,7 +156,7 @@ class AssetForHref(BaseModel):
 
 
 class BaseAsset(BaseAssetSummary):
-    accessRights: rightsStatement | None = None
+    accessRights: rightsStatement
     alternativeTitle: List[str] | None = []
     contactPoint: ContactPoint
     description: str
@@ -157,7 +164,7 @@ class BaseAsset(BaseAssetSummary):
     keyword: List[str] | None = []
     licence: AnyUrl | None = "http://marketplace.cddo.gov.uk/licence/internal"
     relatedAssets: List[AnyUrl | AssetForHref] | None = []
-    securityClassification: Literal["OFFICIAL"]
+    securityClassification: securityClassification
     summary: str | None = None
     version: str | None = "1.0"
     externalIdentifier: str
