@@ -95,7 +95,7 @@ keys_to_rename = {
     "identifier": "externalIdentifier",
     "servesData": "servesDataset",
 }
-key_to_rename_inverse = {v: k for k, v in keys_to_rename.items()}
+keys_to_rename_inverse = {v: k for k, v in keys_to_rename.items()}
 
 date_fields = ["issued", "modified", "created"]
 
@@ -221,7 +221,7 @@ def _validate_db_fields(asset):
     ):
         errors.append(
             db_validation_error_info(
-                key_to_rename_inverse["organisationID"],
+                keys_to_rename_inverse["organisationID"],
                 asset.get("organisationID", ""),
                 err
                 + '. Please use a <a href="https://co-cddo.github.io/ukgov-metadata-exchange-model/OrganisationValues/"> valid organsation</a>.',
@@ -231,7 +231,7 @@ def _validate_db_fields(asset):
         if err := _validation_error(utils.lookup_organisation, c):
             errors.append(
                 db_validation_error_info(
-                    key_to_rename_inverse["creatorID"],
+                    keys_to_rename_inverse["creatorID"],
                     c,
                     err
                     + '. Please use a <a href="https://co-cddo.github.io/ukgov-metadata-exchange-model/OrganisationValues/"> valid organsation</a>.',
@@ -288,7 +288,7 @@ def parse_input_file(
             validated = model.model_validate(d)
         except ValidationError as e:
             validation_errors = validation_errors + validation_error_info(
-                e, key_to_rename_inverse
+                e, keys_to_rename_inverse
             )
         if validation_errors == []:
             validated_data.append(validated)
