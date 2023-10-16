@@ -66,10 +66,12 @@ class ErrorContainer:
         return [self.__model_validate_error(e) for e in self.__errors]
 
 
-def validation_error_info(e: ValidationError) -> List[ErrorInfo]:
+def validation_error_info(e: ValidationError, renamer={}) -> List[ErrorInfo]:
     output = []
     for err in e.errors():
-        field_name = ".".join([str(field) for field in err["loc"]])
+        field_name = ".".join(
+            [renamer.get(str(field), str(field)) for field in err["loc"]]
+        )
         if err["type"] == "enum":
             info = {
                 "message": "Invalid option for field",
@@ -89,12 +91,12 @@ def validation_error_info(e: ValidationError) -> List[ErrorInfo]:
     return output
 
 
-def db_validation_error_info(field_name, value) -> ErrorInfo:
+def db_validation_error_info(field_name, value, message=None) -> ErrorInfo:
     return {
         "scope": errorScope.field,
         "location": field_name,
         "value": value,
-        "message": "Invalid option - no matching record found in database",
+        "message": message or "Invalid option - no matching record found in database",
     }
 
 

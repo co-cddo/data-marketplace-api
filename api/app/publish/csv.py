@@ -4,6 +4,7 @@ from tempfile import SpooledTemporaryFile
 from app import model as m
 from app import utils
 from itertools import groupby
+import dateparser
 from datetime import datetime
 from pydantic import ValidationError
 from app.publish.errors import (
@@ -94,6 +95,8 @@ keys_to_rename = {
     "identifier": "externalIdentifier",
     "servesData": "servesDataset",
 }
+keys_to_rename_inverse = {v: k for k, v in keys_to_rename.items()}
+
 date_fields = ["issued", "modified", "created"]
 
 list_fields = [
@@ -136,8 +139,10 @@ def _cleanup_csv_row_dict(row_dict):
     for date_field in date_fields:
         if date_field in row_dict:
             try:
-                row_dict[date_field] = datetime.fromisoformat(row_dict[date_field])
-            except ValueError:
+                parsed_date = dateparser.parse(row_dict[date_field], locales=["en-GB"])
+                row_dict[date_field] = parsed_date
+            except ValueError as e:
+                print(e)
                 pass  # this is OK as we're going to validate it anyway
     for old_key, new_key in keys_to_rename.items():
         if old_key in row_dict:
@@ -197,46 +202,65 @@ def _aggregate_distributions(row_dicts):
     return data, errors
 
 
-def _lookup_ok(lookup_fn, value):
-    "Return true if the lookup function returned something for the value"
+def _validation_error(lookup_fn, value):
     if value is None:
-        return True
+        return None
     try:
-        return bool(lookup_fn(value))
-    except ValueError:
-        return False
+        lookup_fn(value)
+        return None
+    except ValueError as e:
+        return str(e)
 
 
 def _validate_db_fields(asset):
     """Check that all fields referencing other entities in the database refer to one that exists,
     and return a list of errors for those that dont"""
     errors = []
-    if not _lookup_ok(utils.lookup_organisation, asset["organisationID"]):
+    if err := _validation_error(
+        utils.lookup_organisation, asset.get("organisationID", None)
+    ):
         errors.append(
-            db_validation_error_info("organisationID", asset["organisationID"])
+            db_validation_error_info(
+                keys_to_rename_inverse["organisationID"],
+                asset.get("organisationID", ""),
+                err
+                + '. Please use a <a href="https://co-cddo.github.io/ukgov-metadata-exchange-model/OrganisationValues/"> valid organsation</a>.',
+            )
         )
     for c in asset.get("creatorID", []):
-        if not _lookup_ok(utils.lookup_organisation, c):
-            errors.append(db_validation_error_info("creatorID", c))
+        if err := _validation_error(utils.lookup_organisation, c):
+            errors.append(
+                db_validation_error_info(
+                    keys_to_rename_inverse["creatorID"],
+                    c,
+                    err
+                    + '. Please use a <a href="https://co-cddo.github.io/ukgov-metadata-exchange-model/OrganisationValues/"> valid organsation</a>.',
+                )
+            )
     if asset["type"] == m.assetType.dataset:
-        for dist in asset["distributions"]:
-            if not _lookup_ok(
-                reference_data_validator.media_type_uri, dist["mediaType"]
+        for dist in asset.get("distributions", []):
+            if err := _validation_error(
+                reference_data_validator.media_type_uri, dist.get("mediaType", None)
             ):
                 errors.append(
                     db_validation_error_info(
-                        "distribution.mediaType", dist["mediaType"]
+                        "distribution.mediaType", dist.get("mediaType", ""), err
                     )
                 )
-        if not _lookup_ok(
-            reference_data_validator.update_freq_url, asset["updateFrequency"]
+        if err := _validation_error(
+            reference_data_validator.update_freq_url, asset.get("updateFrequency", None)
         ):
             errors.append(
-                db_validation_error_info("updateFrequency", asset["updateFrequency"])
+                db_validation_error_info(
+                    "updateFrequency",
+                    asset.get("updateFrequency", ""),
+                    err
+                    + '. Please use a <a href="https://co-cddo.github.io/ukgov-metadata-exchange-model/FrequencyValues/">valid update frequency</a>.',
+                )
             )
     for t in asset.get("theme", []):
-        if not _lookup_ok(reference_data_validator.theme_uri, t):
-            errors.append(db_validation_error_info("theme", t))
+        if err := _validation_error(reference_data_validator.theme_uri, t):
+            errors.append(db_validation_error_info("theme", t), err)
     return errors
 
 
@@ -263,16 +287,18 @@ def parse_input_file(
         try:
             validated = model.model_validate(d)
         except ValidationError as e:
-            validation_errors = validation_errors + validation_error_info(e)
+            validation_errors = validation_errors + validation_error_info(
+                e, keys_to_rename_inverse
+            )
         if validation_errors == []:
             validated_data.append(validated)
         else:
             error_ctx.add(
                 {
                     "message": "Validation error for asset",
-                    "location": d["externalIdentifier"]
-                    if d["externalIdentifier"] is not None
-                    else d["title"],
+                    "location": d.get(
+                        "externalIdentifier", d.get("title", "No title provided")
+                    ),
                     "scope": errorScope.asset,
                     "sub_errors": validation_errors,
                     "extras": {"input_data": d},

@@ -38,9 +38,7 @@ class ReferenceDataValidator:
         try:
             suffix = update_freq_notation.split("freq:")[1]
         except:
-            raise ValueError(
-                f"Frequency should be of the format freq:<frequency> - {update_freq_notation}"
-            )
+            raise ValueError(f"Invalid update frequency: {update_freq_notation}")
         uri = FREQ[suffix]
         if uri in self._update_frequencies:
             return uri
