@@ -121,7 +121,7 @@ PastDate = Annotated[datetime, AfterValidator(check_date_past)]
 class DistributionSummary(BaseModel):
     title: str
     mediaType: str
-    licence: AnyUrl | None = "http://marketplace.cddo.gov.uk/licence/internal"
+    licence: str | None = "http://marketplace.cddo.gov.uk/licence/internal"
     modified: PastDate | None = None
     accessService: str | None = None
     externalIdentifier: str | None = None
