@@ -162,7 +162,9 @@ class BaseAsset(BaseAssetSummary):
     description: str
     issued: PastDate | None = None
     keyword: List[str] | None = []
-    licence: AnyUrl | None = "http://marketplace.cddo.gov.uk/licence/internal"
+    licence: AnyUrl | Literal[
+        "DATA_SHARE_REQUEST"
+    ] | None = "http://marketplace.cddo.gov.uk/licence/internal"
     relatedAssets: List[AnyUrl | AssetForHref] | None = []
     securityClassification: securityClassification
     summary: str | None = None
