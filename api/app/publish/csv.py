@@ -265,7 +265,7 @@ def _validate_db_fields(asset):
             )
     for t in asset.get("theme", []):
         if err := _validation_error(reference_data_validator.theme_uri, t):
-            errors.append(db_validation_error_info("theme", t), err)
+            errors.append(db_validation_error_info("theme", t, err))
     return errors
 
 
