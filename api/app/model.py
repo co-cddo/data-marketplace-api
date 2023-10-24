@@ -124,7 +124,7 @@ class DistributionSummary(BaseModel):
     licence: AnyUrl | None = "http://marketplace.cddo.gov.uk/licence/internal"
     modified: PastDate | None = None
     accessService: str | None = None
-    externalIdentifier: str
+    externalIdentifier: str | None = None
     issued: PastDate | None = None
     byteSize: PositiveInt | None = None
 
