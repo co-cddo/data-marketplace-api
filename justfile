@@ -19,4 +19,4 @@ generate-spec-file:
   curl localhost:8000/openapi.json | yq eval -P > openapi.yaml
 
 test:
-  cd api/test && hurl --test --variables-file=.env admin_routes.hurl
+  cd api/test && hurl --test --variables-file=.env admin_routes.hurl && hurl --test --variables-file=.env asset_details.hurl
