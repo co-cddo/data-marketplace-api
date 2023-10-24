@@ -166,7 +166,7 @@ class BaseAsset(BaseAssetSummary):
     relatedAssets: List[AnyUrl | AssetForHref] | None = []
     securityClassification: securityClassification
     summary: str | None = None
-    version: str | None = "1.0"
+    version: str
     externalIdentifier: str
 
     class Config:
