@@ -145,6 +145,9 @@ def _cleanup_csv_row_dict(row_dict):
                     parsed_date = dateparser.parse(
                         row_dict[date_field], locales=["en-GB"]
                     )
+                    if not parsed_date:
+                        parsed_date = dateparser.parse(row_dict[date_field])
+
                 row_dict[date_field] = parsed_date
             except ValueError as e:
                 print(e)
