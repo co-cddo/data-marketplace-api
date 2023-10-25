@@ -54,9 +54,7 @@ def create_assets(assets: List[m.CreateDatasetBody | m.CreateDataServiceBody]):
                 {
                     "message": "Can't store asset data",
                     "scope": errorScope.asset,
-                    "location": a["externalIdentifier"]
-                    if a["externalIdentifier"] is not None
-                    else a["title"],
+                    "location": a.get("externalIdentifier", a.get("title")),
                     "extras": {"error": str(e)},
                 }
             )

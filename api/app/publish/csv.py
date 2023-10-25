@@ -139,7 +139,15 @@ def _cleanup_csv_row_dict(row_dict):
     for date_field in date_fields:
         if date_field in row_dict:
             try:
-                parsed_date = dateparser.parse(row_dict[date_field], locales=["en-GB"])
+                try:
+                    parsed_date = datetime.fromisoformat(row_dict[date_field])
+                except ValueError:
+                    parsed_date = dateparser.parse(
+                        row_dict[date_field], locales=["en-GB"]
+                    )
+                    if not parsed_date:
+                        parsed_date = dateparser.parse(row_dict[date_field])
+
                 row_dict[date_field] = parsed_date
             except ValueError as e:
                 print(e)
@@ -260,7 +268,7 @@ def _validate_db_fields(asset):
             )
     for t in asset.get("theme", []):
         if err := _validation_error(reference_data_validator.theme_uri, t):
-            errors.append(db_validation_error_info("theme", t), err)
+            errors.append(db_validation_error_info("theme", t, err))
     return errors
 
 

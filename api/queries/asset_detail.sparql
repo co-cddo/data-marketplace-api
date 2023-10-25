@@ -10,7 +10,7 @@ PREFIX cddo_graph: <http://marketplace.cddo.gov.uk/graph/>
 
 SELECT ?resourceUri ?updateFrequency ?endpointDescription ?endpointURL ?serviceStatus ?serviceType ?accessRights
 ?contactName ?contactEmail ?contactAddress ?contactTelephone ?created ?description ?issued
-?licence ?modified ?organisation ?securityClassification ?summary ?title ?type ?catalogueCreated ?catalogueModified ?creator ?keyword ?alternativeTitle ?relatedAssets ?theme ?servesDataset ?distribution ?externalIdentifier
+?licence ?modified ?organisation ?securityClassification ?summary ?title ?type ?version ?catalogueCreated ?catalogueModified ?creator ?keyword ?alternativeTitle ?relatedAssets ?theme ?servesDataset ?distribution ?externalIdentifier
 FROM cddo_graph:assets
 WHERE {{
 ?resourceUri dct:identifier "$asset_id" ;
