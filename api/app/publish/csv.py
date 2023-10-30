@@ -252,7 +252,10 @@ def _validate_db_fields(asset):
             ):
                 errors.append(
                     db_validation_error_info(
-                        "distribution.mediaType", dist.get("mediaType", ""), err
+                        "distribution.mediaType",
+                        dist.get("mediaType", ""),
+                        err
+                        + '. Please use a <a href="https://co-cddo.github.io/ukgov-metadata-exchange-model/mediaType/"> valid mediaType</a>.',
                     )
                 )
         if err := _validation_error(
