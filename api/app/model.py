@@ -552,3 +552,8 @@ class ReviewRequest(BaseModel):
 class DecisionRequest(BaseModel):
     status: ShareRequestDecisionStatus
     decisionNotes: str
+
+
+class AssetCountsResponse(BaseModel):
+    Dataset: int
+    DataService: int

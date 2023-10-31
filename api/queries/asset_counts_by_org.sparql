@@ -1,0 +1,13 @@
+PREFIX cddo_graph: <http://marketplace.cddo.gov.uk/graph/>
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+PREFIX dct: <http://purl.org/dc/terms/>
+
+SELECT ?assetLabel (COUNT(?assetLabel) as ?count)
+FROM cddo_graph:assets
+WHERE {
+  ?asset a ?assetType ;
+  		 dct:publisher "$org".
+
+  ?assetType rdfs:label ?assetLabel.
+}
+GROUP BY ?assetLabel

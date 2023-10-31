@@ -122,3 +122,8 @@ def detail(asset_id: str):
 
     asset["description"] = dbutils.unwrap_markdown(asset["description"])
     return asset
+
+
+def counts_by_org(org: str):
+    query_results = assets_db.run_query("asset_counts_by_org", org=org)
+    return query_results
