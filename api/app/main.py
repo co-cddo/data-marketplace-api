@@ -16,7 +16,7 @@ from app import utils
 from app import model as m
 from app.db import asset as asset_db, user as user_db, share as share_db
 from app.publish import csv as pubcsv, response as pubres, create_asset as publish
-from app.auth.jwt_bearer import JWTBearer
+from app.auth.jwt_bearer import JWTBearer, authenticated_user
 from app.routers.users import router as users_router
 from app.routers.manage_shares import router as shares_router
 
@@ -100,6 +100,22 @@ async def upsert_sharedata(
     user_id = utils.user_id_from_email(jwt.get("email"))
     res = share_db.upsert_sharedata(user_id, req.sharedata)
     return res
+
+
+@app.get("/asset-counts")
+async def asset_counts(
+    user: Annotated[m.RegisteredUser, Depends(authenticated_user)]
+) -> m.AssetCountsResponse:
+    results_dicts = asset_db.counts_by_org(user.org.slug)
+
+    counts = {"Dataset": 0, "DataService": 0}
+    for asset_type in counts.keys():
+        for asset in results_dicts:
+            if asset["assetLabel"] == asset_type:
+                counts[asset_type] = asset["count"]
+                break
+
+    return m.AssetCountsResponse.model_validate(counts)
 
 
 @app.post("/publish", tags=["data"])
